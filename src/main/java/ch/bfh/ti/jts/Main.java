@@ -1,12 +1,24 @@
 package ch.bfh.ti.jts;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.UIManager;
+import ch.bfh.ti.jts.gui.App;
+
 public class Main
 {
-
    public static void main(String[] args)
    {
-      // TODO Auto-generated method stub
-
+      try
+      {
+         // set look and feel to native
+         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      }
+      catch (Exception e)
+      {
+         Logger.getLogger(Main.class.getName()).log(Level.WARNING, null, e);         
+      }
+      
+      new App().run();
    }
-
 }

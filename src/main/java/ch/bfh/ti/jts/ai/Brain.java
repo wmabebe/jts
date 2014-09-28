@@ -8,9 +8,15 @@ public abstract class Brain
    
    public Brain(Agent agent)
    {
-      if (agent == null) throw new IllegalArgumentException();
+      if (agent == null) throw new IllegalArgumentException("agent is null");
       
       this.agent = agent;
+      this.agent.setBrain(this);
+   }
+   
+   public Agent getAgent()
+   {
+      return agent;
    }
    
    public abstract Decision think();
