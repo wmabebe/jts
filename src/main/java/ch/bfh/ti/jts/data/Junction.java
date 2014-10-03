@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -47,5 +48,10 @@ public class Junction extends Element {
         g.setStroke(new BasicStroke(1));
         g.setColor(Color.BLACK);
         g.fill(shape);
+    }
+    
+    @Override
+    public void simulate(Element oldSelf, Duration duration) {
+        // do nothing
     }
 }

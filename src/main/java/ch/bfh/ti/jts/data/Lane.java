@@ -4,18 +4,38 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.io.Serializable;
+import java.time.Duration;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Lane extends Element {
     
-    public final static int        LANE_LAYER = Junction.JUNCTION_LAYER + 1;
-    private final Edge             edge;
-    private final int              index;
-    private final double           speed;
-    private final double           length;
-    private final Shape            shape;
-    private final Collection<Lane> lanes;
+    public final static int              LANE_LAYER = Junction.JUNCTION_LAYER + 1;
+    private final Edge                   edge;
+    private final int                    index;
+    private final double                 speed;
+    private final double                 length;
+    private final Shape                  shape;
+    private final Collection<Lane>       lanes;
+    /**
+     * Skiplist of agents on the line. Key: Position on line, Value: Agent
+     */
+    private ConcurrentSkipListSet<Agent> agents;
+    /**
+     * A comperator for Agents on a Line
+     * 
+     * @author ente
+     */
+    private class AgentLineComperator implements Comparator<Agent>, Serializable {
+        
+        @Override
+        public int compare(final Agent a1, final Agent a2) {
+            return new Double(a1.getPosition()).compareTo(a2.getPosition());
+        }
+    }
     
     public Lane(final Edge edge, final int index, final double speed, final double length, final Shape shape) {
         if (edge == null) {
@@ -30,6 +50,7 @@ public class Lane extends Element {
         this.length = length;
         this.shape = shape;
         lanes = new LinkedList<Lane>();
+        agents = new ConcurrentSkipListSet<Agent>(new AgentLineComperator());
     }
     
     public Edge getEdge() {
@@ -57,10 +78,20 @@ public class Lane extends Element {
         return LANE_LAYER;
     }
     
+    public ConcurrentSkipListSet<Agent> getAgents() {
+        return agents;
+    }
+    
     @Override
     public void render(final Graphics2D g) {
         g.setStroke(new BasicStroke(1));
         g.setColor(Color.LIGHT_GRAY);
         g.draw(shape);
+    }
+    
+    @Override
+    public void simulate(Element oldSelf, Duration duration) {
+        // update agent positions in set
+        agents = new ConcurrentSkipListSet<Agent>(agents);
     }
 }

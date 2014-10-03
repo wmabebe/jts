@@ -1,20 +1,19 @@
 package ch.bfh.ti.jts.data;
 
 import java.awt.Graphics2D;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeSet;
 
-import ch.bfh.ti.jts.gui.Renderable;
-
 /**
  * Data holder for a traffic net.
  * 
  * @author ente
  */
-public class Net extends Element implements Renderable {
+public class Net extends Element {
     
     public final static int                         NET_LAYER = 0;
     private final Map<Integer, Element>             elements  = new HashMap<Integer, Element>();
@@ -63,5 +62,14 @@ public class Net extends Element implements Renderable {
                 element.render(g);
             }
         }
+    }
+    
+    @Override
+    public void simulate(Element oldSelf, Duration duration) {
+        final Net oldSelfNet = (Net) oldSelf;
+        // simulation step for each element
+        getElements().stream().parallel().forEach(e -> {
+            e.simulate(oldSelfNet.getElement(e), duration);
+        });
     }
 }

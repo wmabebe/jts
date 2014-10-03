@@ -8,9 +8,10 @@ import ch.bfh.ti.jts.simulation.Simulation;
 
 public class App implements Runnable {
     
-    private final Net        net;
-    private final Window     window;
-    private final Simulation simulation;
+    public static final boolean DEBUG = true;
+    private final Net           net;
+    private final Window        window;
+    private final Simulation    simulation;
     
     public App() {
         net = new Importer().importData("src/main/resources/net.net.xml");
@@ -24,7 +25,7 @@ public class App implements Runnable {
     public void run() {
         init();
         while (isRunning() && !Thread.interrupted()) {
-            update();
+            simulation.tick();
             window.render();
         }
         end();
@@ -36,10 +37,6 @@ public class App implements Runnable {
     
     private boolean isRunning() {
         return true;
-    }
-    
-    private void update() {
-        simulation.tick();
     }
     
     private void render(final Graphics2D g) {

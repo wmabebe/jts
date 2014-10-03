@@ -1,9 +1,11 @@
 package ch.bfh.ti.jts.simulation;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 
-import ch.bfh.ti.jts.data.Net;
+import ch.bfh.ti.jts.data.Element;
 import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 
 /**
@@ -11,27 +13,35 @@ import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
  * 
  * @author ente
  */
-public class Simulation {
+public class Simulation<T extends Element> {
     
+    /**
+     * Maximum number of old simulatables to keep
+     */
+    private final static int OLD_SIMULATABLES_KEEP = 100;
     /**
      * Net for which to simulate traffic.
      */
-    private final List<Net> nets = new LinkedList<Net>();
+    private final List<T>    oldSimulatables       = new LinkedList<T>();
+    private final T          simulatable;
+    private final Instant    lastTick              = Instant.now();
     
-    public Simulation(final Net net) {
-        this.nets.add(net);
+    public Simulation(final T simulatable) {
+        this.simulatable = simulatable;
     }
     
     /**
      * Do a simulation step
      */
     public void tick() {
+        // get diff to last tick
+        final Duration duration = Duration.between(lastTick, Instant.now());
         // serialize
-        final Net oldNet = nets.get(0);
-        final Net newNet = (Net) DeepCopy.copy(oldNet);
-        // simulation step for each element
-        newNet.getElements().stream().parallel().forEach(e -> {
-            oldNet.getElement(e);
-        });
+        final T oldSimulatable = (T) DeepCopy.copy(simulatable);
+        oldSimulatables.add(oldSimulatable);
+        if (oldSimulatables.size() > OLD_SIMULATABLES_KEEP) {
+            oldSimulatables.remove(0);
+        }
+        simulatable.simulate(oldSimulatable, duration);
     }
 }
