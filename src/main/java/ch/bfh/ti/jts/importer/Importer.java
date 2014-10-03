@@ -92,7 +92,7 @@ public class Importer {
         final Shape shape = getShape(node.getAttributes().getNamedItem("shape").getNodeValue());
         final Junction junction = new Junction(x, y, shape);
         junctions.put(id, junction);
-        net.getJunctions().add(junction);
+        net.addElement(junction);
     }
     
     private void extractEdge(final Node node) {
@@ -110,7 +110,7 @@ public class Importer {
         final Junction end = junctions.get(to);
         final Edge edge = new Edge(start, end, priority);
         edges.put(id, edge);
-        net.getEdges().add(edge);
+        net.addElement(edge);
         final NodeList nodes = node.getChildNodes();
         for (int i = 1; i < nodes.getLength(); i++) {
             final Node child = nodes.item(i);
@@ -134,7 +134,7 @@ public class Importer {
         final Shape shape = getShape(node.getAttributes().getNamedItem("shape").getNodeValue());
         final Lane lane = new Lane(edge, index, speed, length, shape);
         edge.getLanes().add(lane);
-        net.getLanes().add(lane);
+        net.addElement(lane);
         lanes.put(id, lane);
     }
     

@@ -4,8 +4,9 @@ import ch.bfh.ti.jts.ai.Brain;
 
 public class Agent extends Element {
     
-    private Brain brain;
-    private Lane  lane;
+    public final static int AGENT_LAYER = Junction.JUNCTION_LAYER + 1;
+    private Brain           brain;
+    private Lane            lane;
     
     public Agent() {
     }
@@ -24,5 +25,10 @@ public class Agent extends Element {
     
     public Lane getLane() {
         return lane;
+    }
+    
+    @Override
+    public int getLayer() {
+        return AGENT_LAYER;
     }
 }

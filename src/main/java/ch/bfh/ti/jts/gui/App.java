@@ -39,6 +39,7 @@ public class App implements Runnable {
     }
     
     private void update() {
+        simulation.tick();
     }
     
     private void render(final Graphics2D g) {

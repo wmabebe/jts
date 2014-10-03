@@ -1,5 +1,7 @@
 package ch.bfh.ti.jts.data;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.util.Collection;
@@ -7,6 +9,7 @@ import java.util.LinkedList;
 
 public class Lane extends Element {
     
+    public final static int        LANE_LAYER = Junction.JUNCTION_LAYER + 1;
     private final Edge             edge;
     private final int              index;
     private final double           speed;
@@ -50,7 +53,14 @@ public class Lane extends Element {
     }
     
     @Override
+    public int getLayer() {
+        return LANE_LAYER;
+    }
+    
+    @Override
     public void render(final Graphics2D g) {
+        g.setStroke(new BasicStroke(1));
+        g.setColor(Color.LIGHT_GRAY);
         g.draw(shape);
     }
 }
