@@ -58,5 +58,6 @@ public class Edge extends Element {
     
     @Override
     public void simulate(Element oldSelf, Duration duration) {
+        // do nothing
     }
 }

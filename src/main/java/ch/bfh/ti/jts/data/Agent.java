@@ -19,7 +19,7 @@ public class Agent extends Element {
      */
     private double          position    = 0;
     /**
-     * The velocity of an agent
+     * The velocity of an agent in m/s
      */
     private double          velocity    = 14;
     
@@ -36,6 +36,7 @@ public class Agent extends Element {
     
     public void setLane(final Lane lane) {
         this.lane = lane;
+        lane.getAgents().add(this);
     }
     
     public Lane getLane() {
