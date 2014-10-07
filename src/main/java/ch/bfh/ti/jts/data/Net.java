@@ -1,59 +1,75 @@
 package ch.bfh.ti.jts.data;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics2D;
+import java.time.Duration;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.TreeSet;
 
-import ch.bfh.ti.jts.gui.Renderable;
-
-public class Net extends Element implements Renderable {
+/**
+ * Data holder for a traffic net.
+ * 
+ * @author ente
+ */
+public class Net extends Element {
     
-    private final Collection<Agent>    agents;
-    private final Collection<Edge>     edges;
-    private final Collection<Junction> junctions;
-    private final Collection<Lane>     lanes;
+    public final static int                         NET_LAYER = 0;
+    private final Map<Integer, Element>             elements  = new HashMap<Integer, Element>();
+    private final Map<Integer, Collection<Element>> layers    = new HashMap<Integer, Collection<Element>>(); ;
     
-    public Net() {
-        agents = new LinkedList<Agent>();
-        edges = new LinkedList<Edge>();
-        junctions = new LinkedList<Junction>();
-        lanes = new LinkedList<Lane>();
+    /**
+     * Get the copy of the given element in this net.
+     * 
+     * @param element
+     *            the element looked up
+     * @return the element of this net, {@code null} if the element was not
+     *         found
+     */
+    public Element getElement(final Element element) {
+        return elements.get(element.getId());
     }
     
-    public Collection<Agent> getAgents() {
-        return agents;
+    public void addElement(final Element element) {
+        elements.put(element.getId(), element);
+        final int elementLayer = element.getLayer();
+        // does the layer exist?
+        if (!layers.containsKey(elementLayer)) {
+            // add a new list container for elements
+            layers.put(elementLayer, new LinkedList<Element>());
+        }
+        // add element to layer
+        layers.get(elementLayer).add(element);
     }
     
-    public Collection<Edge> getEdges() {
-        return edges;
+    public Collection<Element> getElements() {
+        return elements.values();
     }
     
-    public Collection<Junction> getJunctions() {
-        return junctions;
-    }
-    
-    public Collection<Lane> getLanes() {
-        return lanes;
+    @Override
+    public int getLayer() {
+        return NET_LAYER;
     }
     
     @Override
     public void render(final Graphics2D g) {
-        g.setStroke(new BasicStroke(6));
-        g.setColor(Color.BLACK);
-        for (final Edge edge : edges) {
-            edge.render(g);
+        // get a sorted list of all layers
+        final TreeSet<Integer> sortedLayers = new TreeSet<Integer>(layers.keySet());
+        // render the layers in order
+        for (final Integer layer : sortedLayers) {
+            for (final Element element : layers.get(layer)) {
+                element.render(g);
+            }
         }
-        g.setStroke(new BasicStroke(1));
-        g.setColor(Color.BLACK);
-        for (final Junction junction : junctions) {
-            junction.render(g);
-        }
-        g.setStroke(new BasicStroke(1));
-        g.setColor(Color.LIGHT_GRAY);
-        for (final Lane lane : lanes) {
-            lane.render(g);
-        }
+    }
+    
+    @Override
+    public void simulate(Element oldSelf, Duration duration) {
+        final Net oldSelfNet = (Net) oldSelf;
+        // simulation step for each element
+        getElements().stream().parallel().forEach(e -> {
+            e.simulate(oldSelfNet.getElement(e), duration);
+        });
     }
 }

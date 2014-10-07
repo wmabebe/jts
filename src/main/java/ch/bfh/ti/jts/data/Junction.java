@@ -1,12 +1,16 @@
 package ch.bfh.ti.jts.data;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.LinkedList;
 
 public class Junction extends Element {
     
+    public final static int        JUNCTION_LAYER = Edge.EDGE_LAYER + 1;
     private final double           x;
     private final double           y;
     private final Shape            shape;
@@ -35,7 +39,19 @@ public class Junction extends Element {
     }
     
     @Override
+    public int getLayer() {
+        return JUNCTION_LAYER;
+    }
+    
+    @Override
     public void render(final Graphics2D g) {
+        g.setStroke(new BasicStroke(1));
+        g.setColor(Color.BLACK);
         g.fill(shape);
+    }
+    
+    @Override
+    public void simulate(Element oldSelf, Duration duration) {
+        // do nothing
     }
 }
