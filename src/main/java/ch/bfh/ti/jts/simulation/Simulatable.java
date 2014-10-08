@@ -7,7 +7,7 @@ import ch.bfh.ti.jts.data.Element;
 
 /**
  * Interface implemented by {@link Element} which can be simulated.
- * 
+ *
  * @author ente
  */
 @FunctionalInterface
@@ -15,7 +15,7 @@ public interface Simulatable {
     
     /**
      * Called in each simulation step
-     * 
+     *
      * @param duration
      *            duration to simulate
      * @param decision

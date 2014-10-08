@@ -25,10 +25,15 @@ public class Lane extends Element {
     private final ConcurrentSkipListSet<Agent> agents;
     /**
      * A comperator for Agents on a Line
-     * 
+     *
      * @author ente
      */
     private class AgentLineComperator implements Comparator<Agent>, Serializable {
+        
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
         
         @Override
         public int compare(final Agent a1, final Agent a2) {
@@ -72,11 +77,11 @@ public class Lane extends Element {
         return lanes;
     }
     
-    public boolean goesTo(Junction junction) {
+    public boolean goesTo(final Junction junction) {
         return getEdge().getEnd() == junction;
     }
     
-    public boolean comesFrom(Junction junction) {
+    public boolean comesFrom(final Junction junction) {
         return getEdge().getStart() == junction;
     }
     

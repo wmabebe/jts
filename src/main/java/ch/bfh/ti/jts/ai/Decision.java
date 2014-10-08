@@ -12,14 +12,14 @@ public class Decision {
     private Lane                nextJunctionLane;
     
     public Decision() {
-        this.laneChangeDirection = LaneChangeDirection.NONE;
+        laneChangeDirection = LaneChangeDirection.NONE;
     }
     
     public double getAcceleration() {
         return acceleration;
     }
     
-    public void setAcceleration(double acceleration) {
+    public void setAcceleration(final double acceleration) {
         this.acceleration = acceleration;
     }
     
@@ -27,7 +27,7 @@ public class Decision {
         return laneChangeDirection;
     }
     
-    public void setLaneChangeDirection(LaneChangeDirection laneChangeDirection) {
+    public void setLaneChangeDirection(final LaneChangeDirection laneChangeDirection) {
         this.laneChangeDirection = laneChangeDirection;
     }
     
@@ -35,7 +35,7 @@ public class Decision {
         return nextJunctionLane;
     }
     
-    public void setNextJunctionLane(Lane nextJunctionLane) {
+    public void setNextJunctionLane(final Lane nextJunctionLane) {
         this.nextJunctionLane = nextJunctionLane;
     }
 }

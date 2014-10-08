@@ -12,7 +12,7 @@ import ch.bfh.ti.jts.data.Net;
 
 /**
  * Simulates traffic on a @{link ch.bfh.ti.jts.data.Net}
- * 
+ *
  * @author ente
  */
 public class Simulation {

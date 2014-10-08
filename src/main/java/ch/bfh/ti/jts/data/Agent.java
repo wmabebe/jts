@@ -52,8 +52,9 @@ public class Agent extends Element implements Thinkable, Simulatable {
     }
     
     public void setPosition(final Double position) {
-        if (position < 0 || position > 1.0)
+        if (position < 0 || position > 1.0) {
             throw new IllegalArgumentException("position");
+        }
         this.position = position;
     }
     
@@ -62,14 +63,14 @@ public class Agent extends Element implements Thinkable, Simulatable {
     }
     
     private double getX() {
-        Junction start = getLane().getEdge().getStart();
-        Junction end = getLane().getEdge().getEnd();
+        final Junction start = getLane().getEdge().getStart();
+        final Junction end = getLane().getEdge().getEnd();
         return start.getX() + getPosition() * (end.getX() - start.getX());
     }
     
     private double getY() {
-        Junction start = getLane().getEdge().getStart();
-        Junction end = getLane().getEdge().getEnd();
+        final Junction start = getLane().getEdge().getStart();
+        final Junction end = getLane().getEdge().getEnd();
         return start.getY() + getPosition() * (end.getY() - start.getY());
     }
     
@@ -88,7 +89,7 @@ public class Agent extends Element implements Thinkable, Simulatable {
     
     /**
      * Gets the color of the agent by his velocity.
-     * 
+     *
      * @return color
      */
     private Color getColor() {
@@ -101,9 +102,9 @@ public class Agent extends Element implements Thinkable, Simulatable {
     }
     
     @Override
-    public void render(Graphics2D g) {
-        double x = getX();
-        double y = getY();
+    public void render(final Graphics2D g) {
+        final double x = getX();
+        final double y = getY();
         g.setStroke(new BasicStroke(1));
         g.setColor(getColor());
         g.translate(x, y);
@@ -112,37 +113,37 @@ public class Agent extends Element implements Thinkable, Simulatable {
     }
     
     @Override
-    public void think(Decision decision) {
+    public void think(final Decision decision) {
         // TODO Auto-generated method stub
     }
     
     @Override
-    public void simulate(Duration duration, Decision decision) {
-        double distanceToDrive = getVelocity() * duration.getNano() * 10E-9;
+    public void simulate(final Duration duration, final Decision decision) {
+        final double distanceToDrive = getVelocity() * duration.getNano() * 10E-9;
         followLane(getLane(), distanceToDrive);
     }
     
     private void followLane(final Lane currentLane, final double distanceToDrive) {
-        double lengthLane = currentLane.getLength();
-        double distanceOnLaneLeft = lengthLane * (1 - getPosition());
+        final double lengthLane = currentLane.getLength();
+        final double distanceOnLaneLeft = lengthLane * (1 - getPosition());
         if (distanceToDrive <= distanceOnLaneLeft) {
             // stay on this lane
             setLane(currentLane);
             setPosition(getPosition() + distanceToDrive / lengthLane);
         } else {
             // pass junction and switch to an other lane
-            double distanceToDriveOnNewLane = distanceToDrive - distanceOnLaneLeft;
-            Edge currentEdge = currentLane.getEdge();
-            Junction currentJunction = currentEdge.getEnd();
+            final double distanceToDriveOnNewLane = distanceToDrive - distanceOnLaneLeft;
+            final Edge currentEdge = currentLane.getEdge();
+            final Junction currentJunction = currentEdge.getEnd();
             // TODO: decide on which lane to go. atm take any random
-            List<Edge> nextEdges = currentJunction.getEdges().stream().filter(x -> x.comesFrom(currentJunction)).collect(Collectors.toList());
+            final List<Edge> nextEdges = currentJunction.getEdges().stream().filter(x -> x.comesFrom(currentJunction)).collect(Collectors.toList());
             Collections.shuffle(nextEdges);
-            Edge nextEdge = nextEdges.get(0);
+            final Edge nextEdge = nextEdges.get(0);
             if (nextEdge == null) {
                 throw new RuntimeException("no edge to go to");
             }
             // get first lane
-            Lane nextLane = nextEdge.getLanes().stream().findFirst().get();
+            final Lane nextLane = nextEdge.getLanes().stream().findFirst().get();
             if (nextLane == null) {
                 throw new RuntimeException("edge has no lanes!");
             }

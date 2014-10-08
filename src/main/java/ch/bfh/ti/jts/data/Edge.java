@@ -43,11 +43,11 @@ public class Edge extends Element {
         return lanes;
     }
     
-    public boolean goesTo(Junction junction) {
+    public boolean goesTo(final Junction junction) {
         return getEnd() == junction;
     }
     
-    public boolean comesFrom(Junction junction) {
+    public boolean comesFrom(final Junction junction) {
         return getStart() == junction;
     }
     

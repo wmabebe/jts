@@ -22,9 +22,9 @@ public class App implements Runnable {
         // TODO: remove when agent spawning is implemented
         final int numAgents = 50;
         for (int i = 0; i < numAgents; i++) {
-            Agent agent = new Agent();
+            final Agent agent = new Agent();
             // get first lane...
-            Lane lane = (Lane) net.getElementStream().filter(x -> x.getClass() == Lane.class).findAny().get();
+            final Lane lane = (Lane) net.getElementStream().filter(x -> x.getClass() == Lane.class).findAny().get();
             agent.setLane(lane);
             agent.setPosition(Math.random());
             agent.setVelocity(0.1);

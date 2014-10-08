@@ -15,7 +15,7 @@ import ch.bfh.ti.jts.simulation.Simulatable;
 
 /**
  * Data holder for a traffic net.
- * 
+ *
  * @author ente
  */
 public class Net extends Element {

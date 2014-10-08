@@ -6,7 +6,7 @@ import java.io.OutputStream;
 /**
  * ByteArrayOutputStream implementation that doesn't synchronize methods and
  * doesn't copy the data on toByteArray().
- * 
+ *
  * @author Philip Isenhour {@link http
  *         ://javatechniques.com/blog/faster-deep-copies-of-java-objects/}
  * @author ente
@@ -29,15 +29,15 @@ public class FastByteArrayOutputStream extends OutputStream {
     /**
      * Constructs a stream with the given initial size
      */
-    public FastByteArrayOutputStream(int initSize) {
-        this.size = 0;
-        this.buf = new byte[initSize];
+    public FastByteArrayOutputStream(final int initSize) {
+        size = 0;
+        buf = new byte[initSize];
     }
     
     /**
      * Ensures that we have a large enough buffer for the given size.
      */
-    private void verifyBufferSize(int sz) {
+    private void verifyBufferSize(final int sz) {
         if (sz > buf.length) {
             byte[] old = buf;
             buf = new byte[Math.max(sz, 2 * buf.length)];
@@ -59,21 +59,21 @@ public class FastByteArrayOutputStream extends OutputStream {
     }
     
     @Override
-    public final void write(byte b[]) {
+    public final void write(final byte b[]) {
         verifyBufferSize(size + b.length);
         System.arraycopy(b, 0, buf, size, b.length);
         size += b.length;
     }
     
     @Override
-    public final void write(byte b[], int off, int len) {
+    public final void write(final byte b[], final int off, final int len) {
         verifyBufferSize(size + len);
         System.arraycopy(b, off, buf, size, len);
         size += len;
     }
     
     @Override
-    public final void write(int b) {
+    public final void write(final int b) {
         verifyBufferSize(size + 1);
         buf[size++] = (byte) b;
     }

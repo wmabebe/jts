@@ -7,7 +7,7 @@ import ch.bfh.ti.jts.gui.Renderable;
 
 /**
  * Base class for all the elements
- * 
+ *
  * @author winki
  * @author ente
  */
@@ -18,7 +18,7 @@ public abstract class Element implements Renderable {
     
     /**
      * Gets the id of this element
-     * 
+     *
      * @return the unique element id
      */
     public int getId() {
@@ -27,7 +27,7 @@ public abstract class Element implements Renderable {
     
     /**
      * The layer of the object. 0: Background 1: First layer
-     * 
+     *
      * @return the layer
      */
     public abstract int getLayer();

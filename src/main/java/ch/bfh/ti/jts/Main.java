@@ -9,13 +9,13 @@ import ch.bfh.ti.jts.gui.App;
 
 public class Main {
     
-    public static void main(final String[] args) {       
+    public static void main(final String[] args) {
         try {
             // set look and feel to native
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (final Exception e) {
             Logger.getLogger(Main.class.getName()).log(Level.WARNING, null, e);
-        }               
+        }
         new App().run();
     }
 }
