@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Edge;
 import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
@@ -180,5 +181,13 @@ public class Importer {
         final Lane laneFrom = lanes.get(String.format("%s_%s", from, fromLane));
         final Lane laneTo = lanes.get(String.format("%s_%s", to, toLane));
         laneFrom.getLanes().add(laneTo);
+    }
+    
+    public void addTestAgents(Net net) {
+        final int numAgents = 50;
+        for (int i = 0; i < numAgents; i++) {
+            Agent agent = new Agent();
+            net.addElement(agent);
+        }
     }
 }

@@ -9,12 +9,15 @@ import ch.bfh.ti.jts.simulation.Simulation;
 public class App implements Runnable {
     
     public static final boolean DEBUG = true;
+    
+    private final Importer importer = new Importer();
     private final Net           net;
     private final Window        window;
     private final Simulation    simulation;
     
     public App() {
-        net = new Importer().importData("src/main/resources/net.net.xml");
+        net = importer.importData("src/main/resources/net.net.xml");
+        importer.addTestAgents(net);
         window = new Window(g -> {
             render(g);
         });
