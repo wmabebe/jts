@@ -1,4 +1,12 @@
-jts
-===
+# Java Traffic Simulator (jts)
 
-Java Traffic Simulator
+## Tasks
+
+Mischa
+- Simulation (Decision objects, think, simulate)
+- Calculate world coordinates of agent
+
+Winku
+- Spawn agents
+- Dummy AI
+- Move agents

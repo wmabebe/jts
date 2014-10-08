@@ -1,6 +1,7 @@
 package ch.bfh.ti.jts.data;
 
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;

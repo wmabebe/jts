@@ -6,6 +6,8 @@ import java.awt.Graphics2D;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
+import javax.naming.OperationNotSupportedException;
+
 import ch.bfh.ti.jts.ai.Brain;
 import ch.bfh.ti.jts.gui.App;
 
@@ -49,6 +51,14 @@ public class Agent extends Element {
     
     public double getPosition() {
         return position;
+    }
+        
+    private double getX(){
+        return -1; // TODO
+    }
+    
+    private double getY(){
+        return -1; // TODO
     }
     
     public void setVelocity(final Double velocity) {

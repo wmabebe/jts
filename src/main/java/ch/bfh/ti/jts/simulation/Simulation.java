@@ -2,9 +2,11 @@ package ch.bfh.ti.jts.simulation;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.data.Element;
 import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 
@@ -34,6 +36,13 @@ public class Simulation<T extends Element> {
      * Do a simulation step
      */
     public void tick() {
+        // ai
+        // call every think method of all Intelligents (parallel)
+        // fill a collection
+        // loop through decisions -> simulate every decision (serial)
+        Collection<Decision> decisions = new LinkedList<Decision>();
+        
+                
         // get diff to last tick
         final Duration duration = Duration.between(lastTick, Instant.now());
         // serialize
