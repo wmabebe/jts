@@ -90,7 +90,7 @@ public class Lane extends Element {
     }
     
     @Override
-    public void simulate(Element oldSelf, Duration duration) {
+    public void simulate(Duration duration) {
         // update agent positions in set
         agents = new ConcurrentSkipListSet<Agent>(agents);
     }

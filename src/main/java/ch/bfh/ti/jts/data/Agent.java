@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit;
 
 import ch.bfh.ti.jts.ai.Brain;
 import ch.bfh.ti.jts.gui.App;
+import ch.bfh.ti.jts.simulation.Simulatable;
 
 public class Agent extends Element {
     
@@ -19,7 +20,7 @@ public class Agent extends Element {
     private Brain               brain;
     private Lane                lane;
     /**
-     * The relative position of the agent on the lane
+     * The relative position of the agent on the lane (>= 0.0 and < 1.0)
      */
     private double              position    = 0;
     /**
@@ -48,7 +49,7 @@ public class Agent extends Element {
     }
     
     public void setPosition(final Double position) {
-        if (position < 0 || position > 1.0)
+        if (position < 0 || position >= 1.0)
             throw new IllegalArgumentException("position");
         this.position = position;
     }
@@ -94,8 +95,29 @@ public class Agent extends Element {
     }
     
     @Override
-    public void simulate(Element oldSelf, Duration duration) {
-        // set new position
-        setPosition(getPosition() + getVelocity() * duration.get(ChronoUnit.SECONDS));
+    public void simulate(Duration duration) {
+        double distanceToMove = getVelocity() * duration.get(ChronoUnit.SECONDS);
+        double lengthLane = getLane().getLength();
+        double distanceOnLaneLeft = lengthLane * (1 - getPosition());
+        if (distanceToMove <= distanceOnLaneLeft) {
+            // stay on this edge
+            setPosition(getPosition() + distanceToMove / lengthLane);
+        } else {
+            // pass junction and switch to an other lane
+            double distanceToMoveOnNewLane = distanceToMove - distanceOnLaneLeft;
+            Edge currentEdge = getLane().getEdge();
+            // TODO: decide on which lane to go. atm take
+            Edge nextEdge = currentEdge.getEnd().getEdges().stream().findAny().orElse(null);
+            if (nextEdge == null) {
+                throw new RuntimeException("no edge to go to");
+            }
+            // get first lane
+            Lane nextLane = nextEdge.getLanes().stream().findFirst().get();
+            if (nextLane == null) {
+                throw new RuntimeException("edge has no lanes!");
+            }
+            setLane(nextLane);
+            setPosition(distanceToMoveOnNewLane / nextLane.getLength());
+        }
     }
 }

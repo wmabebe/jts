@@ -51,7 +51,7 @@ public class Junction extends Element {
     }
     
     @Override
-    public void simulate(Element oldSelf, Duration duration) {
+    public void simulate(Duration duration) {
         // do nothing
     }
 }

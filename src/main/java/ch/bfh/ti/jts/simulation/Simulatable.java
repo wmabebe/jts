@@ -2,8 +2,6 @@ package ch.bfh.ti.jts.simulation;
 
 import java.time.Duration;
 
-import ch.bfh.ti.jts.data.Element;
-
 @FunctionalInterface
 public interface Simulatable {
     
@@ -15,5 +13,5 @@ public interface Simulatable {
      * @param duration
      *            duration to simulate
      */
-    public void simulate(final Element oldSelf, final Duration duration);
+    public void simulate(final Duration duration);
 }

@@ -65,11 +65,10 @@ public class Net extends Element {
     }
     
     @Override
-    public void simulate(Element oldSelf, Duration duration) {
-        final Net oldSelfNet = (Net) oldSelf;
+    public void simulate(Duration duration) {
         // simulation step for each element
-        getElements().stream().parallel().forEach(e -> {
-            e.simulate(oldSelfNet.getElement(e), duration);
+        getElements().stream().sequential().forEach(e -> {
+            e.simulate(duration);
         });
     }
 }

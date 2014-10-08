@@ -39,6 +39,6 @@ public abstract class Element implements Renderable, Simulatable, Serializable {
     @Override
     public abstract void render(final Graphics2D g);
     
-    @Override
-    public abstract void simulate(Element oldSelf, Duration duration);
+    //@Override
+    //public abstract void simulate(Duration duration);
 }
