@@ -1,11 +1,23 @@
 package ch.bfh.ti.jts.ai;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 import ch.bfh.ti.jts.data.Lane;
 
 public class Decision {
     
     public static enum LaneChangeDirection {
-        NONE, LEFT, RIGHT
+        NONE, LEFT, RIGHT;
+        
+        private static final List<LaneChangeDirection> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
+        private static final int                       SIZE   = VALUES.size();
+        
+        public static LaneChangeDirection randomLaneChange(final Random random) {
+            return VALUES.get(random.nextInt(VALUES.size()));
+        }
     }
     private double              acceleration;
     private LaneChangeDirection laneChangeDirection;

@@ -37,8 +37,9 @@ public class Simulation {
      */
     public void tick() {
         final Instant now = Instant.now();
-        // get diff to last tick
+        // get diff time to last tick
         final Duration duration = Duration.between(lastTick, now);
+        final double durationS = duration.getNano() * 10E-9;
         // build thread safe hash map which holds all the decisions of the
         // thinkables
         final Map<Thinkable, Decision> initDecisions = new HashMap<Thinkable, Decision>();
@@ -52,7 +53,7 @@ public class Simulation {
         });
         // simulate
         simulateNet.getSimulatableStream().forEach(e -> {
-            e.simulate(duration, decisions.get(e));
+            e.simulate(durationS, decisions.get(e));
         });
         lastTick = now;
     }

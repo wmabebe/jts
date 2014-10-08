@@ -5,44 +5,39 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import ch.bfh.ti.jts.ai.Brain;
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 
-public class Agent extends Element implements Thinkable, Simulatable {
+public abstract class Agent extends Element implements Thinkable, Simulatable {
     
-    public final static int     AGENT_LAYER = Junction.JUNCTION_LAYER + 1;
-    private final static double size        = 3.0;
-    private final static Shape  shape       = new Ellipse2D.Double(-size / 2, -size / 2, size, size);
-    private Brain               brain;
+    /**
+     * Max velocity of agent (inclusive) [m/s]
+     */
+    private static final double MAX_VELOCITY = 5;
+    /**
+     * Minimal velocity of agent (inclusive) [m/s], 0 := agent can't reverse.
+     */
+    private static final double MIN_VELOCITY = 0;
+    public final static int     AGENT_LAYER  = Junction.JUNCTION_LAYER + 1;
+    private final static double size         = 3.0;
+    private final static Shape  shape        = new Ellipse2D.Double(-size / 2, -size / 2, size, size);
     private Lane                lane;
     /**
      * The relative position of the agent on the lane (>= 0.0 and < 1.0)
      */
-    private double              position    = 0;
+    private double              position     = 0;
     /**
      * The velocity of an agent in m/s
      */
-    private double              velocity    = 14;
+    private double              velocity     = 3;
     
     public Agent() {
     }
     
-    public void setBrain(final Brain brain) {
-        this.brain = brain;
-    }
-    
-    public Brain getBrain() {
-        return brain;
-    }
-    
     public void setLane(final Lane lane) {
+        lane.getAgents().remove(this);
         this.lane = lane;
         lane.getAgents().add(this);
     }
@@ -76,6 +71,9 @@ public class Agent extends Element implements Thinkable, Simulatable {
     
     public void setVelocity(final Double velocity) {
         this.velocity = velocity;
+        // check if out of bounds
+        this.velocity = Math.min(MAX_VELOCITY, this.velocity);
+        this.velocity = Math.max(MIN_VELOCITY, this.velocity);
     }
     
     public double getVelocity() {
@@ -113,42 +111,28 @@ public class Agent extends Element implements Thinkable, Simulatable {
     }
     
     @Override
-    public void think(final Decision decision) {
-        // TODO Auto-generated method stub
+    public void simulate(final double duration, final Decision decision) {
+        setVelocity(getVelocity() + decision.getAcceleration() * duration);
+        // TODO: implement lane change
+        followLane(getLane(), getVelocity() * duration, decision);
     }
     
-    @Override
-    public void simulate(final Duration duration, final Decision decision) {
-        final double distanceToDrive = getVelocity() * duration.getNano() * 10E-9;
-        followLane(getLane(), distanceToDrive);
-    }
-    
-    private void followLane(final Lane currentLane, final double distanceToDrive) {
-        final double lengthLane = currentLane.getLength();
-        final double distanceOnLaneLeft = lengthLane * (1 - getPosition());
+    private void followLane(final Lane currentLane, final double distanceToDrive, final Decision decision) {
+        double lengthLane = currentLane.getLength();
+        double distanceOnLaneLeft = lengthLane * (1 - getPosition());
         if (distanceToDrive <= distanceOnLaneLeft) {
             // stay on this lane
             setLane(currentLane);
             setPosition(getPosition() + distanceToDrive / lengthLane);
         } else {
             // pass junction and switch to an other lane
-            final double distanceToDriveOnNewLane = distanceToDrive - distanceOnLaneLeft;
-            final Edge currentEdge = currentLane.getEdge();
-            final Junction currentJunction = currentEdge.getEnd();
-            // TODO: decide on which lane to go. atm take any random
-            final List<Edge> nextEdges = currentJunction.getEdges().stream().filter(x -> x.comesFrom(currentJunction)).collect(Collectors.toList());
-            Collections.shuffle(nextEdges);
-            final Edge nextEdge = nextEdges.get(0);
-            if (nextEdge == null) {
-                throw new RuntimeException("no edge to go to");
-            }
-            // get first lane
-            final Lane nextLane = nextEdge.getLanes().stream().findFirst().get();
+            double distanceToDriveOnNewLane = distanceToDrive - distanceOnLaneLeft;
+            final Lane nextLane = decision.getNextJunctionLane();
             if (nextLane == null) {
-                throw new RuntimeException("edge has no lanes!");
+                throw new RuntimeException("Agent didn't decide where to go.");
             }
             setPosition(0.0);
-            followLane(nextLane, distanceToDriveOnNewLane);
+            followLane(nextLane, distanceToDriveOnNewLane, decision);
         }
     }
 }

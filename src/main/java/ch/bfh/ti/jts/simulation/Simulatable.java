@@ -1,7 +1,5 @@
 package ch.bfh.ti.jts.simulation;
 
-import java.time.Duration;
-
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.data.Element;
 
@@ -17,10 +15,10 @@ public interface Simulatable {
      * Called in each simulation step
      *
      * @param duration
-     *            duration to simulate
+     *            duration to simulate in seconds
      * @param decision
      *            Decision made by this {@link Simulatable}, {@code null} if the
      *            {@link Simulatable} does not implement the thinkable interface
      */
-    public void simulate(final Duration duration, final Decision decision);
+    public void simulate(final double duration, final Decision decision);
 }

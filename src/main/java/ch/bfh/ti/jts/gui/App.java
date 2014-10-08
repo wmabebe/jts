@@ -2,6 +2,7 @@ package ch.bfh.ti.jts.gui;
 
 import java.awt.Graphics2D;
 
+import ch.bfh.ti.jts.ai.agents.RandomAgent;
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
@@ -10,8 +11,9 @@ import ch.bfh.ti.jts.simulation.Simulation;
 
 public class App implements Runnable {
     
-    public static final boolean DEBUG    = true;
-    private final Importer      importer = new Importer();
+    public static final boolean DEBUG         = true;
+    public static final int     TEST_AGENTS_C = 5;
+    private final Importer      importer      = new Importer();
     private final Net           net;
     private final Window        window;
     private final Simulation    simulation;
@@ -20,9 +22,8 @@ public class App implements Runnable {
         net = importer.importData("src/main/resources/net.net.xml");
         // add some test agents for now
         // TODO: remove when agent spawning is implemented
-        final int numAgents = 50;
-        for (int i = 0; i < numAgents; i++) {
-            final Agent agent = new Agent();
+        for (int i = 0; i < TEST_AGENTS_C; i++) {
+            final Agent agent = new RandomAgent();
             // get first lane...
             final Lane lane = (Lane) net.getElementStream().filter(x -> x.getClass() == Lane.class).findAny().get();
             agent.setLane(lane);

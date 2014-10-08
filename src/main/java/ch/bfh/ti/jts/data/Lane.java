@@ -4,7 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -28,12 +27,7 @@ public class Lane extends Element {
      *
      * @author ente
      */
-    private class AgentLineComperator implements Comparator<Agent>, Serializable {
-        
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1L;
+    private class AgentLineComperator implements Comparator<Agent> {
         
         @Override
         public int compare(final Agent a1, final Agent a2) {
