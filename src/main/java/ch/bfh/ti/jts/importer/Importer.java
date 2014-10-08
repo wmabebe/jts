@@ -187,6 +187,14 @@ public class Importer {
         final int numAgents = 50;
         for (int i = 0; i < numAgents; i++) {
             Agent agent = new Agent();
+            
+            // get first lane...
+            Lane lane = (Lane) net.getElements().stream().filter(x -> x.getClass() == Lane.class).findAny().get();
+            
+            agent.setLane(lane);
+            agent.setPosition(Math.random());
+            agent.setVelocity(10.0);
+            
             net.addElement(agent);
         }
     }
