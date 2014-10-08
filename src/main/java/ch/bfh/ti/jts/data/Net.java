@@ -1,12 +1,17 @@
 package ch.bfh.ti.jts.data;
 
 import java.awt.Graphics2D;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Stream;
+
+import ch.bfh.ti.jts.ai.Thinkable;
+import ch.bfh.ti.jts.simulation.Simulatable;
 
 /**
  * Data holder for a traffic net.
@@ -15,24 +20,14 @@ import java.util.TreeSet;
  */
 public class Net extends Element {
     
-    public final static int                         NET_LAYER = 0;
-    private final Map<Integer, Element>             elements  = new HashMap<Integer, Element>();
-    private final Map<Integer, Collection<Element>> layers    = new HashMap<Integer, Collection<Element>>(); ;
-    
-    /**
-     * Get the copy of the given element in this net.
-     * 
-     * @param element
-     *            the element looked up
-     * @return the element of this net, {@code null} if the element was not
-     *         found
-     */
-    public Element getElement(final Element element) {
-        return elements.get(element.getId());
-    }
+    public final static int                         NET_LAYER   = 0;
+    private final Set<Element>                      elements    = new HashSet<Element>();
+    private final Set<Simulatable>                  simulatable = new HashSet<Simulatable>();
+    private final Set<Thinkable>                    thinkable   = new HashSet<Thinkable>();
+    private final Map<Integer, Collection<Element>> layers      = new HashMap<Integer, Collection<Element>>(); ;
     
     public void addElement(final Element element) {
-        elements.put(element.getId(), element);
+        elements.add(element);
         final int elementLayer = element.getLayer();
         // does the layer exist?
         if (!layers.containsKey(elementLayer)) {
@@ -41,10 +36,26 @@ public class Net extends Element {
         }
         // add element to layer
         layers.get(elementLayer).add(element);
+        // element thinkable?
+        if (Thinkable.class.isInstance(element)) {
+            thinkable.add((Thinkable) element);
+        }
+        // element simulatable?
+        if (Simulatable.class.isInstance(element)) {
+            simulatable.add((Simulatable) element);
+        }
     }
     
-    public Collection<Element> getElements() {
-        return elements.values();
+    public Stream<Element> getElementStream() {
+        return elements.stream().sequential();
+    }
+    
+    public Stream<Thinkable> getThinkableStream() {
+        return thinkable.stream().parallel();
+    }
+    
+    public Stream<Simulatable> getSimulatableStream() {
+        return simulatable.stream().sequential();
     }
     
     @Override
@@ -62,13 +73,5 @@ public class Net extends Element {
                 element.render(g);
             }
         }
-    }
-    
-    @Override
-    public void simulate(Duration duration) {
-        // simulation step for each element
-        getElements().stream().sequential().forEach(e -> {
-            e.simulate(duration);
-        });
     }
 }

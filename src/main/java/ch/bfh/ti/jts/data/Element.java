@@ -1,13 +1,9 @@
 package ch.bfh.ti.jts.data;
 
 import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.io.Serializable;
-import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import ch.bfh.ti.jts.gui.Renderable;
-import ch.bfh.ti.jts.simulation.Simulatable;
 
 /**
  * Base class for all the elements
@@ -15,7 +11,7 @@ import ch.bfh.ti.jts.simulation.Simulatable;
  * @author winki
  * @author ente
  */
-public abstract class Element implements Renderable, Simulatable, Serializable {
+public abstract class Element implements Renderable {
     
     private static final AtomicInteger NEXT_ID = new AtomicInteger(0);
     private final int                  id      = NEXT_ID.incrementAndGet();
@@ -38,7 +34,4 @@ public abstract class Element implements Renderable, Simulatable, Serializable {
     
     @Override
     public abstract void render(final Graphics2D g);
-    
-    //@Override
-    //public abstract void simulate(Duration duration);
 }

@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import ch.bfh.ti.jts.ai.Brain;
+import ch.bfh.ti.jts.ai.Decision;
+import ch.bfh.ti.jts.ai.Thinkable;
+import ch.bfh.ti.jts.simulation.Simulatable;
 
-public class Agent extends Element {
+public class Agent extends Element implements Thinkable, Simulatable {
     
     public final static int     AGENT_LAYER = Junction.JUNCTION_LAYER + 1;
     private final static double size        = 3.0;
@@ -109,7 +112,12 @@ public class Agent extends Element {
     }
     
     @Override
-    public void simulate(Duration duration) {
+    public void think(Decision decision) {
+        // TODO Auto-generated method stub
+    }
+    
+    @Override
+    public void simulate(Duration duration, Decision decision) {
         double distanceToDrive = getVelocity() * duration.getNano() * 10E-9;
         followLane(getLane(), distanceToDrive);
     }

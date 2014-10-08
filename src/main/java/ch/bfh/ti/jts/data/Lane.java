@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -13,17 +12,17 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Lane extends Element {
     
-    public final static int              LANE_LAYER = Junction.JUNCTION_LAYER + 1;
-    private final Edge                   edge;
-    private final int                    index;
-    private final double                 speed;
-    private final double                 length;
-    private final Shape                  shape;
-    private final Collection<Lane>       lanes;
+    public final static int                    LANE_LAYER = Junction.JUNCTION_LAYER + 1;
+    private final Edge                         edge;
+    private final int                          index;
+    private final double                       speed;
+    private final double                       length;
+    private final Shape                        shape;
+    private final Collection<Lane>             lanes;
     /**
      * Skiplist of agents on the line. Key: Position on line, Value: Agent
      */
-    private ConcurrentSkipListSet<Agent> agents;
+    private final ConcurrentSkipListSet<Agent> agents;
     /**
      * A comperator for Agents on a Line
      * 
@@ -95,11 +94,5 @@ public class Lane extends Element {
         g.setStroke(new BasicStroke(1));
         g.setColor(Color.LIGHT_GRAY);
         g.draw(shape);
-    }
-    
-    @Override
-    public void simulate(Duration duration) {
-        // update agent positions in set
-        agents = new ConcurrentSkipListSet<Agent>(agents);
     }
 }

@@ -3,7 +3,6 @@ package ch.bfh.ti.jts.data;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -62,10 +61,5 @@ public class Edge extends Element {
         g.setStroke(new BasicStroke(6));
         g.setColor(Color.BLACK);
         g.drawLine((int) start.getX(), (int) start.getY(), (int) end.getX(), (int) end.getY());
-    }
-    
-    @Override
-    public void simulate(Duration duration) {
-        // do nothing
     }
 }
