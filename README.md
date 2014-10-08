@@ -2,7 +2,7 @@
 
 ## Tasks
 
-Mischa
+Enteee
 - Simulation (Decision objects, think, simulate)
   - call every think method of all Intelligents (parallel)
   - fill a collection
