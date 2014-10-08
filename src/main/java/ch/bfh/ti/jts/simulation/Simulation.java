@@ -2,13 +2,9 @@ package ch.bfh.ti.jts.simulation;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.data.Element;
-import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 
 /**
  * Simulates traffic on a @{link ch.bfh.ti.jts.data.Net}

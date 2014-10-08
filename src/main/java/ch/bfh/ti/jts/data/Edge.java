@@ -44,6 +44,14 @@ public class Edge extends Element {
         return lanes;
     }
     
+    public boolean goesTo(Junction junction) {
+        return getEnd() == junction;
+    }
+    
+    public boolean comesFrom(Junction junction) {
+        return getStart() == junction;
+    }
+    
     @Override
     public int getLayer() {
         return EDGE_LAYER;

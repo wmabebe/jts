@@ -6,18 +6,16 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import ch.bfh.ti.jts.ai.Brain;
-import ch.bfh.ti.jts.gui.App;
-import ch.bfh.ti.jts.simulation.Simulatable;
 
 public class Agent extends Element {
     
     public final static int     AGENT_LAYER = Junction.JUNCTION_LAYER + 1;
-    private final static double size        = 5.0;
+    private final static double size        = 3.0;
     private final static Shape  shape       = new Ellipse2D.Double(-size / 2, -size / 2, size, size);
     private Brain               brain;
     private Lane                lane;
@@ -63,13 +61,13 @@ public class Agent extends Element {
     private double getX() {
         Junction start = getLane().getEdge().getStart();
         Junction end = getLane().getEdge().getEnd();
-        return getPosition() * (end.getX() - start.getX());
+        return start.getX() + getPosition() * (end.getX() - start.getX());
     }
     
     private double getY() {
         Junction start = getLane().getEdge().getStart();
         Junction end = getLane().getEdge().getEnd();
-        return getPosition() * (end.getY() - start.getY());
+        return start.getY() + getPosition() * (end.getY() - start.getY());
     }
     
     public void setVelocity(final Double velocity) {
@@ -85,12 +83,26 @@ public class Agent extends Element {
         return AGENT_LAYER;
     }
     
+    /**
+     * Gets the color of the agent by his velocity.
+     * 
+     * @return color
+     */
+    private Color getColor() {
+        final double MAX_VELOCITY = 50.0;
+        float hue = 0;
+        if (getVelocity() <= MAX_VELOCITY) {
+            hue = 0.33f - (float) (getVelocity() / MAX_VELOCITY * 0.33);
+        }
+        return Color.getHSBColor(hue, 1.0f, 1.0f);
+    }
+    
     @Override
     public void render(Graphics2D g) {
         double x = getX();
         double y = getY();
         g.setStroke(new BasicStroke(1));
-        g.setColor(Color.RED);
+        g.setColor(getColor());
         g.translate(x, y);
         g.fill(shape);
         g.translate(-x, -y);
@@ -106,26 +118,28 @@ public class Agent extends Element {
         double lengthLane = currentLane.getLength();
         double distanceOnLaneLeft = lengthLane * (1 - getPosition());
         if (distanceToDrive <= distanceOnLaneLeft) {
-            // stay on this edge
+            // stay on this lane
+            setLane(currentLane);
             setPosition(getPosition() + distanceToDrive / lengthLane);
         } else {
             // pass junction and switch to an other lane
             double distanceToDriveOnNewLane = distanceToDrive - distanceOnLaneLeft;
             Edge currentEdge = currentLane.getEdge();
-            // TODO: decide on which lane to go. atm take any
-            Edge nextEdge = currentEdge.getEnd().getEdges().stream().findAny().orElse(null);
+            Junction currentJunction = currentEdge.getEnd();
+            // TODO: decide on which lane to go. atm take any random
+            List<Edge> nextEdges = currentJunction.getEdges().stream().filter(x -> x.comesFrom(currentJunction)).collect(Collectors.toList());
+            Collections.shuffle(nextEdges);
+            Edge nextEdge = nextEdges.get(0);
             if (nextEdge == null) {
-                //throw new RuntimeException("no edge to go to");
-                setPosition(0.0);
-                return;
+                throw new RuntimeException("no edge to go to");
             }
             // get first lane
             Lane nextLane = nextEdge.getLanes().stream().findFirst().get();
             if (nextLane == null) {
                 throw new RuntimeException("edge has no lanes!");
             }
-            setLane(nextLane);
-            setPosition(distanceToDriveOnNewLane / nextLane.getLength());
+            setPosition(0.0);
+            followLane(nextLane, distanceToDriveOnNewLane);
         }
     }
 }

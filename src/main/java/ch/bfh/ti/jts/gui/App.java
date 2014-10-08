@@ -8,12 +8,11 @@ import ch.bfh.ti.jts.simulation.Simulation;
 
 public class App implements Runnable {
     
-    public static final boolean DEBUG = true;
-    
-    private final Importer importer = new Importer();
-    private final Net           net;
-    private final Window        window;
-    private final Simulation    simulation;
+    public static final boolean   DEBUG    = true;
+    private final Importer        importer = new Importer();
+    private final Net             net;
+    private final Window          window;
+    private final Simulation<Net> simulation;
     
     public App() {
         net = importer.importData("src/main/resources/net.net.xml");
@@ -21,7 +20,7 @@ public class App implements Runnable {
         window = new Window(g -> {
             render(g);
         });
-        simulation = new Simulation(net);
+        simulation = new Simulation<Net>(net);
     }
     
     @Override

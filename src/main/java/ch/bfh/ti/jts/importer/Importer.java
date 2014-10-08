@@ -110,6 +110,8 @@ public class Importer {
         final Junction start = junctions.get(from);
         final Junction end = junctions.get(to);
         final Edge edge = new Edge(start, end, priority);
+        start.getEdges().add(edge);
+        end.getEdges().add(edge);
         edges.put(id, edge);
         net.addElement(edge);
         final NodeList nodes = node.getChildNodes();
@@ -187,14 +189,11 @@ public class Importer {
         final int numAgents = 50;
         for (int i = 0; i < numAgents; i++) {
             Agent agent = new Agent();
-            
             // get first lane...
             Lane lane = (Lane) net.getElements().stream().filter(x -> x.getClass() == Lane.class).findAny().get();
-            
             agent.setLane(lane);
             agent.setPosition(Math.random());
             agent.setVelocity(0.1);
-            
             net.addElement(agent);
         }
     }

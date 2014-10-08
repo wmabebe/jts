@@ -73,6 +73,14 @@ public class Lane extends Element {
         return lanes;
     }
     
+    public boolean goesTo(Junction junction) {
+        return getEdge().getEnd() == junction;
+    }
+    
+    public boolean comesFrom(Junction junction) {
+        return getEdge().getStart() == junction;
+    }
+    
     @Override
     public int getLayer() {
         return LANE_LAYER;

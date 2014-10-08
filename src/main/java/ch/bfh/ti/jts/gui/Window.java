@@ -53,7 +53,6 @@ public class Window {
         frame.repaint();
     }
     
-    @SuppressWarnings("serial")
     private void init() {
         // Create game window...
         frame = new JFrame();
