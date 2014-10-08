@@ -7,6 +7,8 @@ import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.ai.Brain;
 import ch.bfh.ti.jts.gui.App;
@@ -49,7 +51,7 @@ public class Agent extends Element {
     }
     
     public void setPosition(final Double position) {
-        if (position < 0 || position >= 1.0)
+        if (position < 0 || position > 1.0)
             throw new IllegalArgumentException("position");
         this.position = position;
     }
@@ -96,20 +98,26 @@ public class Agent extends Element {
     
     @Override
     public void simulate(Duration duration) {
-        double distanceToMove = getVelocity() * duration.get(ChronoUnit.SECONDS);
-        double lengthLane = getLane().getLength();
+        double distanceToDrive = getVelocity() * duration.getNano() * 10E-9;
+        followLane(getLane(), distanceToDrive);
+    }
+    
+    private void followLane(final Lane currentLane, final double distanceToDrive) {
+        double lengthLane = currentLane.getLength();
         double distanceOnLaneLeft = lengthLane * (1 - getPosition());
-        if (distanceToMove <= distanceOnLaneLeft) {
+        if (distanceToDrive <= distanceOnLaneLeft) {
             // stay on this edge
-            setPosition(getPosition() + distanceToMove / lengthLane);
+            setPosition(getPosition() + distanceToDrive / lengthLane);
         } else {
             // pass junction and switch to an other lane
-            double distanceToMoveOnNewLane = distanceToMove - distanceOnLaneLeft;
-            Edge currentEdge = getLane().getEdge();
-            // TODO: decide on which lane to go. atm take
+            double distanceToDriveOnNewLane = distanceToDrive - distanceOnLaneLeft;
+            Edge currentEdge = currentLane.getEdge();
+            // TODO: decide on which lane to go. atm take any
             Edge nextEdge = currentEdge.getEnd().getEdges().stream().findAny().orElse(null);
             if (nextEdge == null) {
-                throw new RuntimeException("no edge to go to");
+                //throw new RuntimeException("no edge to go to");
+                setPosition(0.0);
+                return;
             }
             // get first lane
             Lane nextLane = nextEdge.getLanes().stream().findFirst().get();
@@ -117,7 +125,7 @@ public class Agent extends Element {
                 throw new RuntimeException("edge has no lanes!");
             }
             setLane(nextLane);
-            setPosition(distanceToMoveOnNewLane / nextLane.getLength());
+            setPosition(distanceToDriveOnNewLane / nextLane.getLength());
         }
     }
 }

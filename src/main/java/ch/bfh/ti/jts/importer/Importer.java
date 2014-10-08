@@ -193,7 +193,7 @@ public class Importer {
             
             agent.setLane(lane);
             agent.setPosition(Math.random());
-            agent.setVelocity(10.0);
+            agent.setVelocity(0.1);
             
             net.addElement(agent);
         }
