@@ -5,7 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Lane;
+import ch.bfh.ti.jts.utils.Helpers;
 
 public class Decision {
     
@@ -13,7 +15,6 @@ public class Decision {
         NONE, LEFT, RIGHT;
         
         private static final List<LaneChangeDirection> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
-        private static final int                       SIZE   = VALUES.size();
         
         public static LaneChangeDirection randomLaneChange(final Random random) {
             return VALUES.get(random.nextInt(VALUES.size()));
@@ -31,8 +32,8 @@ public class Decision {
         return acceleration;
     }
     
-    public void setAcceleration(final double acceleration) {
-        this.acceleration = acceleration;
+    public void setAcceleration(double acceleration) {
+        this.acceleration = Helpers.clamp(acceleration, Agent.MIN_ACCELERATION, Agent.MAX_ACCELERATION);
     }
     
     public LaneChangeDirection getLaneChangeDirection() {

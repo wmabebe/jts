@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 public class Junction extends Element {
     
@@ -37,6 +38,12 @@ public class Junction extends Element {
         return edges;
     }
     
+    public Collection<Edge> getOutgoingEdges() {
+        return (Collection<Edge>) getEdges().stream().filter(x -> {
+            return x.comesFrom(this);
+        }).collect(Collectors.toList());
+    }
+     
     @Override
     public int getLayer() {
         return JUNCTION_LAYER;

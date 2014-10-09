@@ -28,7 +28,7 @@ public class App implements Runnable {
             final Lane lane = (Lane) net.getElementStream().filter(x -> x.getClass() == Lane.class).findAny().get();
             agent.setLane(lane);
             agent.setPosition(Math.random());
-            agent.setVelocity(0.1);
+            agent.setVelocity(10);
             net.addElement(agent);
         }
         window = new Window(g -> {

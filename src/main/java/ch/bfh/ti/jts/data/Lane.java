@@ -79,6 +79,14 @@ public class Lane extends Element {
         return getEdge().getStart() == junction;
     }
     
+    public Lane getLeftLane(){
+        return getEdge().getLanes().stream().filter(x -> x.index == index + 1).findAny().orElse(null);
+    }
+    
+    public Lane getRightLane(){
+        return getEdge().getLanes().stream().filter(x -> x.index == index - 1).findAny().orElse(null);
+    }    
+    
     @Override
     public int getLayer() {
         return LANE_LAYER;

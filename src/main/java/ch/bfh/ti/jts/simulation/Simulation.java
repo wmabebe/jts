@@ -1,7 +1,5 @@
 package ch.bfh.ti.jts.simulation;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +19,7 @@ public class Simulation {
      * Net for which to simulate traffic.
      */
     private final Net simulateNet;
-    private Instant   lastTick;
+    private long   lastTick;
     
     public Simulation(final Net simulateNet) {
         this.simulateNet = simulateNet;
@@ -29,17 +27,17 @@ public class Simulation {
     }
     
     public void start() {
-        lastTick = Instant.now();
+        lastTick = System.nanoTime();
     }
     
     /**
      * Do a simulation step
      */
     public void tick() {
-        final Instant now = Instant.now();
+        final long now = System.nanoTime();
         // get diff time to last tick
-        final Duration duration = Duration.between(lastTick, now);
-        final double durationS = duration.getNano() * 10E-9;
+        final long duration = now - lastTick;
+        final double durationS = duration * 1E-9;
         // build thread safe hash map which holds all the decisions of the
         // thinkables
         final Map<Thinkable, Decision> initDecisions = new HashMap<Thinkable, Decision>();

@@ -9,29 +9,38 @@ import java.awt.geom.Ellipse2D;
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.simulation.Simulatable;
+import ch.bfh.ti.jts.utils.Helpers;
 
 public abstract class Agent extends Element implements Thinkable, Simulatable {
     
     /**
      * Max velocity of agent (inclusive) [m/s]
      */
-    private static final double MAX_VELOCITY = 5;
+    private static final double MAX_VELOCITY     = 22.2;
     /**
      * Minimal velocity of agent (inclusive) [m/s], 0 := agent can't reverse.
      */
-    private static final double MIN_VELOCITY = 0;
-    public final static int     AGENT_LAYER  = Junction.JUNCTION_LAYER + 1;
-    private final static double size         = 3.0;
-    private final static Shape  shape        = new Ellipse2D.Double(-size / 2, -size / 2, size, size);
+    private static final double MIN_VELOCITY     = 0;
+    /**
+     * Max acceleration of agent (inclusive) [m/s^^]
+     */
+    public static final double  MAX_ACCELERATION = 5.0;
+    /**
+     * Minimal acceleration of agent (inclusive) [m/s^2]
+     */
+    public static final double  MIN_ACCELERATION = -5.0;
+    public final static int     AGENT_LAYER      = Junction.JUNCTION_LAYER + 1;
+    private final static double size             = 3.0;
+    private final static Shape  shape            = new Ellipse2D.Double(-size / 2, -size / 2, size, size);
     private Lane                lane;
     /**
      * The relative position of the agent on the lane (>= 0.0 and < 1.0)
      */
-    private double              position     = 0;
+    private double              position         = 0;
     /**
      * The velocity of an agent in m/s
      */
-    private double              velocity     = 3;
+    private double              velocity         = 0;
     
     public Agent() {
     }
@@ -69,11 +78,9 @@ public abstract class Agent extends Element implements Thinkable, Simulatable {
         return start.getY() + getPosition() * (end.getY() - start.getY());
     }
     
-    public void setVelocity(final Double velocity) {
-        this.velocity = velocity;
+    public void setVelocity(final double velocity) {
         // check if out of bounds
-        this.velocity = Math.min(MAX_VELOCITY, this.velocity);
-        this.velocity = Math.max(MIN_VELOCITY, this.velocity);
+        this.velocity = Helpers.clamp(velocity, MIN_VELOCITY, MAX_VELOCITY);
     }
     
     public double getVelocity() {
@@ -91,12 +98,9 @@ public abstract class Agent extends Element implements Thinkable, Simulatable {
      * @return color
      */
     private Color getColor() {
-        final double MAX_VELOCITY = 50.0;
-        float hue = 0;
-        if (getVelocity() <= MAX_VELOCITY) {
-            hue = 0.33f - (float) (getVelocity() / MAX_VELOCITY * 0.33);
-        }
-        return Color.getHSBColor(hue, 1.0f, 1.0f);
+        double hue = 0.33 - 0.33 * (getVelocity() / MAX_VELOCITY);
+        hue = Helpers.clamp(hue, 0.0, 1.0);
+        return Color.getHSBColor((float) hue, 1.0f, 1.0f);
     }
     
     @Override
@@ -113,7 +117,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable {
     @Override
     public void simulate(final double duration, final Decision decision) {
         setVelocity(getVelocity() + decision.getAcceleration() * duration);
-        // TODO: implement lane change
         followLane(getLane(), getVelocity() * duration, decision);
     }
     
