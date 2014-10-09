@@ -2,9 +2,12 @@ package ch.bfh.ti.jts.importer;
 
 import java.awt.Shape;
 import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -133,11 +136,37 @@ public class Importer {
         final int index = Integer.valueOf(node.getAttributes().getNamedItem("index").getNodeValue());
         final double speed = Double.valueOf(node.getAttributes().getNamedItem("speed").getNodeValue());
         final double length = Double.valueOf(node.getAttributes().getNamedItem("speed").getNodeValue());
-        final Shape shape = getShape(node.getAttributes().getNamedItem("shape").getNodeValue());
-        final Lane lane = new Lane(edge, index, speed, length, shape);
+        final Shape path = getShape(node.getAttributes().getNamedItem("shape").getNodeValue());
+        final Point2D startPosition = getStartPosition(path);
+        final Point2D endPosition = getEndPosition(path);
+        final Lane lane = new Lane(edge, index, speed, length, path, startPosition, endPosition);
         edge.getLanes().add(lane);
         net.addElement(lane);
         lanes.put(id, lane);
+    }
+
+    private Point2D getStartPosition(Shape path) {
+        List<Point2D> points = getPointsFromShape(path);
+        // TODO: implement properly!
+        return points.get(0);
+    }
+    
+    private Point2D getEndPosition(Shape path) {
+        List<Point2D> points = getPointsFromShape(path);
+        // TODO: implement properly!
+        return points.get(1);
+    }
+    
+    private List<Point2D> getPointsFromShape(Shape shape){
+        List<Point2D> points = new LinkedList<Point2D>();
+        PathIterator it = shape.getPathIterator(null);
+        double[] coords = new double[2];
+        while (!it.isDone()){
+            it.currentSegment(coords);
+            points.add(new Point2D.Double(coords[0], coords[1]));
+            it.next();
+        }
+        return points;
     }
     
     private Shape getShape(final String shapeString) {

@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -16,6 +17,8 @@ public class Lane extends Element {
     private final int                          index;
     private final double                       speed;
     private final double                       length;
+    private final Point2D                      startPosition;
+    private final Point2D                      endPosition;
     private final Shape                        shape;
     private final Collection<Lane>             lanes;
     /**
@@ -35,22 +38,24 @@ public class Lane extends Element {
         }
     }
     
-    public Lane(final Edge edge, final int index, final double speed, final double length, final Shape shape) {
+    public Lane(final Edge edge, final int index, final double speed, final double length, final Shape shape, final Point2D startPosition, final Point2D endPosition) {
         if (edge == null) {
             throw new IllegalArgumentException("edge is null");
         }
         if (shape == null) {
             throw new IllegalArgumentException("shape is null");
         }
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
         this.edge = edge;
         this.index = index;
         this.speed = speed;
         this.length = length;
         this.shape = shape;
-        lanes = new LinkedList<Lane>();
-        agents = new ConcurrentSkipListSet<Agent>(new AgentLineComperator());
+        this.lanes = new LinkedList<Lane>();
+        this.agents = new ConcurrentSkipListSet<Agent>(new AgentLineComperator());
     }
-    
+        
     public Edge getEdge() {
         return edge;
     }
@@ -79,13 +84,21 @@ public class Lane extends Element {
         return getEdge().getStart() == junction;
     }
     
-    public Lane getLeftLane(){
+    public Lane getLeftLane() {
         return getEdge().getLanes().stream().filter(x -> x.index == index + 1).findAny().orElse(null);
     }
     
-    public Lane getRightLane(){
+    public Lane getRightLane() {
         return getEdge().getLanes().stream().filter(x -> x.index == index - 1).findAny().orElse(null);
     }    
+    
+    public Point2D getStartPosition() {
+        return startPosition;
+    }    
+    
+    public Point2D getEndPosition() {
+        return endPosition;
+    }
     
     @Override
     public int getLayer() {
