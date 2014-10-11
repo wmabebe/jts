@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class Junction extends Element {
     
-    public final static int        JUNCTION_LAYER = Edge.EDGE_LAYER + 1;
+    public final static int        JUNCTION_LAYER = Lane.LANE_LAYER + 1;
     private final double           x;
     private final double           y;
     private final Shape            shape;

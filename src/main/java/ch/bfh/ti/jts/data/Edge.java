@@ -1,7 +1,5 @@
 package ch.bfh.ti.jts.data;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -58,8 +56,6 @@ public class Edge extends Element {
     
     @Override
     public void render(final Graphics2D g) {
-        g.setStroke(new BasicStroke(6));
-        g.setColor(Color.BLACK);
-        g.drawLine((int) start.getX(), (int) start.getY(), (int) end.getX(), (int) end.getY());
+        // render nothing
     }
 }

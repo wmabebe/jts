@@ -3,23 +3,21 @@ package ch.bfh.ti.jts.data;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import ch.bfh.ti.jts.gui.data.PolyShape;
+
 public class Lane extends Element {
     
-    public final static int                    LANE_LAYER = Junction.JUNCTION_LAYER + 1;
+    public final static int                    LANE_LAYER = Edge.EDGE_LAYER + 1;
     private final Edge                         edge;
     private final int                          index;
     private final double                       speed;
     private final double                       length;
-    private final Point2D                      startPosition;
-    private final Point2D                      endPosition;
-    private final Shape                        shape;
+    private final PolyShape                    polyShape;
     private final Collection<Lane>             lanes;
     /**
      * Skiplist of agents on the line. Key: Position on line, Value: Agent
@@ -38,24 +36,22 @@ public class Lane extends Element {
         }
     }
     
-    public Lane(final Edge edge, final int index, final double speed, final double length, final Shape shape, final Point2D startPosition, final Point2D endPosition) {
+    public Lane(final Edge edge, final int index, final double speed, final double length, final PolyShape polyShape) {
         if (edge == null) {
             throw new IllegalArgumentException("edge is null");
         }
-        if (shape == null) {
-            throw new IllegalArgumentException("shape is null");
+        if (polyShape == null) {
+            throw new IllegalArgumentException("polyShape is null");
         }
-        this.startPosition = startPosition;
-        this.endPosition = endPosition;
         this.edge = edge;
         this.index = index;
         this.speed = speed;
         this.length = length;
-        this.shape = shape;
+        this.polyShape = polyShape;
         this.lanes = new LinkedList<Lane>();
         this.agents = new ConcurrentSkipListSet<Agent>(new AgentLineComperator());
     }
-        
+    
     public Edge getEdge() {
         return edge;
     }
@@ -76,6 +72,10 @@ public class Lane extends Element {
         return lanes;
     }
     
+    public PolyShape getPolyShape() {
+        return polyShape;
+    }
+    
     public boolean goesTo(final Junction junction) {
         return getEdge().getEnd() == junction;
     }
@@ -90,14 +90,6 @@ public class Lane extends Element {
     
     public Lane getRightLane() {
         return getEdge().getLanes().stream().filter(x -> x.index == index - 1).findAny().orElse(null);
-    }    
-    
-    public Point2D getStartPosition() {
-        return startPosition;
-    }    
-    
-    public Point2D getEndPosition() {
-        return endPosition;
     }
     
     @Override
@@ -111,8 +103,11 @@ public class Lane extends Element {
     
     @Override
     public void render(final Graphics2D g) {
-        g.setStroke(new BasicStroke(1));
-        g.setColor(Color.LIGHT_GRAY);
-        g.draw(shape);
+        g.setStroke(new BasicStroke(4));
+        g.setColor(Color.WHITE);
+        g.draw(polyShape.getShape());
+        g.setStroke(new BasicStroke(3));
+        g.setColor(Color.BLACK);
+        g.draw(polyShape.getShape());
     }
 }

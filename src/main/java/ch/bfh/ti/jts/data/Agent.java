@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
 
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Thinkable;
@@ -68,21 +67,11 @@ public abstract class Agent extends Element implements Thinkable, Simulatable {
     }
     
     private double getX() {
-        //final Junction start = getLane().getEdge().getStart();
-        //final Junction end = getLane().getEdge().getEnd();
-        //return start.getX() + getPosition() * (end.getX() - start.getX());
-        final Point2D start = getLane().getStartPosition();
-        final Point2D end = getLane().getEndPosition();
-        return start.getX() + getPosition() * (end.getX() - start.getX());
+        return getLane().getPolyShape().getRelativePosition(getPosition()).getX();
     }
     
     private double getY() {
-        //final Junction start = getLane().getEdge().getStart();
-        //final Junction end = getLane().getEdge().getEnd();
-        //return start.getY() + getPosition() * (end.getY() - start.getY());
-        final Point2D start = getLane().getStartPosition();
-        final Point2D end = getLane().getEndPosition();
-        return start.getY() + getPosition() * (end.getY() - start.getY());
+        return getLane().getPolyShape().getRelativePosition(getPosition()).getY();
     }
     
     public void setVelocity(final double velocity) {

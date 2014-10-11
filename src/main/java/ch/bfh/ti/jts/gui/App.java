@@ -19,7 +19,8 @@ public class App implements Runnable {
     private final Simulation    simulation;
     
     public App() {
-        net = importer.importData("src/main/resources/net.net.xml");
+        String mapname = "net";        
+        net = importer.importData(String.format("src/main/resources/%s.net.xml", mapname));
         // add some test agents for now
         // TODO: remove when agent spawning is implemented
         for (int i = 0; i < TEST_AGENTS_C; i++) {
