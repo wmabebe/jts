@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -14,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,16 +27,26 @@ import javax.swing.JPanel;
 
 public class Window {
     
-    private JFrame             frame;
-    private JPanel             panel;
-    private int                windoww      = 1000;
-    private int                windowh      = 600;
-    private final double       offsethdelta = 0.05;
-    private double             offsetx      = 0;
-    private double             offsety      = 0;
-    private double             offseth      = 0.5;
-    private final Set<Integer> keys         = new HashSet<Integer>();
-    private final Renderable   renderable;
+    /**
+     * Zoom delta. Determines how much to change the zoom when scrolling. Also
+     * sets the minimum zoom
+     */
+    private static final double ZOOM_DELTA = 0.05;
+    private JFrame              frame;
+    private JPanel              panel;
+    private int                 windoww    = 1000;
+    private int                 windowh    = 600;
+    /**
+     * Offset in x and y direction from (0/0)
+     */
+    private final Point2D       offset     = new Point2D.Double();
+    /**
+     * Zoom factor
+     */
+    private double              zoom       = 1;
+    private final Point2D       zoomCenter = new Point2D.Double();
+    private final Set<Integer>  keys       = new HashSet<Integer>();
+    private final Renderable    renderable;
     
     public Window(final Renderable renderable) {
         if (renderable == null) {
@@ -61,9 +73,6 @@ public class Window {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         panel = new JPanel() {
             
-            /**
-             *
-             */
             private static final long serialVersionUID = 1L;
             
             @Override
@@ -74,10 +83,14 @@ public class Window {
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 8));
                     // transformation (scroll and zoom)
+                    System.out.println("Offset: " + offset + " ZoomCenter: " + zoomCenter);
                     final AffineTransform t = new AffineTransform();
-                    t.translate(windoww / 2, windowh / 2);
-                    t.scale(1 / offseth, 1 / offseth);
-                    t.translate(offsetx * offseth, offsety * offseth);
+                    // move to the zoom center
+                    t.translate(-zoomCenter.getX(), -zoomCenter.getY());
+                    // zoom
+                    t.scale(zoom, zoom);
+                    t.translate(zoomCenter.getX(), zoomCenter.getY());
+                    t.translate(offset.getX(), offset.getY());
                     g2d.setTransform(t);
                     renderable.render(g2d);
                     // Let the OS have a little time...
@@ -86,6 +99,32 @@ public class Window {
                     if (g2d != null) {
                         g2d.dispose();
                     }
+                }
+            }
+        };
+        final MouseAdapter adapter = new MouseAdapter() {
+            
+            private boolean isDown            = false;
+            private Point   mousePressedPoint = new Point();
+            
+            @Override
+            public void mousePressed(final MouseEvent e) {
+                mousePressedPoint = e.getPoint();
+                isDown = true;
+            }
+            
+            @Override
+            public void mouseReleased(final MouseEvent e) {
+                isDown = false;
+            }
+            
+            @Override
+            public void mouseDragged(final MouseEvent e) {
+                if (isDown) {
+                    double deltaX = e.getX() - mousePressedPoint.getX();
+                    double deltaY = e.getY() - mousePressedPoint.getY();
+                    offset.setLocation(offset.getX() + deltaX, offset.getY() + deltaY);
+                    mousePressedPoint = e.getPoint();
                 }
             }
         };
@@ -116,46 +155,27 @@ public class Window {
                 keys.add(keyCode);
             }
         });
-        final MouseAdapter adapter = new MouseAdapter() {
-            
-            boolean isDown = false;
-            int     x      = 0;
-            int     y      = 0;
-            
-            @Override
-            public void mousePressed(final MouseEvent e) {
-                x = e.getX();
-                y = e.getY();
-                isDown = true;
-            }
-            
-            @Override
-            public void mouseReleased(final MouseEvent e) {
-                isDown = false;
-            }
-            
-            @Override
-            public void mouseDragged(final MouseEvent e) {
-                if (isDown) {
-                    offsetx += e.getX() - x;
-                    offsety += e.getY() - y;
-                    x = e.getX();
-                    y = e.getY();
-                }
-            }
-        };
         panel.addMouseListener(adapter);
         panel.addMouseMotionListener(adapter);
         panel.addMouseWheelListener(new MouseWheelListener() {
             
             @Override
             public void mouseWheelMoved(final MouseWheelEvent e) {
+                final Point mousePoint = e.getPoint();
                 final int rotation = e.getWheelRotation();
-                if (rotation < 0 && offseth >= offsethdelta) {
-                    offseth -= offsethdelta;
-                } else if (rotation > 0) {
-                    offseth += offsethdelta;
+                double zoomDelta = 0;
+                if (rotation < 0) {
+                    // zoom in
+                    zoomDelta = ZOOM_DELTA;
+                } else if (rotation > 0 && zoom >= ZOOM_DELTA) {
+                    // zoom out
+                    zoomDelta = -ZOOM_DELTA;
                 }
+                // correct offet
+                zoom += zoomDelta;
+                offset.setLocation(offset.getX() * (1 + zoomDelta), offset.getY() * (1 + zoomDelta));
+                // set mouse point relative to no zoom
+                zoomCenter.setLocation((mousePoint.getX() - offset.getX()) / zoom, (mousePoint.getY() - offset.getY()) / zoom);
             }
         });
         initMenu();

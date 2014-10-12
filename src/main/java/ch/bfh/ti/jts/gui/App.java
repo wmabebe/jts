@@ -19,7 +19,7 @@ public class App implements Runnable {
     private final Simulation    simulation;
     
     public App() {
-        String mapname = "net";        
+        String mapname = "net";
         net = importer.importData(String.format("src/main/resources/%s.net.xml", mapname));
         // add some test agents for now
         // TODO: remove when agent spawning is implemented
@@ -57,6 +57,14 @@ public class App implements Runnable {
     }
     
     private void render(final Graphics2D g) {
+        /*
+         * Hotfix: affine transformation y = -y. We've to do this because the
+         * coordinates imported expect a origin in the left bottom corner. But
+         * java does stuff different. Therefore the origin is in the left upper
+         * corner. As a result all the agents are driving on the wrong side.
+         * TODO: Change importer so that the y coordinates get transformed.
+         */
+        // g.transform(new AffineTransform().getScaleInstance(1, -1));
         net.render(g);
     }
     

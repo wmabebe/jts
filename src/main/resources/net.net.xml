@@ -25,24 +25,27 @@
 
     <location netOffset="54.55,227.19" convBoundary="0.00,0.00,266.17,438.66" origBoundary="-54.55,-227.19,211.62,211.46" projParameter="!"/>
 
+    <edge id="3" from="1" to="2" priority="-1">
+        <lane id="3_0" index="0" speed="13.90" length="233.65" shape="52.02,223.72 -1.60,0.39"/>
+    </edge>
     <edge id="-3" from="2" to="1" priority="-1">
         <lane id="-3_0" index="0" speed="13.90" length="233.65" shape="1.60,-0.39 55.23,222.95"/>
+    </edge>
+    
+    <edge id="7" from="1" to="6" priority="-1">
+        <lane id="7_0" index="0" speed="13.90" length="211.49" shape="56.28,232.10 59.53,438.63"/>
     </edge>
     <edge id="-7" from="6" to="1" priority="-1">
         <lane id="-7_0" index="0" speed="13.90" length="211.49" shape="56.23,438.68 52.98,232.15"/>
     </edge>
-    <edge id="-9" from="8" to="1" priority="-1">
-        <lane id="-9_0" index="0" speed="13.90" length="211.77" shape="266.11,236.87 59.42,229.03"/>
-    </edge>
-    <edge id="3" from="1" to="2" priority="-1">
-        <lane id="3_0" index="0" speed="13.90" length="233.65" shape="52.02,223.72 -1.60,0.39"/>
-    </edge>
-    <edge id="7" from="1" to="6" priority="-1">
-        <lane id="7_0" index="0" speed="13.90" length="211.49" shape="56.28,232.10 59.53,438.63"/>
-    </edge>
+    
     <edge id="9" from="1" to="8" priority="-1">
         <lane id="9_0" index="0" speed="13.90" length="211.77" shape="59.54,225.73 266.23,233.57"/>
     </edge>
+    <edge id="-9" from="8" to="1" priority="-1">
+        <lane id="-9_0" index="0" speed="13.90" length="211.77" shape="266.11,236.87 59.42,229.03"/>
+    </edge>
+    
 
     <junction id="1" type="priority" x="54.55" y="227.19" incLanes="-7_0 -9_0 -3_0" intLanes="" shape="51.38,232.17 57.88,232.07 59.36,230.63 59.60,224.13 56.79,222.58 50.47,224.10">
         <request index="0" response="000000000" foes="100010000"/>
