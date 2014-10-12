@@ -133,7 +133,7 @@ public class Importer {
         final String id = node.getAttributes().getNamedItem("id").getNodeValue();
         final int index = Integer.valueOf(node.getAttributes().getNamedItem("index").getNodeValue());
         final double speed = Double.valueOf(node.getAttributes().getNamedItem("speed").getNodeValue());
-        final double length = Double.valueOf(node.getAttributes().getNamedItem("speed").getNodeValue());
+        final double length = Double.valueOf(node.getAttributes().getNamedItem("length").getNodeValue());
         final PolyShape polyShape = new PolyShape(node.getAttributes().getNamedItem("shape").getNodeValue());
         final Lane lane = new Lane(edge, index, speed, length, polyShape);
         edge.getLanes().add(lane);

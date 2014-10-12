@@ -91,6 +91,10 @@ public class Window {
                     t.scale(zoom, zoom);
                     t.translate(zoomCenter.getX(), zoomCenter.getY());
                     t.translate(offset.getX(), offset.getY());
+                    // origin of the cartesian coordinates is different in c++
+                    // (source of the data) and java (rendering)
+                    // we solve the problem with a reflection across the x axis
+                    t.scale(1, -1);
                     g2d.setTransform(t);
                     renderable.render(g2d);
                     // Let the OS have a little time...
