@@ -13,6 +13,7 @@ public class PolyShape {
     private List<Point2D>       points;
     private Shape               shape;
     private double              length;
+    private Point2D             position;
     
     public PolyShape(final String shapeString) {
         this(buildPoints(shapeString));
@@ -55,10 +56,31 @@ public class PolyShape {
             double y = getStartPoint().getY() + relative * (getEndPoint().getY() - getStartPoint().getY());
             return new Point2D.Double(x, y);
         }
-        // TODO: implement
-        double x = getStartPoint().getX() + relative * (getEndPoint().getX() - getStartPoint().getX());
-        double y = getStartPoint().getY() + relative * (getEndPoint().getY() - getStartPoint().getY());
-        return new Point2D.Double(x, y);
+        double lengthOnPolyline = relative * length;
+        followPolygon(lengthOnPolyline, 0);
+        return position;
+    }
+    
+    private void followPolygon(final double distanceToFollow, final int segment) {
+        double distanceOnSegment = getSegmentLength(segment);
+        if (distanceToFollow <= distanceOnSegment) {
+            double relativePositionOnSegment = distanceToFollow / distanceOnSegment;
+            Point2D segmentStart = points.get(segment);
+            Point2D segmentEnd = points.get(segment + 1);
+            double x = segmentStart.getX() + relativePositionOnSegment * (segmentEnd.getX() - segmentStart.getX());
+            double y = segmentStart.getY() + relativePositionOnSegment * (segmentEnd.getY() - segmentStart.getY());
+            position = new Point2D.Double(x, y);
+        } else {
+            // pass junction and switch to an other lane
+            double distanceToDriveOnNextSegment = distanceToFollow - distanceOnSegment;
+            if (segment > points.size() - 3) {
+                // TODO: fix this!
+                position = getEndPoint();
+                return;
+                //throw new RuntimeException("end of polygon");
+            }
+            followPolygon(distanceToDriveOnNextSegment, segment + 1);
+        }
     }
     
     private static List<Point2D> buildPoints(final String shapeString) {
@@ -109,5 +131,12 @@ public class PolyShape {
             }
         }
         return length;
+    }
+    
+    private double getSegmentLength(final int index) {
+        if (index < 0 || index > points.size() - 2) {
+            throw new IndexOutOfBoundsException("index");
+        }
+        return points.get(index).distance(points.get(index + 1));
     }
 }

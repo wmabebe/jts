@@ -12,14 +12,14 @@ import ch.bfh.ti.jts.simulation.Simulation;
 public class App implements Runnable {
     
     public static final boolean DEBUG         = true;
-    public static final int     TEST_AGENTS_C = 5;
+    public static final int     TEST_AGENTS_C = 20;
     private final Importer      importer      = new Importer();
     private final Net           net;
     private final Window        window;
     private final Simulation    simulation;
     
     public App() {
-        String mapname = "net";        
+        String mapname = "net";
         net = importer.importData(String.format("src/main/resources/%s.net.xml", mapname));
         // add some test agents for now
         // TODO: remove when agent spawning is implemented
@@ -29,7 +29,7 @@ public class App implements Runnable {
             final Lane lane = (Lane) net.getElementStream().filter(x -> x.getClass() == Lane.class).findAny().get();
             agent.setLane(lane);
             agent.setPosition(Math.random());
-            agent.setVelocity(10);
+            agent.setVelocity(13.8); // 50km/h
             net.addElement(agent);
         }
         window = new Window(g -> {

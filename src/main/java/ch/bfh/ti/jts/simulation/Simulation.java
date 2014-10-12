@@ -19,7 +19,7 @@ public class Simulation {
      * Net for which to simulate traffic.
      */
     private final Net simulateNet;
-    private long   lastTick;
+    private long      lastTick;
     
     public Simulation(final Net simulateNet) {
         this.simulateNet = simulateNet;
@@ -37,7 +37,7 @@ public class Simulation {
         final long now = System.nanoTime();
         // get diff time to last tick
         final long duration = now - lastTick;
-        final double durationS = duration * 1E-9;
+        final double durationSeconds = duration * 1E-9;
         // build thread safe hash map which holds all the decisions of the
         // thinkables
         final Map<Thinkable, Decision> initDecisions = new HashMap<Thinkable, Decision>();
@@ -51,7 +51,7 @@ public class Simulation {
         });
         // simulate
         simulateNet.getSimulatableStream().forEach(e -> {
-            e.simulate(durationS, decisions.get(e));
+            e.simulate(durationSeconds, decisions.get(e));
         });
         lastTick = now;
     }

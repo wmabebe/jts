@@ -5,9 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Lane;
-import ch.bfh.ti.jts.utils.Helpers;
 
 public class Decision {
     
@@ -32,8 +30,8 @@ public class Decision {
         return acceleration;
     }
     
-    public void setAcceleration(double acceleration) {
-        this.acceleration = Helpers.clamp(acceleration, Agent.MIN_ACCELERATION, Agent.MAX_ACCELERATION);
+    public void setAcceleration(final double acceleration) {
+        this.acceleration = acceleration;
     }
     
     public LaneChangeDirection getLaneChangeDirection() {

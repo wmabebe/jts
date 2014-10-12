@@ -3,24 +3,20 @@ package ch.bfh.ti.jts.ai.agents;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Edge;
 import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
 
-/**
- * A agent which does random stuff.
- * 
- * @author ente
- */
-public class RandomAgent extends Agent {
+public class IdleAgent extends Agent {
     
     @Override
     public void think(Decision decision) {
-        decision.setAcceleration(ThreadLocalRandom.current().nextDouble() * (getVehicle().getMaxAcceleration() - getVehicle().getMinAcceleration()) + getVehicle().getMinAcceleration());
-        decision.setLaneChangeDirection(Decision.LaneChangeDirection.randomLaneChange(ThreadLocalRandom.current()));
-        Junction nextJunction = getLane().getEdge().getEnd();
+        decision.setAcceleration(0);
+        decision.setLaneChangeDirection(Decision.LaneChangeDirection.NONE);
+        Junction nextJunction = getNextJunction();
         final List<Edge> nextEdges = new LinkedList<Edge>(nextJunction.getOutgoingEdges());
         // get all lanes from a random next edge
         final List<Lane> nextLanes = new LinkedList<Lane>(nextEdges.get(ThreadLocalRandom.current().nextInt(nextEdges.size())).getLanes());

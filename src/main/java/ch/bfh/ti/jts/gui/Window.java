@@ -78,6 +78,10 @@ public class Window {
                     t.translate(windoww / 2, windowh / 2);
                     t.scale(1 / offseth, 1 / offseth);
                     t.translate(offsetx * offseth, offsety * offseth);
+                    // origin of the cartesian coordinates is different in c++
+                    // (source of the data) and java (rendering)
+                    // we solve the problem with a reflection across the x axis
+                    t.scale(1, -1);
                     g2d.setTransform(t);
                     renderable.render(g2d);
                     // Let the OS have a little time...
