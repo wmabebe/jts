@@ -1,5 +1,6 @@
 package ch.bfh.ti.jts.gui;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
@@ -15,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,6 +46,7 @@ public class Window {
      * Zoom factor
      */
     private double              zoom       = 1;
+    private AffineTransform     t          = new AffineTransform();
     private final Point2D       zoomCenter = new Point2D.Double();
     private final Set<Integer>  keys       = new HashSet<Integer>();
     private final Renderable    renderable;
@@ -82,20 +85,37 @@ public class Window {
                     g2d = (Graphics2D) g;
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 8));
+                    t = new AffineTransform();
+                    /*
+                     * Hotfix: affine transformation y = -y. We've to do this
+                     * because the coordinates imported expect a origin in the
+                     * left bottom corner. But java does stuff different.
+                     * Therefore the origin is in the left upper corner. As a
+                     * result all the agents are driving on the wrong side.
+                     * TODO: Change importer so that the y coordinates get
+                     * transformed.
+                     */
+                    // t.scale(1, -1);
+                    // move to offset
+                    t.translate(offset.getX(), offset.getY());
                     // transformation (scroll and zoom)
-                    System.out.println("Offset: " + offset + " ZoomCenter: " + zoomCenter);
-                    final AffineTransform t = new AffineTransform();
-                    // move to the zoom center
-                    t.translate(-zoomCenter.getX(), -zoomCenter.getY());
+                    t.translate(zoomCenter.getX(), zoomCenter.getY());
                     // zoom
                     t.scale(zoom, zoom);
-                    t.translate(zoomCenter.getX(), zoomCenter.getY());
-                    t.translate(offset.getX(), offset.getY());
-                    // origin of the cartesian coordinates is different in c++
-                    // (source of the data) and java (rendering)
-                    // we solve the problem with a reflection across the x axis
-                    t.scale(1, -1);
+                    // move to the zoom center
+                    t.translate(-zoomCenter.getX(), -zoomCenter.getY());
+                    if (App.DEBUG) {
+                        g2d.setColor(Color.GREEN);
+                        g2d.drawLine(0, 0, (int) offset.getX(), (int) offset.getY());
+                        g2d.drawOval((int) zoomCenter.getX() - 10, (int) zoomCenter.getY() - 10, 20, 20);
+                    }
                     g2d.setTransform(t);
+                    if (App.DEBUG) {
+                        g2d.setColor(Color.RED);
+                        g2d.drawLine(-20, 0, 20, 0);
+                        g2d.drawLine(0, -20, 0, 20);
+                        g2d.drawOval((int) zoomCenter.getX() - 10, (int) zoomCenter.getY() - 10, 20, 20);
+                    }
                     renderable.render(g2d);
                     // Let the OS have a little time...
                     Thread.yield();
@@ -166,6 +186,7 @@ public class Window {
             @Override
             public void mouseWheelMoved(final MouseWheelEvent e) {
                 final Point mousePoint = e.getPoint();
+                // set zoom center relative to no zoom
                 final int rotation = e.getWheelRotation();
                 double zoomDelta = 0;
                 if (rotation < 0) {
@@ -175,14 +196,20 @@ public class Window {
                     // zoom out
                     zoomDelta = -ZOOM_DELTA;
                 }
-                // correct offet
+                // change zoom
                 zoom += zoomDelta;
-                offset.setLocation(offset.getX() * (1 + zoomDelta), offset.getY() * (1 + zoomDelta));
-                // set mouse point relative to no zoom
-                zoomCenter.setLocation((mousePoint.getX() - offset.getX()) / zoom, (mousePoint.getY() - offset.getY()) / zoom);
+                try {
+                    t.inverseTransform(mousePoint, mousePoint);
+                    zoomCenter.setLocation(mousePoint.getX(), mousePoint.getY());
+                } catch (NoninvertibleTransformException e1) {
+                }
             }
         });
-        initMenu();
+        /*
+         * TODO: don't uncomment this because if you do so the coordinate origin
+         * will be strange!
+         */
+        // initMenu();
     }
     
     private void initMenu() {

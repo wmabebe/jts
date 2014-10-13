@@ -57,14 +57,6 @@ public class App implements Runnable {
     }
     
     private void render(final Graphics2D g) {
-        /*
-         * Hotfix: affine transformation y = -y. We've to do this because the
-         * coordinates imported expect a origin in the left bottom corner. But
-         * java does stuff different. Therefore the origin is in the left upper
-         * corner. As a result all the agents are driving on the wrong side.
-         * TODO: Change importer so that the y coordinates get transformed.
-         */
-        // g.transform(new AffineTransform().getScaleInstance(1, -1));
         net.render(g);
     }
     
