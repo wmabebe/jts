@@ -86,16 +86,6 @@ public class Window {
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 8));
                     t = new AffineTransform();
-                    /*
-                     * Hotfix: affine transformation y = -y. We've to do this
-                     * because the coordinates imported expect a origin in the
-                     * left bottom corner. But java does stuff different.
-                     * Therefore the origin is in the left upper corner. As a
-                     * result all the agents are driving on the wrong side.
-                     * TODO: Change importer so that the y coordinates get
-                     * transformed.
-                     */
-                    // t.scale(1, -1);
                     // move to offset
                     t.translate(offset.getX(), offset.getY());
                     // transformation (scroll and zoom)
@@ -116,6 +106,18 @@ public class Window {
                         g2d.drawLine(0, -20, 0, 20);
                         g2d.drawOval((int) zoomCenter.getX() - 10, (int) zoomCenter.getY() - 10, 20, 20);
                     }
+                    // center on screen
+                    g2d.transform(AffineTransform.getTranslateInstance(windoww / 2, windowh / 2));
+                    /*
+                     * Hotfix: affine transformation y = -y. We've to do this
+                     * because the coordinates imported expect a origin in the
+                     * left bottom corner. But java does stuff different.
+                     * Therefore the origin is in the left upper corner. As a
+                     * result all the agents are driving on the wrong side.
+                     * TODO: Change importer so that the y coordinates get
+                     * transformed.
+                     */
+                    g2d.transform(AffineTransform.getScaleInstance(1, -1));
                     renderable.render(g2d);
                     // Let the OS have a little time...
                     Thread.yield();
@@ -199,8 +201,10 @@ public class Window {
                 // change zoom
                 zoom += zoomDelta;
                 try {
-                    t.inverseTransform(mousePoint, mousePoint);
-                    zoomCenter.setLocation(mousePoint.getX(), mousePoint.getY());
+                    final Point mousePointInverse = new Point();
+                    t.inverseTransform(mousePoint, mousePointInverse);
+                    zoomCenter.setLocation(mousePointInverse.getX(), mousePointInverse.getY());
+                    offset.setLocation(mousePoint.getX() - mousePointInverse.getX(), mousePoint.getY() - mousePointInverse.getY());
                 } catch (NoninvertibleTransformException e1) {
                 }
             }
