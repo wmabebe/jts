@@ -27,6 +27,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
+import ch.bfh.ti.jts.data.Net;
+
 public class Window {
     
     /**
@@ -49,9 +51,9 @@ public class Window {
     private AffineTransform     t          = new AffineTransform();
     private final Point2D       zoomCenter = new Point2D.Double();
     private final Set<Integer>  keys       = new HashSet<Integer>();
-    private final Renderable    renderable;
+    private final Net           renderable;
     
-    public Window(final Renderable renderable) {
+    public Window(final Net renderable) {
         if (renderable == null) {
             throw new IllegalArgumentException("renderable is null");
         }
@@ -126,6 +128,9 @@ public class Window {
                         g2d.dispose();
                     }
                 }
+            }
+            
+            private void paintUI(final Graphics2D g) {
             }
         };
         final MouseAdapter adapter = new MouseAdapter() {

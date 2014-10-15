@@ -1,11 +1,5 @@
 package ch.bfh.ti.jts.simulation;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import ch.bfh.ti.jts.ai.Decision;
-import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.data.Net;
 
 /**
@@ -38,21 +32,11 @@ public class Simulation {
         // get diff time to last tick
         final long duration = now - lastTick;
         final double durationSeconds = duration * 1E-9;
-        // build thread safe hash map which holds all the decisions of the
-        // thinkables
-        final Map<Thinkable, Decision> initDecisions = new HashMap<Thinkable, Decision>();
-        simulateNet.getThinkableStream().sequential().forEach(e -> {
-            initDecisions.put(e, new Decision());
-        });
-        final Map<Thinkable, Decision> decisions = Collections.unmodifiableMap(initDecisions);
         // think
-        simulateNet.getThinkableStream().forEach(e -> {
-            e.think(decisions.get(e));
-        });
+        simulateNet.think();
         // simulate
-        simulateNet.getSimulatableStream().forEach(e -> {
-            e.simulate(durationSeconds, decisions.get(e));
-        });
+        simulateNet.simulate(durationSeconds);
+        // set lastTick for timediff
         lastTick = now;
     }
 }

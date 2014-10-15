@@ -12,7 +12,7 @@ import ch.bfh.ti.jts.gui.data.PolyShape;
 
 public class Lane extends Element {
     
-    public final static int                    LANE_LAYER = Edge.EDGE_LAYER + 1;
+    public final static int                    LANE_RENDER_LAYER = Edge.EDGE_RENDER_LAYER + 1;
     private final Edge                         edge;
     private final int                          index;
     private final double                       speed;
@@ -93,8 +93,8 @@ public class Lane extends Element {
     }
     
     @Override
-    public int getLayer() {
-        return LANE_LAYER;
+    public int getRenderLayer() {
+        return LANE_RENDER_LAYER;
     }
     
     public ConcurrentSkipListSet<Agent> getAgents() {

@@ -8,8 +8,14 @@ import ch.bfh.ti.jts.data.Element;
  *
  * @author ente
  */
-@FunctionalInterface
 public interface Simulatable {
+    
+    /**
+     * The simulation layer of the object. 0: Simulate first 1: Simulate second
+     *
+     * @return the layer
+     */
+    int getSimulationLayer();
     
     /**
      * Called in each simulation step
@@ -20,5 +26,5 @@ public interface Simulatable {
      *            Decision made by this {@link Simulatable}, {@code null} if the
      *            {@link Simulatable} does not implement the thinkable interface
      */
-    public void simulate(final double duration, final Decision decision);
+    void simulate(final double duration, final Decision decision);
 }

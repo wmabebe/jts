@@ -1,5 +1,6 @@
 package ch.bfh.ti.jts.ai;
 
+
 /**
  * Interface implemented by each {@link Element} which can make decisions.
  *

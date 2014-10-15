@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 public class Edge extends Element {
     
-    public static final int        EDGE_LAYER = Net.NET_LAYER + 1;
+    public static final int        EDGE_RENDER_LAYER = Net.NET_RENDER_LAYER + 1;
     private final Junction         start;
     private final Junction         end;
     private final int              priority;
@@ -50,8 +50,8 @@ public class Edge extends Element {
     }
     
     @Override
-    public int getLayer() {
-        return EDGE_LAYER;
+    public int getRenderLayer() {
+        return EDGE_RENDER_LAYER;
     }
     
     @Override

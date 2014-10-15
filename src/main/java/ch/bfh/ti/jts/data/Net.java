@@ -1,48 +1,43 @@
 package ch.bfh.ti.jts.data;
 
 import java.awt.Graphics2D;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.simulation.Simulatable;
+import ch.bfh.ti.jts.utils.layers.Layers;
 
 /**
  * Data holder for a traffic net.
  *
  * @author ente
  */
-public class Net extends Element {
+public class Net {
     
-    public final static int                         NET_LAYER   = 0;
-    private final Set<Element>                      elements    = new HashSet<Element>();
-    private final Set<Simulatable>                  simulatable = new HashSet<Simulatable>();
-    private final Set<Thinkable>                    thinkable   = new HashSet<Thinkable>();
-    private final Map<Integer, Collection<Element>> layers      = new HashMap<Integer, Collection<Element>>(); ;
+    public final static int           NET_RENDER_LAYER = 0;
+    private final Set<Element>        elements         = new HashSet<Element>();
+    private final Layers<Element>     renderables      = new Layers<>();
+    private final Set<Thinkable>      thinkables       = new HashSet<Thinkable>();
+    private final Layers<Simulatable> simulatables     = new Layers<Simulatable>();
+    final Map<Thinkable, Decision>    decisions        = new HashMap<Thinkable, Decision>();
     
     public void addElement(final Element element) {
         elements.add(element);
-        final int elementLayer = element.getLayer();
-        // does the layer exist?
-        if (!layers.containsKey(elementLayer)) {
-            // add a new list container for elements
-            layers.put(elementLayer, new LinkedList<Element>());
-        }
-        // add element to layer
-        layers.get(elementLayer).add(element);
-        // element thinkable?
+        renderables.addLayerable(element.getRenderLayer(), element);
         if (Thinkable.class.isInstance(element)) {
-            thinkable.add((Thinkable) element);
+            final Thinkable thinkable = (Thinkable) element;
+            thinkables.add(thinkable);
+            decisions.put(thinkable, new Decision());
         }
         // element simulatable?
         if (Simulatable.class.isInstance(element)) {
-            simulatable.add((Simulatable) element);
+            final Simulatable simulatable = (Simulatable) element;
+            simulatables.addLayerable(simulatable.getSimulationLayer(), simulatable);
         }
     }
     
@@ -50,28 +45,25 @@ public class Net extends Element {
         return elements.stream().sequential();
     }
     
-    public Stream<Thinkable> getThinkableStream() {
-        return thinkable.stream().parallel();
+    public void think() {
+        thinkables.stream().parallel().forEach(e -> {
+            e.think(decisions.get(e));
+        });
     }
     
-    public Stream<Simulatable> getSimulatableStream() {
-        return simulatable.stream().sequential();
+    public void simulate(double duration) {
+        for (int layer : simulatables.getLayersIterator()) {
+            simulatables.getLayerStream(layer).sequential().forEach(e -> {
+                e.simulate(duration, decisions.get(e));
+            });
+        }
     }
     
-    @Override
-    public int getLayer() {
-        return NET_LAYER;
-    }
-    
-    @Override
     public void render(final Graphics2D g) {
-        // get a sorted list of all layers
-        final TreeSet<Integer> sortedLayers = new TreeSet<Integer>(layers.keySet());
-        // render the layers in order
-        for (final Integer layer : sortedLayers) {
-            for (final Element element : layers.get(layer)) {
-                element.render(g);
-            }
+        for (int layer : renderables.getLayersIterator()) {
+            renderables.getLayerStream(layer).sequential().forEach(e -> {
+                e.render(g);
+            });
         }
     }
 }

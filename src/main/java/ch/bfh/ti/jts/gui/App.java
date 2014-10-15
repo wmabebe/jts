@@ -1,7 +1,5 @@
 package ch.bfh.ti.jts.gui;
 
-import java.awt.Graphics2D;
-
 import ch.bfh.ti.jts.ai.agents.RandomAgent;
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Lane;
@@ -32,9 +30,7 @@ public class App implements Runnable {
             agent.setVelocity(13.8); // 50km/h
             net.addElement(agent);
         }
-        window = new Window(g -> {
-            render(g);
-        });
+        window = new Window(net);
         simulation = new Simulation(net);
     }
     
@@ -54,10 +50,6 @@ public class App implements Runnable {
     
     private boolean isRunning() {
         return true;
-    }
-    
-    private void render(final Graphics2D g) {
-        net.render(g);
     }
     
     private void end() {

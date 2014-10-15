@@ -11,21 +11,22 @@ import ch.bfh.ti.jts.utils.Helpers;
 
 public abstract class Agent extends Element implements Thinkable, Simulatable {
     
-    public final static int AGENT_LAYER  = Junction.JUNCTION_LAYER + 1;
+    public final static int AGENT_RENDER_LAYER     = Junction.JUNCTION_RENDER_LAYER + 1;
+    public final static int AGENT_SIMULATION_LAYER = 0;
     private Lane            lane;
     /**
      * The relative position of the agent on the lane (>= 0.0 and < 1.0)
      */
-    private double          position     = 0;
+    private double          position               = 0;
     /**
      * The velocity of an agent in m/s
      */
-    private double          velocity     = 0;
+    private double          velocity               = 0;
     /**
      * The acceleration of a agent in m/s^2
      */
-    private double          acceleration = 0;
-    private Vehicle         vehicle;
+    private double          acceleration           = 0;
+    private final Vehicle   vehicle;
     
     public Agent() {
         this.vehicle = new Vehicle(-20, 20, 0, 33.3 /* 120 km/h */);
@@ -45,7 +46,9 @@ public abstract class Agent extends Element implements Thinkable, Simulatable {
         if (position < 0 || position > 1.0) {
             throw new IllegalArgumentException("position");
         }
+        lane.getAgents().remove(this);
         this.position = position;
+        lane.getAgents().add(this);
     }
     
     public double getPosition() {
@@ -132,8 +135,8 @@ public abstract class Agent extends Element implements Thinkable, Simulatable {
     }
     
     @Override
-    public int getLayer() {
-        return AGENT_LAYER;
+    public int getRenderLayer() {
+        return AGENT_RENDER_LAYER;
     }
     
     /**
@@ -156,6 +159,11 @@ public abstract class Agent extends Element implements Thinkable, Simulatable {
         g.translate(x, y);
         g.fill(vehicle.getShape());
         g.translate(-x, -y);
+    }
+    
+    @Override
+    public int getSimulationLayer() {
+        return AGENT_SIMULATION_LAYER;
     }
     
     @Override
