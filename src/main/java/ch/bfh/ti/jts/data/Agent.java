@@ -9,24 +9,29 @@ import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
 
-public abstract class Agent extends Element implements Thinkable, Simulatable {
+public abstract class Agent extends Element implements Thinkable, Simulatable, Comparable<Agent> {
     
-    public final static int AGENT_RENDER_LAYER     = Junction.JUNCTION_RENDER_LAYER + 1;
-    public final static int AGENT_SIMULATION_LAYER = 0;
-    private Lane            lane;
+    public final static int    AGENT_RENDER_LAYER     = Junction.JUNCTION_RENDER_LAYER + 1;
+    public final static int    AGENT_SIMULATION_LAYER = 0;
+    /**
+     * The hue of the agent when driving with maximum velocity. slower is in the
+     * range [0 , AGENT_MAX_VELOCITY_COLOR]. 0.33 : Green
+     */
+    public final static double AGENT_MAX_VELOCITY_HUE = 0.33;
+    private Lane               lane;
     /**
      * The relative position of the agent on the lane (>= 0.0 and < 1.0)
      */
-    private double          position               = 0;
+    private double             position               = 0;
     /**
      * The velocity of an agent in m/s
      */
-    private double          velocity               = 0;
+    private double             velocity               = 0;
     /**
      * The acceleration of a agent in m/s^2
      */
-    private double          acceleration           = 0;
-    private final Vehicle   vehicle;
+    private double             acceleration           = 0;
+    private final Vehicle      vehicle;
     
     public Agent() {
         this.vehicle = new Vehicle(-20, 20, 0, 33.3 /* 120 km/h */);
@@ -40,6 +45,11 @@ public abstract class Agent extends Element implements Thinkable, Simulatable {
     
     public Lane getLane() {
         return lane;
+    }
+    
+    @Override
+    public int compareTo(Agent a) {
+        return new Double(getPosition()).compareTo(a.getPosition());
     }
     
     public void setPosition(final Double position) {
@@ -145,7 +155,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable {
      * @return color
      */
     private Color getColor() {
-        double hue = 0.33 - 0.33 * (getVelocity() / vehicle.getMaxVelocity());
+        double hue = AGENT_MAX_VELOCITY_HUE * (getVelocity() / vehicle.getMaxVelocity());
         hue = Helpers.clamp(hue, 0.0, 1.0);
         return Color.getHSBColor((float) hue, 1.0f, 1.0f);
     }

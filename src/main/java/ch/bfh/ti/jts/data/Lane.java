@@ -4,37 +4,30 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.gui.data.PolyShape;
+import ch.bfh.ti.jts.simulation.Simulatable;
 
-public class Lane extends Element {
+public class Lane extends Element implements Simulatable {
     
-    public final static int                    LANE_RENDER_LAYER = Edge.EDGE_RENDER_LAYER + 1;
-    private final Edge                         edge;
-    private final int                          index;
-    private final double                       speed;
-    private final double                       length;
-    private final PolyShape                    polyShape;
-    private final Collection<Lane>             lanes;
+    public final static int              LANE_RENDER_LAYER     = Edge.EDGE_RENDER_LAYER + 1;
+    public final static int              LANE_SIMULATION_LAYER = Agent.AGENT_SIMULATION_LAYER + 1;
+    private final Edge                   edge;
+    private final int                    index;
+    private final double                 speed;
+    private final double                 length;
+    private final PolyShape              polyShape;
+    /**
+     * Lanes which are connected to this lane (over a junction)
+     */
+    private final Collection<Lane>       lanes;
     /**
      * Skiplist of agents on the line. Key: Position on line, Value: Agent
      */
-    private final ConcurrentSkipListSet<Agent> agents;
-    /**
-     * A comperator for Agents on a Line
-     *
-     * @author ente
-     */
-    private class AgentLineComperator implements Comparator<Agent> {
-        
-        @Override
-        public int compare(final Agent a1, final Agent a2) {
-            return new Double(a1.getPosition()).compareTo(a2.getPosition());
-        }
-    }
+    private ConcurrentSkipListSet<Agent> agents;
     
     public Lane(final Edge edge, final int index, final double speed, final double length, final PolyShape polyShape) {
         if (edge == null) {
@@ -49,7 +42,7 @@ public class Lane extends Element {
         this.length = length;
         this.polyShape = polyShape;
         this.lanes = new LinkedList<Lane>();
-        this.agents = new ConcurrentSkipListSet<Agent>(new AgentLineComperator());
+        this.agents = new ConcurrentSkipListSet<Agent>();
     }
     
     public Edge getEdge() {
@@ -92,13 +85,39 @@ public class Lane extends Element {
         return getEdge().getLanes().stream().filter(x -> x.index == index - 1).findAny().orElse(null);
     }
     
+    public ConcurrentSkipListSet<Agent> getAgents() {
+        return agents;
+    }
+    
     @Override
     public int getRenderLayer() {
         return LANE_RENDER_LAYER;
     }
     
-    public ConcurrentSkipListSet<Agent> getAgents() {
-        return agents;
+    @Override
+    public int getSimulationLayer() {
+        return LANE_SIMULATION_LAYER;
+    }
+    
+    @Override
+    public void simulate(double duration, Decision decision) {
+        final ConcurrentSkipListSet<Agent> agentsBuffer = new ConcurrentSkipListSet<Agent>();
+        // to through agents in order
+        while (agents.size() > 0) {
+            final Agent thisAgent = agents.pollFirst();
+            if (agents.size() > 0) {
+                final Agent nextAgent = agents.first();
+                // check if order is still ok, detect collisions
+                if (thisAgent.getPosition() >= nextAgent.getPosition()) {
+                    // collision!
+                    thisAgent.setVelocity(0);
+                    nextAgent.setVelocity(0);
+                    thisAgent.setPosition(nextAgent.getPosition());
+                }
+            }
+            agentsBuffer.add(thisAgent);
+        }
+        agents = agentsBuffer;
     }
     
     @Override
