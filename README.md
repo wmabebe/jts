@@ -1,33 +1,80 @@
 # Java Traffic Simulator (jts)
 
-## Journal
+*Java Traffic Simulator* is a traffic flow microsimulation written in Java.
 
-### 14: CW 39
+This project is currently under heavy developement.
 
-Enteee, Winku
+## Features
 
-- Write requirements doc [done]
+* Simulation engine which is easely extensible
+  ```java
+public interface Simulatable {
+    int getSimulationLayer();
+    void simulate(final double duration, final Decision decision);
+}
+  ```
+* Import road map data from [OpenStreetMap][osm]
+* Graphical user interface with 2D output
+  * Allows scrolling and zooming
 
-### 14: CW 40
+
+## Resources
+
+* [Project outline][projoutl]
+* [Simulation of Urban MObility (SUMO), old website][sumoweb]
+* [Simulation of Urban MObility (SUMO), wiki][sumowiki]
+
+
+## Planning
+
+### Planned features
+
+* Lane changing
+* Parameterizable AI
+
+
+### Journal
+
+#### Calendar week 39
+
+Enteee, winki
+
+* Write requirements doc [done]
+
+#### Calendar week 40
 
 Enteee
-- Basic simulator setup [done]
+* Basic simulator setup [done]
 
-Winku
-- Projekt setup [done]
-- Basic data structure [done]
-- Implement xml importer [done]
+winku
+* Projekt setup [done]
+* Basic data structure [done]
+* Implement xml importer [done]
 
-### 14: CW 41
+#### Calendar week 41
 
 Enteee
-- Simulation (Decision objects, think, simulate)
-  - call every think method of all Intelligents (parallel) [done]
-  - fill a collection [done]
-  - loop through decisions -> simulate every decision (serial) [done, without lane switching]
-- Calculate world coordinates of agent
+* Simulation (Decision objects, think, simulate)
+  * call every think method of all Intelligents (parallel) [done]
+  * fill a collection [done]
+  * loop through decisions -> simulate every decision (serial) [done, without lane switching]
+* Calculate world coordinates of agent
 
-Winku
-- Spawn agents [done]
-- Dummy AI [done]
-- Move agents [done]
+winku
+* Spawn agents [done]
+* Dummy AI [done]
+* Move agents [done]
+
+#### Calendar week 42
+
+Enteee
+
+winki
+* Render agents on polygons [done]
+* Orientation of agents visible [done]
+
+
+[osm]:http://www.openstreetmap.ch/
+[projoutl]:https://staff.hti.bfh.ch/swp1/Projekt_1/projects.html
+[sumoweb]:http://web.archive.org/web/20140625054800/http://sumo-sim.org/
+[sumowiki]:http://sumo.dlr.de/wiki/Main_Page

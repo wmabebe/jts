@@ -13,22 +13,33 @@ public class PolyShape {
     private List<Point2D>       points;
     private Shape               shape;
     private double              length;
+    private boolean             closedPath;
     private Point2D             position;
+    private double              orientation;
     
-    public PolyShape(final String shapeString) {
-        this(buildPoints(shapeString));
-    }
-    
-    public PolyShape(List<Point2D> points) {
+    public PolyShape(List<Point2D> points, final boolean closedPath) {
         if (points == null) {
             throw new IllegalArgumentException("points is null");
         }
         if (points.size() == 0) {
             throw new IllegalArgumentException("points is empty");
         }
+        this.closedPath = closedPath;
         this.points = points;
         this.shape = buildShape();
         this.length = buildLength();
+    }
+    
+    public PolyShape(List<Point2D> points) {
+        this(points, false);
+    }
+    
+    public PolyShape(final String shapeString, final boolean closedPath) {
+        this(buildPoints(shapeString), closedPath);
+    }
+    
+    public PolyShape(final String shapeString) {
+        this(buildPoints(shapeString), false);
     }
     
     public Shape getShape() {
@@ -48,17 +59,27 @@ public class PolyShape {
     }
     
     public Point2D getRelativePosition(double relative) {
+        calculate(relative);
+        return position;
+    }
+    
+    public double getRelativeOrientation(double relative) {
+        calculate(relative);
+        return orientation;
+    }
+    
+    private void calculate(final double relative) {
         if (relative < 0.0 || relative > 1.0) {
             throw new IllegalArgumentException("relative is out of bounds");
         }
         if (points.size() == 2) {
             double x = getStartPoint().getX() + relative * (getEndPoint().getX() - getStartPoint().getX());
             double y = getStartPoint().getY() + relative * (getEndPoint().getY() - getStartPoint().getY());
-            return new Point2D.Double(x, y);
+            position = new Point2D.Double(x, y);
+            orientation = getAngleBetweenTwoPoints(getStartPoint(), getEndPoint());
         }
         double lengthOnPolyline = relative * length;
         followPolygon(lengthOnPolyline, 0);
-        return position;
     }
     
     private void followPolygon(final double distanceToFollow, final int segment) {
@@ -70,15 +91,10 @@ public class PolyShape {
             double x = segmentStart.getX() + relativePositionOnSegment * (segmentEnd.getX() - segmentStart.getX());
             double y = segmentStart.getY() + relativePositionOnSegment * (segmentEnd.getY() - segmentStart.getY());
             position = new Point2D.Double(x, y);
+            orientation = getAngleBetweenTwoPoints(segmentStart, segmentEnd);
         } else {
             // pass junction and switch to an other lane
             double distanceToDriveOnNextSegment = distanceToFollow - distanceOnSegment;
-            if (segment > points.size() - 3) {
-                // TODO: fix this!
-                position = getEndPoint();
-                return;
-                //throw new RuntimeException("end of polygon");
-            }
             followPolygon(distanceToDriveOnNextSegment, segment + 1);
         }
     }
@@ -107,6 +123,12 @@ public class PolyShape {
         return pointlist;
     }
     
+    private double getAngleBetweenTwoPoints(final Point2D p1, final Point2D p2) {
+        double dx = p2.getX() - p1.getX();
+        double dy = p2.getY() - p1.getY();
+        return Math.atan2(dy, dx);
+    }
+    
     private Shape buildShape() {
         final Path2D path = new Path2D.Double();
         for (int i = 0; i < points.size(); i++) {
@@ -117,7 +139,9 @@ public class PolyShape {
                 path.lineTo(point.getX(), point.getY());
             }
         }
-        // path.closePath();
+        if (closedPath) {
+            path.closePath();
+        }
         return path;
     }
     
@@ -128,6 +152,7 @@ public class PolyShape {
             for (int i = 1; i < points.size(); i++) {
                 Point2D current = points.get(i);
                 length += current.distance(last);
+                last = current;
             }
         }
         return length;

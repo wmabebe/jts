@@ -1,7 +1,7 @@
 package ch.bfh.ti.jts.data;
 
 import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
+import java.awt.geom.Path2D;
 
 public class Vehicle {
     
@@ -22,7 +22,7 @@ public class Vehicle {
      */
     private double              maxVelocity;
     private final static double SIZE  = 3.0;
-    private final static Shape  SHAPE = new Ellipse2D.Double(-SIZE / 2, -SIZE / 2, SIZE, SIZE);
+    private final static Shape  SHAPE = buildShape();
     
     public Vehicle() {
         this(-5, 5, 0, 33.3);
@@ -53,5 +53,14 @@ public class Vehicle {
     
     public double getMinVelocity() {
         return minVelocity;
+    }
+    
+    private static final Shape buildShape() {
+        final Path2D path = new Path2D.Double();
+        path.moveTo(SIZE / 2, 0.0);
+        path.lineTo(-SIZE / 2, SIZE / 4);
+        path.lineTo(-SIZE / 2, -SIZE / 4);
+        path.closePath();
+        return path;
     }
 }

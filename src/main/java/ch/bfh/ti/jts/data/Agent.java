@@ -3,6 +3,8 @@ package ch.bfh.ti.jts.data;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Thinkable;
@@ -20,9 +22,9 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
     public final static double AGENT_MAX_VELOCITY_HUE = 0.33;
     private Lane               lane;
     /**
-     * The relative position of the agent on the lane (>= 0.0 and < 1.0)
+     * The relative position of the agent on the lane (>= 0.0 and <= 1.0)
      */
-    private double             position               = 0;
+    private double             relativePosition       = 0;
     /**
      * The velocity of an agent in m/s
      */
@@ -49,32 +51,28 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
     
     @Override
     public int compareTo(Agent a) {
-        return new Double(getPosition()).compareTo(a.getPosition());
+        return new Double(getRelativePosition()).compareTo(a.getRelativePosition());
     }
     
-    public void setPosition(final Double position) {
+    public void setRelativePosition(final Double position) {
         if (position < 0 || position > 1.0) {
             throw new IllegalArgumentException("position");
         }
         lane.getAgents().remove(this);
-        this.position = position;
+        this.relativePosition = position;
         lane.getAgents().add(this);
     }
     
-    public double getPosition() {
-        return position;
+    public double getRelativePosition() {
+        return relativePosition;
+    }
+    
+    public Point2D getPosition() {
+        return getLane().getPolyShape().getRelativePosition(getRelativePosition());
     }
     
     public Vehicle getVehicle() {
         return vehicle;
-    }
-    
-    private double getX() {
-        return getLane().getPolyShape().getRelativePosition(getPosition()).getX();
-    }
-    
-    private double getY() {
-        return getLane().getPolyShape().getRelativePosition(getPosition()).getY();
     }
     
     public Junction getNextJunction() {
@@ -127,10 +125,10 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
     
     private void followLane(final double distanceToDrive, final Decision decision) {
         double lengthLane = getLane().getLength();
-        double distanceOnLaneLeft = lengthLane * (1 - getPosition());
+        double distanceOnLaneLeft = lengthLane * (1 - getRelativePosition());
         if (distanceToDrive <= distanceOnLaneLeft) {
             // stay on this lane
-            setPosition(getPosition() + distanceToDrive / lengthLane);
+            setRelativePosition(getRelativePosition() + distanceToDrive / lengthLane);
         } else {
             // pass junction and switch to an other lane
             double distanceToDriveOnNewLane = distanceToDrive - distanceOnLaneLeft;
@@ -138,7 +136,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
             if (nextLane == null) {
                 throw new RuntimeException("Agent didn't decide where to go.");
             }
-            setPosition(0.0);
+            setRelativePosition(0.0);
             setLane(nextLane);
             followLane(distanceToDriveOnNewLane, decision);
         }
@@ -162,12 +160,15 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
     
     @Override
     public void render(final Graphics2D g) {
-        final double x = getX();
-        final double y = getY();
+        final Point2D position = getPosition();
+        final double x = position.getX();
+        final double y = position.getY();
+        double orientation = getLane().getPolyShape().getRelativeOrientation(getRelativePosition());
+        AffineTransform at = AffineTransform.getRotateInstance(orientation);
         g.setStroke(new BasicStroke(1));
         g.setColor(getColor());
         g.translate(x, y);
-        g.fill(vehicle.getShape());
+        g.fill(at.createTransformedShape(vehicle.getShape()));
         g.translate(-x, -y);
     }
     

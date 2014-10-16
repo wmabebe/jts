@@ -93,7 +93,7 @@ public class Window {
                     // transformation (scroll and zoom)
                     t.translate(zoomCenter.getX(), zoomCenter.getY());
                     // zoom
-                    t.scale(zoom, zoom);
+                    t.scale(1 / zoom, 1 / zoom);
                     // move to the zoom center
                     t.translate(-zoomCenter.getX(), -zoomCenter.getY());
                     if (App.DEBUG) {
@@ -129,9 +129,6 @@ public class Window {
                     }
                 }
             }
-            
-            private void paintUI(final Graphics2D g) {
-            }
         };
         final MouseAdapter adapter = new MouseAdapter() {
             
@@ -160,16 +157,20 @@ public class Window {
             }
         };
         frame.setContentPane(panel);
-        // Add canvas to game window...
-        // frame.pack();
+        /*
+         * TODO: don't uncomment this because if you do so the coordinate origin
+         * will be strange!
+         */
+        // initMenu();
         frame.setExtendedState(Frame.MAXIMIZED_BOTH);
         // app.setLocationRelativeTo(null);
         frame.addComponentListener(new ComponentAdapter() {
             
             @Override
             public void componentResized(final ComponentEvent e) {
-                windoww = frame.getWidth();
-                windowh = frame.getHeight();
+                windoww = panel.getWidth();
+                windowh = panel.getHeight();
+                System.out.println(windowh);
             }
         });
         frame.addKeyListener(new KeyAdapter() {
@@ -214,11 +215,6 @@ public class Window {
                 }
             }
         });
-        /*
-         * TODO: don't uncomment this because if you do so the coordinate origin
-         * will be strange!
-         */
-        // initMenu();
     }
     
     private void initMenu() {
