@@ -170,7 +170,6 @@ public class Window {
             public void componentResized(final ComponentEvent e) {
                 windoww = panel.getWidth();
                 windowh = panel.getHeight();
-                System.out.println(windowh);
             }
         });
         frame.addKeyListener(new KeyAdapter() {
