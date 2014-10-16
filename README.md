@@ -7,12 +7,14 @@ This project is currently under heavy developement.
 ## Features
 
 * Simulation engine which is easely extensible
-  ```java
+
+```java
 public interface Simulatable {
     int getSimulationLayer();
     void simulate(final double duration, final Decision decision);
 }
-  ```
+```
+  
 * Import road map data from [OpenStreetMap][osm]
 * Graphical user interface with 2D output
   * Allows scrolling and zooming
