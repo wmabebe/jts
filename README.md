@@ -18,13 +18,6 @@ public interface Simulatable {
   * Allows scrolling and zooming
 
 
-## Resources
-
-* [Project outline][projoutl]
-* [Simulation of Urban MObility (SUMO), old website][sumoweb]
-* [Simulation of Urban MObility (SUMO), wiki][sumowiki]
-
-
 ## Planning
 
 ### Planned features
@@ -74,7 +67,23 @@ winki
 * Orientation of agents visible [done]
 
 
+## Resources
+
+* [Project outline][projoutl]
+* [Simulation of Urban MObility (SUMO), old website][sumoweb]
+* [Simulation of Urban MObility (SUMO), wiki][sumowiki]
+
+
+## Licence
+
+This software and the underlying source code is licensed under the [MIT license][license].
+
+
+
+
 [osm]:http://www.openstreetmap.ch/
 [projoutl]:https://staff.hti.bfh.ch/swp1/Projekt_1/projects.html
 [sumoweb]:http://web.archive.org/web/20140625054800/http://sumo-sim.org/
 [sumowiki]:http://sumo.dlr.de/wiki/Main_Page
+
+[license]:http://opensource.org/licenses/mit-license.php
