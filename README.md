@@ -53,7 +53,6 @@ Enteee
   * call every think method of all Intelligents (parallel) [done]
   * fill a collection [done]
   * loop through decisions -> simulate every decision (serial) [done, without lane switching]
-* Calculate world coordinates of agent
 
 winku
 * Spawn agents [done]
@@ -63,11 +62,22 @@ winku
 #### Calendar week 42
 
 Enteee
+* Zooming [done]
+* Collisions [partially done, buggy]
+* Lane switching
 
 winki
 * Render agents on polygons [done]
 * Orientation of agents visible [done]
 
+#### Calendar week 43
+
+Enteee
+* GPS-helper
+
+winki
+* Import of route-files
+* Spawning of agents based on activities
 
 ## Resources
 
