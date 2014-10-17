@@ -58,9 +58,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
         if (position < 0 || position > 1.0) {
             throw new IllegalArgumentException("position");
         }
-        lane.getAgents().remove(this);
         this.relativePosition = position;
-        lane.getAgents().add(this);
     }
     
     public double getRelativePosition() {
@@ -131,20 +129,15 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
             setRelativePosition(getRelativePosition() + distanceToDrive / lengthLane);
         } else {
             // pass junction and switch to an other lane
-            double distanceToDriveOnNewLane = distanceToDrive - distanceOnLaneLeft;
+            double distanceToDriveOnNextLane = distanceToDrive - distanceOnLaneLeft;
             final Lane nextLane = decision.getNextJunctionLane();
             if (nextLane == null) {
                 throw new RuntimeException("Agent didn't decide where to go.");
             }
             setRelativePosition(0.0);
             setLane(nextLane);
-            followLane(distanceToDriveOnNewLane, decision);
+            followLane(distanceToDriveOnNextLane, decision);
         }
-    }
-    
-    @Override
-    public int getRenderLayer() {
-        return AGENT_RENDER_LAYER;
     }
     
     /**
@@ -156,6 +149,11 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
         double hue = AGENT_MAX_VELOCITY_HUE * (getVelocity() / vehicle.getMaxVelocity());
         hue = Helpers.clamp(hue, 0.0, 1.0);
         return Color.getHSBColor((float) hue, 1.0f, 1.0f);
+    }
+    
+    @Override
+    public int getRenderLayer() {
+        return AGENT_RENDER_LAYER;
     }
     
     @Override

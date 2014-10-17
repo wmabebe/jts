@@ -105,10 +105,10 @@ public class Lane extends Element implements Simulatable {
         // to through agents in order
         while (agents.size() > 0) {
             final Agent thisAgent = agents.pollFirst();
-            if (agents.size() > 0) {
+            if (thisAgent.getLane() == this && agents.size() > 0) {
                 final Agent nextAgent = agents.first();
                 // check if order is still ok, detect collisions
-                if (thisAgent.getRelativePosition() >= nextAgent.getRelativePosition()) {
+                if (nextAgent.getLane() == this && thisAgent.getRelativePosition() >= nextAgent.getRelativePosition()) {
                     // collision!
                     thisAgent.setVelocity(0);
                     nextAgent.setVelocity(0);

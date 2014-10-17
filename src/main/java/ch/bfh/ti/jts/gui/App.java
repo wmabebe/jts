@@ -10,7 +10,7 @@ import ch.bfh.ti.jts.simulation.Simulation;
 public class App implements Runnable {
     
     public static final boolean DEBUG         = true;
-    public static final int     TEST_AGENTS_C = 500;
+    public static final int     TEST_AGENTS_C = 200;
     private final Importer      importer      = new Importer();
     private final Net           net;
     private final Window        window;
