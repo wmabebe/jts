@@ -76,8 +76,8 @@ Enteee
 * GPS-helper
 
 winki
-* Import of route-files
-* Spawning of agents based on activities
+* Import of route-files [done]
+* Spawning of agents based on activities [done]
 
 ## Resources
 

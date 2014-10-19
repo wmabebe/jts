@@ -12,7 +12,8 @@ public class Edge extends Element {
     private final int              priority;
     private final Collection<Lane> lanes;
     
-    public Edge(final Junction start, final Junction end, final int priority) {
+    public Edge(final String name, final Junction start, final Junction end, final int priority) {
+        super(name);
         if (start == null) {
             throw new IllegalArgumentException("start is null");
         }
@@ -41,6 +42,10 @@ public class Edge extends Element {
         return lanes;
     }
     
+    public Lane getFirstLane() {
+        return getLanes().stream().sequential().findFirst().orElse(null);
+    }
+    
     public boolean goesTo(final Junction junction) {
         return getEnd() == junction;
     }
@@ -56,6 +61,6 @@ public class Edge extends Element {
     
     @Override
     public void render(final Graphics2D g) {
-        // render nothing
+        // do nothing
     }
 }

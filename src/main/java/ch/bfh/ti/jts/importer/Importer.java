@@ -1,34 +1,24 @@
 package ch.bfh.ti.jts.importer;
 
-import java.awt.Shape;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import ch.bfh.ti.jts.data.Edge;
-import ch.bfh.ti.jts.data.Junction;
-import ch.bfh.ti.jts.data.Lane;
-import ch.bfh.ti.jts.data.Net;
-import ch.bfh.ti.jts.gui.data.PolyShape;
-
-public class Importer {
+/**
+ * Abstract class for XML file importers.
+ * 
+ * @author Mathias
+ * @param <T>
+ *            type of the imported class file.
+ */
+public abstract class Importer<T> {
     
-    private DocumentBuilderFactory      documentBuilderFactory;
-    private DocumentBuilder             documentBuilder;
-    private final Net                   net             = new Net();
-    private final Collection<Node>      edgesNodes      = new LinkedList<Node>();
-    private final Collection<Node>      connectionNodes = new LinkedList<Node>();
-    private final Map<String, Junction> junctions       = new LinkedHashMap<String, Junction>();
-    private final Map<String, Edge>     edges           = new LinkedHashMap<String, Edge>();
-    private final Map<String, Lane>     lanes           = new LinkedHashMap<String, Lane>();
+    private DocumentBuilderFactory documentBuilderFactory;
+    private DocumentBuilder        documentBuilder;
+    private Document               document;
+    private T                      data;
     
     public Importer() {
         try {
@@ -39,121 +29,70 @@ public class Importer {
         }
     }
     
-    public Net importData(final String path) {
+    /**
+     * Imports data from a file into an object representation.
+     * 
+     * @param path
+     *            path to the file to import
+     * @return object representation of the imported file
+     */
+    public T importData(final String path) {
         try {
-            final Document document = documentBuilder.parse(path);
-            extractData(document, net);
+            document = documentBuilder.parse(path);
+            data = extractData(document);
         } catch (final Exception ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException("document parsing failed", ex);
         }
-        return net;
+        return data;
     }
     
-    private void extractData(final Document document, final Net net) {
-        final Node root = document.getDocumentElement();
-        final NodeList nodes = root.getChildNodes();
-        for (int i = 1; i < nodes.getLength(); i++) {
-            final Node node = nodes.item(i);
-            if (node.getNodeName().equals("location")) {
-                extractLocation(node);
-            } else if (node.getNodeName().equals("edge")) {
-                // add to dictionary, extract later
-                edgesNodes.add(node);
-            } else if (node.getNodeName().equals("junction")) {
-                extractJunction(node);
-            } else if (node.getNodeName().equals("connection")) {
-                // add to dictionary, extract later
-                connectionNodes.add(node);
+    /**
+     * Abstract method that handles the data extraction.
+     * 
+     * @param document
+     *            XML document
+     * @return object representation of the imported file
+     */
+    abstract T extractData(final Document document);
+    
+    /**
+     * Converts a class into another.
+     * 
+     * @param input
+     *            input class
+     * @param outputClass
+     *            output type
+     * @return converted object
+     * @throws Exception
+     */
+    private <I, O> O convert(I input, Class<O> outputClass) throws Exception {
+        return input == null ? null : outputClass.getConstructor(String.class).newInstance(input.toString());
+    }
+    
+    /**
+     * Get the attribute value of a node with the specified type.
+     * 
+     * @param node
+     *            document node
+     * @param attributeName
+     *            name of the attribute to convert
+     * @param outputClass
+     *            output type of the attribute
+     * @return attribute value
+     */
+    protected <O> O getAttribute(final Node node, String attributeName, Class<O> outputClass) {
+        O output = null;
+        try {
+            if (node.hasAttributes()) {
+                Node attribute = node.getAttributes().getNamedItem(attributeName);
+                if (attribute != null) {
+                    String value = attribute.getNodeValue();
+                    output = convert(value, outputClass);
+                }
             }
+        } catch (Exception ex) {
+            throw new RuntimeException("conversion failed", ex);
         }
-        // now we have the junctions. extract the edges
-        for (final Node node : edgesNodes) {
-            extractEdge(node);
-        }
-        // now we have the edges. extract the connections
-        for (final Node node : connectionNodes) {
-            extractConnection(node);
-        }
-    }
-    
-    private void extractLocation(final Node node) {
-    }
-    
-    private void extractJunction(final Node node) {
-        if (node == null) {
-            throw new IllegalArgumentException("node is null");
-        }
-        if (!node.hasAttributes()) {
-            throw new IllegalArgumentException("node has no attributes");
-        }
-        final String id = node.getAttributes().getNamedItem("id").getNodeValue();
-        final double x = Double.valueOf(node.getAttributes().getNamedItem("x").getNodeValue());
-        final double y = Double.valueOf(node.getAttributes().getNamedItem("y").getNodeValue());
-        final PolyShape polyShape = new PolyShape(node.getAttributes().getNamedItem("shape").getNodeValue());
-        final Shape shape = polyShape.getShape();
-        final Junction junction = new Junction(x, y, shape);
-        junctions.put(id, junction);
-        net.addElement(junction);
-    }
-    
-    private void extractEdge(final Node node) {
-        if (node == null) {
-            throw new IllegalArgumentException("node is null");
-        }
-        if (!node.hasAttributes()) {
-            throw new IllegalArgumentException("node has no attributes");
-        }
-        final String id = node.getAttributes().getNamedItem("id").getNodeValue();
-        final String from = node.getAttributes().getNamedItem("from").getNodeValue();
-        final String to = node.getAttributes().getNamedItem("to").getNodeValue();
-        final int priority = Integer.valueOf(node.getAttributes().getNamedItem("priority").getNodeValue());
-        final Junction start = junctions.get(from);
-        final Junction end = junctions.get(to);
-        final Edge edge = new Edge(start, end, priority);
-        start.getEdges().add(edge);
-        end.getEdges().add(edge);
-        edges.put(id, edge);
-        net.addElement(edge);
-        final NodeList nodes = node.getChildNodes();
-        for (int i = 1; i < nodes.getLength(); i++) {
-            final Node child = nodes.item(i);
-            if (child.getNodeName().equals("lane")) {
-                extractLane(child, edge);
-            }
-        }
-    }
-    
-    private void extractLane(final Node node, final Edge edge) {
-        if (node == null) {
-            throw new IllegalArgumentException("node is null");
-        }
-        if (!node.hasAttributes()) {
-            throw new IllegalArgumentException("node has no attributes");
-        }
-        final String id = node.getAttributes().getNamedItem("id").getNodeValue();
-        final int index = Integer.valueOf(node.getAttributes().getNamedItem("index").getNodeValue());
-        final double speed = Double.valueOf(node.getAttributes().getNamedItem("speed").getNodeValue());
-        final double length = Double.valueOf(node.getAttributes().getNamedItem("length").getNodeValue());
-        final PolyShape polyShape = new PolyShape(node.getAttributes().getNamedItem("shape").getNodeValue());
-        final Lane lane = new Lane(edge, index, speed, length, polyShape);
-        edge.getLanes().add(lane);
-        net.addElement(lane);
-        lanes.put(id, lane);
-    }
-    
-    private void extractConnection(final Node node) {
-        if (node == null) {
-            throw new IllegalArgumentException("node is null");
-        }
-        if (!node.hasAttributes()) {
-            throw new IllegalArgumentException("node has no attributes");
-        }
-        final String from = node.getAttributes().getNamedItem("from").getNodeValue();
-        final String to = node.getAttributes().getNamedItem("to").getNodeValue();
-        final String fromLane = node.getAttributes().getNamedItem("fromLane").getNodeValue();
-        final String toLane = node.getAttributes().getNamedItem("toLane").getNodeValue();
-        final Lane laneFrom = lanes.get(String.format("%s_%s", from, fromLane));
-        final Lane laneTo = lanes.get(String.format("%s_%s", to, toLane));
-        laneFrom.getLanes().add(laneTo);
+        return output;
     }
 }

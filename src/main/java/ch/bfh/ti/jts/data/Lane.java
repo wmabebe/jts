@@ -6,6 +6,8 @@ import java.awt.Graphics2D;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.gui.data.PolyShape;
@@ -29,7 +31,8 @@ public class Lane extends Element implements Simulatable {
      */
     private ConcurrentSkipListSet<Agent> agents;
     
-    public Lane(final Edge edge, final int index, final double speed, final double length, final PolyShape polyShape) {
+    public Lane(final String name, final Edge edge, final int index, final double speed, final double length, final PolyShape polyShape) {
+        super(name);
         if (edge == null) {
             throw new IllegalArgumentException("edge is null");
         }
@@ -113,6 +116,7 @@ public class Lane extends Element implements Simulatable {
                     thisAgent.setVelocity(0);
                     nextAgent.setVelocity(0);
                     thisAgent.setRelativePosition(nextAgent.getRelativePosition());
+                    Logger.getGlobal().log(Level.INFO, "collision happened");
                 }
             }
             agentsBuffer.add(thisAgent);

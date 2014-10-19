@@ -16,7 +16,8 @@ public class Junction extends Element {
     private final Shape            shape;
     private final Collection<Edge> edges;
     
-    public Junction(final double x, final double y, final Shape shape) {
+    public Junction(final String name, final double x, final double y, final Shape shape) {
+        super(name);
         if (shape == null) {
             throw new IllegalArgumentException("shape is null");
         }
@@ -43,7 +44,7 @@ public class Junction extends Element {
             return x.comesFrom(this);
         }).collect(Collectors.toList());
     }
-     
+    
     @Override
     public int getRenderLayer() {
         return JUNCTION_RENDER_LAYER;

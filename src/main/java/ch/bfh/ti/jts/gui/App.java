@@ -1,36 +1,34 @@
 package ch.bfh.ti.jts.gui;
 
-import ch.bfh.ti.jts.ai.agents.FullSpeedAgent;
-import ch.bfh.ti.jts.data.Agent;
-import ch.bfh.ti.jts.data.Lane;
+import java.util.Collection;
+
 import ch.bfh.ti.jts.data.Net;
-import ch.bfh.ti.jts.importer.Importer;
+import ch.bfh.ti.jts.data.Route;
+import ch.bfh.ti.jts.importer.NetImporter;
+import ch.bfh.ti.jts.importer.RoutesImporter;
 import ch.bfh.ti.jts.simulation.Simulation;
 
 public class App implements Runnable {
     
-    public static final boolean DEBUG         = true;
-    public static final int     TEST_AGENTS_C = 200;
-    private final Importer      importer      = new Importer();
-    private final Net           net;
-    private final Window        window;
-    private final Simulation    simulation;
+    public static final boolean     DEBUG         = true;
+    public static final int         TEST_AGENTS_C = 200;
+    private final Net               net;
+    private final Collection<Route> routes;
+    private final Window            window;
+    private final Simulation        simulation;
     
     public App() {
+        // import net and routes data...
         String mapname = "map1";
-        net = importer.importData(String.format("src/main/resources/%s.net.xml", mapname));
-        // add some test agents for now
-        // TODO: remove when agent spawning is implemented
-        for (int i = 0; i < TEST_AGENTS_C; i++) {
-            final Agent agent = new FullSpeedAgent();
-            // get first lane...
-            final Lane lane = (Lane) net.getElementStream().filter(x -> x.getClass() == Lane.class).findAny().get();
-            agent.setLane(lane);
-            agent.setRelativePosition(Math.random());
-            agent.setVelocity(13.8); // 50km/h
-            net.addElement(agent);
-        }
+        NetImporter netImporter = new NetImporter();
+        net = netImporter.importData(String.format("src/main/resources/%s.net.xml", mapname));
+        RoutesImporter routesImporter = new RoutesImporter();
+        routesImporter.setNet(net);
+        routes = routesImporter.importData(String.format("src/main/resources/%s.rou.xml", mapname));
+        net.addRoutes(routes);
+        // open window...
         window = new Window(net);
+        // start simulation...
         simulation = new Simulation(net);
     }
     

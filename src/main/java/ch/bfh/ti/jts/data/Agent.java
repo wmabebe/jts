@@ -33,10 +33,18 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
      * The acceleration of a agent in m/s^2
      */
     private double             acceleration           = 0;
-    private final Vehicle      vehicle;
+    private Vehicle            vehicle;
     
     public Agent() {
-        this.vehicle = new Vehicle(-20, 20, 0, 33.3 /* 120 km/h */);
+        super(null);
+        this.vehicle = new Vehicle(-20, 20, 0, 33.3 /* 120 km/h */, 1);
+    }
+    
+    public void setVehicle(Vehicle vehicle) {
+        if (vehicle == null){
+            throw new IllegalArgumentException("vehicle is null");
+        }
+        this.vehicle = vehicle;
     }
     
     public void setLane(final Lane lane) {
@@ -69,7 +77,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
         return getLane().getPolyShape().getRelativePosition(getRelativePosition());
     }
     
-    public Vehicle getVehicle() {
+    public Vehicle getVehicle() {        
         return vehicle;
     }
     

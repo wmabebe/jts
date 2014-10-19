@@ -1,8 +1,10 @@
 package ch.bfh.ti.jts.data;
 
 import java.awt.Graphics2D;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -10,6 +12,7 @@ import java.util.stream.Stream;
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.simulation.Simulatable;
+import ch.bfh.ti.jts.utils.Helpers;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
 /**
@@ -19,16 +22,18 @@ import ch.bfh.ti.jts.utils.layers.Layers;
  */
 public class Net {
     
-    public final static int           NET_RENDER_LAYER = 0;
-    private final Set<Element>        elements         = new HashSet<Element>();
-    private final Layers<Element>     renderables      = new Layers<>();
-    private final Set<Thinkable>      thinkables       = new HashSet<Thinkable>();
-    private final Layers<Simulatable> simulatables     = new Layers<Simulatable>();
-    final Map<Thinkable, Decision>    decisions        = new HashMap<Thinkable, Decision>();
+    public final static int                NET_RENDER_LAYER = 0;
+    private final Set<Element>             elements         = new HashSet<Element>();
+    private final Layers<Element>          renderables      = new Layers<>();
+    private final Set<Thinkable>           thinkables       = new HashSet<Thinkable>();
+    private final Layers<Simulatable>      simulatables     = new Layers<Simulatable>();
+    private final Map<Thinkable, Decision> decisions        = new HashMap<Thinkable, Decision>();
+    private final Collection<Route>        routes           = new LinkedList<Route>();
     
     public void addElement(final Element element) {
         elements.add(element);
         renderables.addLayerable(element.getRenderLayer(), element);
+        // element thinkable?
         if (Thinkable.class.isInstance(element)) {
             final Thinkable thinkable = (Thinkable) element;
             thinkables.add(thinkable);
@@ -41,8 +46,30 @@ public class Net {
         }
     }
     
+    public void addAgent(final Agent agent, final Route route) {
+        final Lane lane = route.getRouteStart().getFirstLane();
+        agent.setLane(lane);
+        agent.setVehicle(route.getVehicle());
+        final double relativePositionOnLane = route.getDeparturePos() / lane.getLength();
+        agent.setRelativePosition(Helpers.clamp(relativePositionOnLane, 0.0, 1.0));
+        agent.setVelocity(route.getDepartureSpeed());
+        addElement(agent);
+    }
+    
+    public void addRoutes(final Collection<Route> routes) {
+        this.routes.addAll(routes);
+    }
+    
+    public Collection<Route> getRoutes() {
+        return routes;
+    }
+    
     public Stream<Element> getElementStream() {
         return elements.stream().sequential();
+    }
+    
+    public Stream<Element> getElementStream(Class<?> filter) {
+        return elements.stream().sequential().filter(x -> x.getClass() == filter);
     }
     
     public void think() {

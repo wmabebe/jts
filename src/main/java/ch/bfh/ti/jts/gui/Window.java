@@ -110,15 +110,11 @@ public class Window {
                     }
                     // center on screen
                     g2d.transform(AffineTransform.getTranslateInstance(windoww / 2, windowh / 2));
-                    /*
-                     * Hotfix: affine transformation y = -y. We've to do this
-                     * because the coordinates imported expect a origin in the
-                     * left bottom corner. But java does stuff different.
-                     * Therefore the origin is in the left upper corner. As a
-                     * result all the agents are driving on the wrong side.
-                     * TODO: Change importer so that the y coordinates get
-                     * transformed.
-                     */
+                    // affine transformation y = -y. We've to do this because
+                    // the coordinates imported expect a origin in the
+                    // left bottom corner. But java does stuff different.
+                    // Therefore the origin is in the left upper corner. As a
+                    // result all the agents are driving on the wrong side.
                     g2d.transform(AffineTransform.getScaleInstance(1, -1));
                     renderable.render(g2d);
                     // Let the OS have a little time...

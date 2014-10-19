@@ -12,8 +12,13 @@ import ch.bfh.ti.jts.gui.Renderable;
  */
 public abstract class Element implements Renderable {
     
+    private String                     name;
     private static final AtomicInteger NEXT_ID = new AtomicInteger(0);
     private final int                  id      = NEXT_ID.incrementAndGet();
+    
+    public Element(final String name) {
+        this.name = name;
+    }
     
     /**
      * Gets the id of this element
@@ -22,5 +27,14 @@ public abstract class Element implements Renderable {
      */
     public int getId() {
         return id;
+    }
+    
+    /**
+     * Gets the id of this element (from xml source files)
+     * 
+     * @return the xml name
+     */
+    public String getName() {
+        return name;
     }
 }

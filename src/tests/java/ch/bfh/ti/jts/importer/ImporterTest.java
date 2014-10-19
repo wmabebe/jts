@@ -12,7 +12,7 @@ public class ImporterTest {
     @Test
     public void testImport() {
         try {
-            final Importer importer = new Importer();
+            final NetImporter importer = new NetImporter();
             final Net net = importer.importData("src\\main\\resources\\net.net.xml");
             assertNotNull(net);
         } catch (final Exception e) {
