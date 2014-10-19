@@ -3,17 +3,18 @@ package ch.bfh.ti.jts.gui.data;
 import java.awt.Shape;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class PolyShape {
+public class PolyShape implements Serializable {
     
     private static final String SHAPE_REGEX_STRING = "^[-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+)([ ][-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+))*$";
-    private List<Point2D>       points;
-    private Shape               shape;
-    private double              length;
-    private boolean             closedPath;
+    private final List<Point2D> points;
+    private final Shape         shape;
+    private final double        length;
+    private final boolean       closedPath;
     private Point2D             position;
     private double              orientation;
     

@@ -1,6 +1,7 @@
 package ch.bfh.ti.jts.data;
 
 import java.awt.Graphics2D;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +21,7 @@ import ch.bfh.ti.jts.utils.layers.Layers;
  *
  * @author ente
  */
-public class Net {
+public class Net implements Serializable {
     
     public final static int                NET_RENDER_LAYER = 0;
     private final Set<Element>             elements         = new HashSet<Element>();

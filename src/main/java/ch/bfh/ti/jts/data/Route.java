@@ -1,15 +1,17 @@
 package ch.bfh.ti.jts.data;
 
-public class Route {
+import java.io.Serializable;
+
+public class Route implements Serializable {
     
-    private Vehicle vehicle;
-    private Edge    routeStart;
-    private Edge    routeEnd;
-    private double  departureTime;
-    private double  departurePos;
-    private double  departureSpeed;
-    private double  arrivalPos;
-    private double  arrivalSpeed;
+    private final Vehicle vehicle;
+    private final Edge    routeStart;
+    private final Edge    routeEnd;
+    private final double  departureTime;
+    private final double  departurePos;
+    private final double  departureSpeed;
+    private final double  arrivalPos;
+    private final double  arrivalSpeed;
     
     public Route(final Vehicle vehicle, final Edge routeStart, final Edge routeEnd, final double departureTime, final double departurePos, final double departureSpeed, final double arrivalPos,
             final double arrivalSpeed) {

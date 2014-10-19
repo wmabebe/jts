@@ -20,6 +20,7 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -28,6 +29,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 import ch.bfh.ti.jts.data.Net;
+import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 
 public class Window {
     
@@ -35,29 +37,31 @@ public class Window {
      * Zoom delta. Determines how much to change the zoom when scrolling. Also
      * sets the minimum zoom
      */
-    private static final double ZOOM_DELTA = 0.05;
-    private JFrame              frame;
-    private JPanel              panel;
-    private int                 windoww    = 1000;
-    private int                 windowh    = 600;
+    private static final double        ZOOM_DELTA         = 0.05;
+    private JFrame                     frame;
+    private JPanel                     panel;
+    private int                        windoww            = 1000;
+    private int                        windowh            = 600;
     /**
      * Offset in x and y direction from (0/0)
      */
-    private final Point2D       offset     = new Point2D.Double();
+    private final Point2D              offset             = new Point2D.Double();
     /**
      * Zoom factor
      */
-    private double              zoom       = 1;
-    private AffineTransform     t          = new AffineTransform();
-    private final Point2D       zoomCenter = new Point2D.Double();
-    private final Set<Integer>  keys       = new HashSet<Integer>();
-    private final Net           renderable;
+    private double                     zoom               = 1;
+    private AffineTransform            t                  = new AffineTransform();
+    private final Point2D              zoomCenter         = new Point2D.Double();
+    private final Set<Integer>         keys               = new HashSet<Integer>();
+    private final Net                  renderable;
+    private final AtomicReference<Net> renderableSaveCopy = new AtomicReference<Net>();
     
     public Window(final Net renderable) {
         if (renderable == null) {
             throw new IllegalArgumentException("renderable is null");
         }
         this.renderable = renderable;
+        renderableSaveCopy.set(DeepCopy.copy(renderable));
         frame = new JFrame();
         init();
     }
@@ -67,6 +71,7 @@ public class Window {
     }
     
     public void render() {
+        renderableSaveCopy.set(DeepCopy.copy(renderable));
         frame.repaint();
     }
     
@@ -116,7 +121,7 @@ public class Window {
                     // Therefore the origin is in the left upper corner. As a
                     // result all the agents are driving on the wrong side.
                     g2d.transform(AffineTransform.getScaleInstance(1, -1));
-                    renderable.render(g2d);
+                    renderableSaveCopy.get().render(g2d);
                     // Let the OS have a little time...
                     Thread.yield();
                 } finally {

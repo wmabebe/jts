@@ -3,29 +3,30 @@ package ch.bfh.ti.jts.data;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
+import java.io.Serializable;
 
-public class Vehicle {
+public class Vehicle implements Serializable {
     
     /**
      * Minimal acceleration (inclusive) [m/s^2]
      */
-    private double             minAcceleration;
+    private final double       minAcceleration;
     /**
      * Max acceleration (inclusive) [m/s^^]
      */
-    private double             maxAcceleration;
+    private final double       maxAcceleration;
     /**
      * Minimal velocity (inclusive) [m/s], 0 := agent can't reverse.
      */
-    private double             minVelocity;
+    private final double       minVelocity;
     /**
      * Max velocity (inclusive) [m/s]
      */
-    private double             maxVelocity;
+    private final double       maxVelocity;
     /**
      * The vehicles length [m]
      */
-    private double             length;
+    private final double       length;
     /**
      * The vehicles width [m]
      */

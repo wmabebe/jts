@@ -1,5 +1,6 @@
 package ch.bfh.ti.jts.data;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import ch.bfh.ti.jts.gui.Renderable;
@@ -10,9 +11,9 @@ import ch.bfh.ti.jts.gui.Renderable;
  * @author winki
  * @author ente
  */
-public abstract class Element implements Renderable {
+public abstract class Element implements Renderable, Serializable {
     
-    private String                     name;
+    private final String               name;
     private static final AtomicInteger NEXT_ID = new AtomicInteger(0);
     private final int                  id      = NEXT_ID.incrementAndGet();
     

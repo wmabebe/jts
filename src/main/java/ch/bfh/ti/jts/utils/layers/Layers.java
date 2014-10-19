@@ -1,5 +1,6 @@
 package ch.bfh.ti.jts.utils.layers;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,10 +16,11 @@ import java.util.stream.Stream;
  * @param <T>
  *            the object to hold
  */
-public class Layers<T> {
+public class Layers<T> implements Serializable {
     
-    private final Map<Integer, Collection<T>> layers    = new HashMap<Integer, Collection<T>>();
-    private final SortedSet<Integer>          layerKeys = new TreeSet<>();
+    private static final long                 serialVersionUID = 1L;
+    private final Map<Integer, Collection<T>> layers           = new HashMap<Integer, Collection<T>>();
+    private final SortedSet<Integer>          layerKeys        = new TreeSet<>();
     
     public void addLayerable(final int layer, final T layerable) {
         if (layerable == null) {

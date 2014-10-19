@@ -1,5 +1,6 @@
 package ch.bfh.ti.jts.ai;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.Random;
 
 import ch.bfh.ti.jts.data.Lane;
 
-public class Decision {
+public class Decision implements Serializable {
     
     public static enum LaneChangeDirection {
         NONE, LEFT, RIGHT;
