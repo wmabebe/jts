@@ -21,6 +21,8 @@ import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -137,23 +139,23 @@ public class Window {
             private Point   mousePressedPoint = new Point();
             
             @Override
-            public void mousePressed(final MouseEvent e) {
-                mousePressedPoint = e.getPoint();
+            public void mousePressed(final MouseEvent mouseEvent) {
+                mousePressedPoint = mouseEvent.getPoint();
                 isDown = true;
             }
             
             @Override
-            public void mouseReleased(final MouseEvent e) {
+            public void mouseReleased(final MouseEvent mouseEvent) {
                 isDown = false;
             }
             
             @Override
-            public void mouseDragged(final MouseEvent e) {
+            public void mouseDragged(final MouseEvent mouseEvent) {
                 if (isDown) {
-                    double deltaX = e.getX() - mousePressedPoint.getX();
-                    double deltaY = e.getY() - mousePressedPoint.getY();
+                    double deltaX = mouseEvent.getX() - mousePressedPoint.getX();
+                    double deltaY = mouseEvent.getY() - mousePressedPoint.getY();
                     offset.setLocation(offset.getX() + deltaX, offset.getY() + deltaY);
-                    mousePressedPoint = e.getPoint();
+                    mousePressedPoint = mouseEvent.getPoint();
                 }
             }
         };
@@ -168,7 +170,7 @@ public class Window {
         frame.addComponentListener(new ComponentAdapter() {
             
             @Override
-            public void componentResized(final ComponentEvent e) {
+            public void componentResized(final ComponentEvent componentEvent) {
                 windoww = panel.getWidth();
                 windowh = panel.getHeight();
             }
@@ -176,14 +178,14 @@ public class Window {
         frame.addKeyListener(new KeyAdapter() {
             
             @Override
-            public void keyReleased(final KeyEvent e) {
-                final int keyCode = e.getKeyCode();
+            public void keyReleased(final KeyEvent keyEvent) {
+                final int keyCode = keyEvent.getKeyCode();
                 keys.remove(keyCode);
             }
             
             @Override
-            public void keyPressed(final KeyEvent e) {
-                final int keyCode = e.getKeyCode();
+            public void keyPressed(final KeyEvent keyEvent) {
+                final int keyCode = keyEvent.getKeyCode();
                 keys.add(keyCode);
             }
         });
@@ -192,17 +194,17 @@ public class Window {
         panel.addMouseWheelListener(new MouseWheelListener() {
             
             @Override
-            public void mouseWheelMoved(final MouseWheelEvent e) {
-                final Point mousePoint = e.getPoint();
+            public void mouseWheelMoved(final MouseWheelEvent mouseEvent) {
+                final Point mousePoint = mouseEvent.getPoint();
                 // set zoom center relative to no zoom
-                final int rotation = e.getWheelRotation();
+                final int rotation = mouseEvent.getWheelRotation();
                 double zoomDelta = 0;
-                if (rotation < 0) {
+                if (rotation < 0 && zoom >= ZOOM_DELTA) {
                     // zoom in
-                    zoomDelta = ZOOM_DELTA;
-                } else if (rotation > 0 && zoom >= ZOOM_DELTA) {
-                    // zoom out
                     zoomDelta = -ZOOM_DELTA;
+                } else if (rotation > 0) {
+                    // zoom out
+                    zoomDelta = ZOOM_DELTA;
                 }
                 // change zoom
                 zoom += zoomDelta;
@@ -211,7 +213,8 @@ public class Window {
                     t.inverseTransform(mousePoint, mousePointInverse);
                     zoomCenter.setLocation(mousePointInverse.getX(), mousePointInverse.getY());
                     offset.setLocation(mousePoint.getX() - mousePointInverse.getX(), mousePoint.getY() - mousePointInverse.getY());
-                } catch (NoninvertibleTransformException e1) {
+                } catch (NoninvertibleTransformException e) {
+                    Logger.getGlobal().log(Level.SEVERE, "Can not invert mouse drag vector", e);
                 }
             }
         });
