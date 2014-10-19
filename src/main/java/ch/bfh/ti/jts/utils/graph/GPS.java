@@ -83,6 +83,7 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
                     previous.set(vIndex, u);
                 }
             });
+            // TODO: return something
         }
     }
 }
