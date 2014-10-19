@@ -3,9 +3,13 @@ package ch.bfh.ti.jts.data;
 import java.awt.Graphics2D;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Optional;
 
-public class Edge extends Element {
+import ch.bfh.ti.jts.utils.graph.DirectedGraphEdge;
+
+public class Edge extends Element implements DirectedGraphEdge<Edge, Junction> {
     
+    private static final long      serialVersionUID  = 1L;
     public static final int        EDGE_RENDER_LAYER = Net.NET_RENDER_LAYER + 1;
     private final Junction         start;
     private final Junction         end;
@@ -26,10 +30,12 @@ public class Edge extends Element {
         lanes = new LinkedList<Lane>();
     }
     
+    @Override
     public Junction getStart() {
         return start;
     }
     
+    @Override
     public Junction getEnd() {
         return end;
     }
@@ -46,12 +52,16 @@ public class Edge extends Element {
         return getLanes().stream().sequential().findFirst().orElse(null);
     }
     
-    public boolean goesTo(final Junction junction) {
-        return getEnd() == junction;
-    }
-    
-    public boolean comesFrom(final Junction junction) {
-        return getStart() == junction;
+    @Override
+    public double getLength() {
+        double maxLenght = 0.0;
+        Optional<Lane> maxLane = lanes.stream().max((x, y) -> {
+            return new Double(x.getLength()).compareTo(y.getLength());
+        });
+        if (maxLane.isPresent()) {
+            maxLenght = maxLane.get().getLength();
+        }
+        return maxLenght;
     }
     
     @Override

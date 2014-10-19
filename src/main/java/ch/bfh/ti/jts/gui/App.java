@@ -18,7 +18,7 @@ public class App implements Runnable {
     private final Simulation        simulation;
     
     public App() {
-        // import net and routes data...
+        // import net and routes data
         String mapname = "map1";
         NetImporter netImporter = new NetImporter();
         net = netImporter.importData(String.format("src/main/resources/%s.net.xml", mapname));
@@ -26,9 +26,9 @@ public class App implements Runnable {
         routesImporter.setNet(net);
         routes = routesImporter.importData(String.format("src/main/resources/%s.rou.xml", mapname));
         net.addRoutes(routes);
-        // open window...
+        // open window
         window = new Window(net);
-        // start simulation...
+        // start simulation
         simulation = new Simulation(net);
     }
     

@@ -23,6 +23,7 @@ import ch.bfh.ti.jts.utils.layers.Layers;
  */
 public class Net implements Serializable {
     
+    private static final long              serialVersionUID = 1L;
     public final static int                NET_RENDER_LAYER = 0;
     private final Set<Element>             elements         = new HashSet<Element>();
     private final Layers<Element>          renderables      = new Layers<>();

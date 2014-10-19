@@ -3,6 +3,7 @@ package ch.bfh.ti.jts.ai.agents;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Edge;
@@ -15,6 +16,8 @@ import ch.bfh.ti.jts.data.Lane;
  * @author ente
  */
 public class RandomAgent extends Agent {
+    
+    private static final long serialVersionUID = 1L;
     
     @Override
     public void think(Decision decision) {

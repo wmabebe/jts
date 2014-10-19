@@ -10,6 +10,7 @@ import ch.bfh.ti.jts.data.Lane;
 
 public class Decision implements Serializable {
     
+    private static final long serialVersionUID = 1L;
     public static enum LaneChangeDirection {
         NONE, LEFT, RIGHT;
         

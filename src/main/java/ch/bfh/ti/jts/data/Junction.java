@@ -5,11 +5,16 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Junction extends Element {
+import ch.bfh.ti.jts.utils.graph.DirectedGraphVertex;
+
+public class Junction extends Element implements DirectedGraphVertex<Junction, Edge> {
     
+    private static final long      serialVersionUID      = 1L;
     public final static int        JUNCTION_RENDER_LAYER = Lane.LANE_RENDER_LAYER + 1;
     private final double           x;
     private final double           y;
@@ -39,10 +44,32 @@ public class Junction extends Element {
         return edges;
     }
     
+    @Override
     public Collection<Edge> getOutgoingEdges() {
-        return (Collection<Edge>) getEdges().stream().filter(x -> {
+        return getEdges().stream().filter(x -> {
             return x.comesFrom(this);
         }).collect(Collectors.toList());
+    }
+    
+    @Override
+    public Collection<Junction> getReachableVertices() {
+        final Collection<Junction> neighbours = new HashSet<>();
+        getOutgoingEdges().forEach(x -> {
+            neighbours.add(x.getEnd());
+        });
+        return neighbours;
+    }
+    
+    @Override
+    public Optional<Edge> getEdgeBetween(final Junction vertex) {
+        Optional<Edge> edgeBetween = Optional.empty();
+        for (Edge edge : getOutgoingEdges()) {
+            if (edge.goesTo(vertex)) {
+                edgeBetween = Optional.of(edge);
+                break;
+            }
+        }
+        return edgeBetween;
     }
     
     @Override

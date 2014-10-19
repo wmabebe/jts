@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 public class Vehicle implements Serializable {
     
+    private static final long  serialVersionUID = 1L;
     /**
      * Minimal acceleration (inclusive) [m/s^2]
      */
@@ -24,14 +25,14 @@ public class Vehicle implements Serializable {
      */
     private final double       maxVelocity;
     /**
-     * The vehicles length [m]
+     * Length of the vehicle [m]
      */
     private final double       length;
     /**
-     * The vehicles width [m]
+     * Width of the vehicle [m]
      */
-    private final double       width = 1.7;
-    private final static Shape SHAPE = buildShape();
+    private final double       width            = 1.7;
+    private final static Shape SHAPE            = buildShape();
     
     public Vehicle() {
         this(-5, 5, 0, 33.3, 3);
@@ -75,9 +76,9 @@ public class Vehicle implements Serializable {
     
     private static final Shape buildShape() {
         final Path2D path = new Path2D.Double();
-        path.moveTo(0.5, 0.0);
-        path.lineTo(-0.5, 0.5);
-        path.lineTo(-0.5, -0.5);
+        path.moveTo(1, 0.0);
+        path.lineTo(-1, 1);
+        path.lineTo(-1, -1);
         path.closePath();
         return path;
     }

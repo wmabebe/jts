@@ -13,9 +13,10 @@ import ch.bfh.ti.jts.gui.Renderable;
  */
 public abstract class Element implements Renderable, Serializable {
     
+    private static final long          serialVersionUID = 1L;
     private final String               name;
-    private static final AtomicInteger NEXT_ID = new AtomicInteger(0);
-    private final int                  id      = NEXT_ID.incrementAndGet();
+    private static final AtomicInteger NEXT_ID          = new AtomicInteger(0);
+    private final int                  id               = NEXT_ID.incrementAndGet();
     
     public Element(final String name) {
         this.name = name;

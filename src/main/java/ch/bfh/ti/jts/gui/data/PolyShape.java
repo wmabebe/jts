@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 public class PolyShape implements Serializable {
     
+    private static final long   serialVersionUID   = 1L;
     private static final String SHAPE_REGEX_STRING = "^[-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+)([ ][-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+))*$";
     private final List<Point2D> points;
     private final Shape         shape;

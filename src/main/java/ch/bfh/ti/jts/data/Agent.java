@@ -13,10 +13,11 @@ import ch.bfh.ti.jts.utils.Helpers;
 
 public abstract class Agent extends Element implements Thinkable, Simulatable, Comparable<Agent> {
     
+    private static final long  serialVersionUID       = 1L;
     public final static int    AGENT_RENDER_LAYER     = Junction.JUNCTION_RENDER_LAYER + 1;
     public final static int    AGENT_SIMULATION_LAYER = 0;
     /**
-     * The hue of the agent when driving with maximum velocity. slower is in the
+     * The hue of the agent when driving with maximum velocity. Slower is in the
      * range [0 , AGENT_MAX_VELOCITY_COLOR]. 0.33 : Green
      */
     public final static double AGENT_MAX_VELOCITY_HUE = 0.33;
@@ -41,7 +42,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
     }
     
     public void setVehicle(Vehicle vehicle) {
-        if (vehicle == null){
+        if (vehicle == null) {
             throw new IllegalArgumentException("vehicle is null");
         }
         this.vehicle = vehicle;
@@ -77,12 +78,8 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
         return getLane().getPolyShape().getRelativePosition(getRelativePosition());
     }
     
-    public Vehicle getVehicle() {        
+    public Vehicle getVehicle() {
         return vehicle;
-    }
-    
-    public Junction getNextJunction() {
-        return getLane().getEdge().getEnd();
     }
     
     public void setVelocity(final double velocity) {

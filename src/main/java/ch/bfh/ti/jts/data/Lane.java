@@ -15,6 +15,7 @@ import ch.bfh.ti.jts.simulation.Simulatable;
 
 public class Lane extends Element implements Simulatable {
     
+    private static final long            serialVersionUID      = 1L;
     public final static int              LANE_RENDER_LAYER     = Edge.EDGE_RENDER_LAYER + 1;
     public final static int              LANE_SIMULATION_LAYER = Agent.AGENT_SIMULATION_LAYER + 1;
     private final Edge                   edge;
@@ -110,13 +111,14 @@ public class Lane extends Element implements Simulatable {
             final Agent thisAgent = agents.pollFirst();
             if (thisAgent.getLane() == this && agents.size() > 0) {
                 final Agent nextAgent = agents.first();
-                // check if order is still ok, detect collisions
-                if (nextAgent.getLane() == this && thisAgent.getRelativePosition() >= nextAgent.getRelativePosition()) {
+                final double distanceLeft = thisAgent.getPosition().distance(nextAgent.getPosition()) - thisAgent.getVehicle().getLength() - nextAgent.getVehicle().getLength();
+                if (nextAgent.getLane() == this && distanceLeft <= 0) {
                     // collision!
                     thisAgent.setVelocity(0);
                     nextAgent.setVelocity(0);
-                    thisAgent.setRelativePosition(nextAgent.getRelativePosition());
-                    Logger.getGlobal().log(Level.INFO, "collision happened");
+                    // Logger.getGlobal().log(Level.INFO, "collision happened");
+                } else if (distanceLeft <= 0) {
+                    Logger.getGlobal().log(Level.INFO, "collision not on same lane");
                 }
             }
             agentsBuffer.add(thisAgent);
