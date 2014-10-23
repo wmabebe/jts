@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.data.Net;
 
-public abstract class BasicConsole implements IConsole {
+public abstract class BasicConsole implements Console {
     
     private final static String PROMPT            = "jts>";
     private final static String CURSOR            = "█";
@@ -30,7 +30,7 @@ public abstract class BasicConsole implements IConsole {
     
     public BasicConsole() {
         this.font = new Font("Courier New", Font.PLAIN, 14);
-    }    
+    }
     
     public Net getNet() {
         return net;
@@ -97,9 +97,18 @@ public abstract class BasicConsole implements IConsole {
     
     @Override
     public void writeLine(final String line) {
-        lines.add(line);
-        if (lines.size() > MAX_LINES) {
-            lines.remove();
+        if (line.contains("\n")) {
+            // multiple lines
+            String[] helpLines = line.split("\n");
+            for (String helpLine : helpLines) {
+                writeLine(helpLine);
+            }
+        } else {
+            // single line
+            lines.add(line);
+            if (lines.size() > MAX_LINES) {
+                lines.remove();
+            }
         }
     }
     

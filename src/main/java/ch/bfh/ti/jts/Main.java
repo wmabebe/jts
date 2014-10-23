@@ -16,6 +16,10 @@ public class Main {
         } catch (final Exception e) {
             Logger.getLogger(Main.class.getName()).log(Level.WARNING, null, e);
         }
-        new App().run();
+        
+        // start app
+        App app = new App();
+        app.loadNet("map1");
+        app.run();
     }
 }

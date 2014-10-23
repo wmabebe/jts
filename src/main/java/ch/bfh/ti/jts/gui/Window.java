@@ -31,7 +31,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-import ch.bfh.ti.jts.console.IConsole;
+import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 
@@ -59,9 +59,9 @@ public class Window {
     private final Set<Integer>         keys               = new HashSet<Integer>();
     private final Net                  renderable;
     private final AtomicReference<Net> renderableSaveCopy = new AtomicReference<Net>();
-    private final IConsole             console;
+    private final Console             console;
     
-    public Window(final Net renderable, final IConsole console) {
+    public Window(final Net renderable, final Console console) {
         if (renderable == null) {
             throw new IllegalArgumentException("renderable is null");
         }

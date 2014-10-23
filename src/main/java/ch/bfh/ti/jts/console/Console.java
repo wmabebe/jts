@@ -8,7 +8,7 @@ import ch.bfh.ti.jts.gui.Renderable;
  * 
  * @author Mathias
  */
-public interface IConsole extends Renderable {
+public interface Console extends Renderable {
     
     /**
      * Set the net where the console can execute commands on.

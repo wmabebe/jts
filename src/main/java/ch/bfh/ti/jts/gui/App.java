@@ -2,7 +2,7 @@ package ch.bfh.ti.jts.gui;
 
 import java.util.Collection;
 
-import ch.bfh.ti.jts.console.IConsole;
+import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.console.JtsConsole;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.Route;
@@ -12,31 +12,14 @@ import ch.bfh.ti.jts.simulation.Simulation;
 
 public class App implements Runnable {
     
-    public static final boolean     DEBUG         = true;
-    public static final int         TEST_AGENTS_C = 200;
-    private final Net               net;
-    private final Collection<Route> routes;
-    private final Window            window;
-    private final Simulation        simulation;
-    private final IConsole          console;
+    public static final boolean DEBUG     = true;
     
-    public App() {
-        // import net and routes data
-        String mapname = "map1";
-        NetImporter netImporter = new NetImporter();
-        net = netImporter.importData(String.format("src/main/resources/%s.net.xml", mapname));
-        RoutesImporter routesImporter = new RoutesImporter();
-        routesImporter.setNet(net);
-        routes = routesImporter.importData(String.format("src/main/resources/%s.rou.xml", mapname));
-        net.addRoutes(routes);
-        // create console
-        console = new JtsConsole();    
-        console.setNet(net);
-        // open window
-        window = new Window(net, console);
-        // start simulation
-        simulation = new Simulation(net);
-    }
+    public boolean              isRunning = false;
+    private Net                 net;
+    private Collection<Route>   routes;
+    private Window              window;
+    private Simulation          simulation;
+    private Console            console;
     
     @Override
     public void run() {
@@ -48,14 +31,38 @@ public class App implements Runnable {
         end();
     }
     
+    public void loadNet(String netName) {
+        // import net
+        NetImporter netImporter = new NetImporter();
+        net = netImporter.importData(String.format("src/main/resources/%s.net.xml", netName));
+        
+        // import routes data
+        RoutesImporter routesImporter = new RoutesImporter();
+        routesImporter.setNet(net);
+        routes = routesImporter.importData(String.format("src/main/resources/%s.rou.xml", netName));
+        net.addRoutes(routes);
+    }
+    
     private void init() {
+        // create console
+        console = new JtsConsole();
+        console.setNet(net);
+        
+        // create window
+        window = new Window(net, console);
+        
+        // create simulation
+        simulation = new Simulation(net);
+        
+        isRunning = true;
         window.setVisible(true);
     }
     
     private boolean isRunning() {
-        return true;
+        return isRunning;
     }
     
     private void end() {
+        // free resources or clean up stuff...
     }
 }
