@@ -3,6 +3,8 @@ package ch.bfh.ti.jts.ai.agents;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.data.Agent;
@@ -25,6 +27,9 @@ public class RandomAgent extends Agent {
         decision.setLaneChangeDirection(Decision.LaneChangeDirection.randomLaneChange(ThreadLocalRandom.current()));
         Junction nextJunction = getLane().getEdge().getEnd();
         final List<Edge> nextEdges = new LinkedList<Edge>(nextJunction.getOutgoingEdges());
+        if (nextEdges.size() == 0) {
+            throw new RuntimeException("error: no next edges");
+        }
         // get all lanes from a random next edge
         final List<Lane> nextLanes = new LinkedList<Lane>(nextEdges.get(ThreadLocalRandom.current().nextInt(nextEdges.size())).getLanes());
         // select a random lane

@@ -79,6 +79,14 @@ winki
 * Import of route-files [done]
 * Spawning of agents based on activities [done]
 
+#### Calendar week 44
+
+Enteee
+
+winki
+* Embedded console [in progress]
+
+
 ## Resources
 
 * [Project outline][projoutl]

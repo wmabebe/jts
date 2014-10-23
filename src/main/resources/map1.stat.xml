@@ -2,6 +2,7 @@
 
 <city>
 	<general inhabitants="200" households="100" childrenAgeLimit="18" retirementAgeLimit="65" carRate="0.5" unemploymentRate="0.05" footDistanceLimit="500" incomingTraffic="100" outgoingTraffic="200" />
+
 	<parameters carPreference="0.50" meanTimePerKmInCity="360" freeTimeActivityRate="0.15" uniformRandomTraffic="0.20" departureVariation="120" />
 
 	<population>
@@ -18,17 +19,17 @@
     </workHours>
 
 	<streets>
-		<!-- homes -->
+		
 		<street edge="-84810593" population="1.0" workPosition="0.0" />
 		<street edge="-53631335#3" population="2.0" workPosition="0.0" />
 		<street edge="-71028858" population="1.0" workPosition="0.0" />
-		<!-- work places -->
+		
 		<street edge="53330868" population="0.0" workPosition="1.0" />
 		<street edge="-53330868" population="0.0" workPosition="1.0" />
 		<street edge="71143715#2" population="0.0" workPosition="1.0" />
 		<street edge="-71143715#2" population="0.0" workPosition="1.0" />		
 	</streets>
-	
+
 	<cityGates>
 		<entrance edge="53268712#0" pos="0" incoming="1.0" outgoing="1.0"/>
 		<entrance edge="-53268712#3" pos="0" incoming="1.0" outgoing="1.0"/>
@@ -38,7 +39,7 @@
 		<school edge="53631335#2" pos="23" beginAge="12" endAge="18" capacity="400" opening="32400" closing="64800" />
 		<school edge="-53631335#2" pos="23" beginAge="3" endAge="12" capacity="150" opening="30600" closing="64800" />
 	</schools>
-	
+
 	<busStations>
 		<busStation id="1" edge="-53631335#0" pos="456" />
 		<busStation id="2" edge="-53631335#1" pos="324" />

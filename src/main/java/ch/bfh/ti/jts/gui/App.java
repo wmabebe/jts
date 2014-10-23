@@ -2,6 +2,8 @@ package ch.bfh.ti.jts.gui;
 
 import java.util.Collection;
 
+import ch.bfh.ti.jts.console.IConsole;
+import ch.bfh.ti.jts.console.JtsConsole;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.Route;
 import ch.bfh.ti.jts.importer.NetImporter;
@@ -16,6 +18,7 @@ public class App implements Runnable {
     private final Collection<Route> routes;
     private final Window            window;
     private final Simulation        simulation;
+    private final IConsole          console;
     
     public App() {
         // import net and routes data
@@ -26,8 +29,11 @@ public class App implements Runnable {
         routesImporter.setNet(net);
         routes = routesImporter.importData(String.format("src/main/resources/%s.rou.xml", mapname));
         net.addRoutes(routes);
+        // create console
+        console = new JtsConsole();    
+        console.setNet(net);
         // open window
-        window = new Window(net);
+        window = new Window(net, console);
         // start simulation
         simulation = new Simulation(net);
     }

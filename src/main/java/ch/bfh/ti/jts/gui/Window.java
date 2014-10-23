@@ -1,6 +1,7 @@
 package ch.bfh.ti.jts.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
@@ -30,6 +31,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
+import ch.bfh.ti.jts.console.IConsole;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 
@@ -57,12 +59,17 @@ public class Window {
     private final Set<Integer>         keys               = new HashSet<Integer>();
     private final Net                  renderable;
     private final AtomicReference<Net> renderableSaveCopy = new AtomicReference<Net>();
+    private final IConsole             console;
     
-    public Window(final Net renderable) {
+    public Window(final Net renderable, final IConsole console) {
         if (renderable == null) {
             throw new IllegalArgumentException("renderable is null");
         }
+        if (console == null) {
+            throw new IllegalArgumentException("console is null");
+        }
         this.renderable = renderable;
+        this.console = console;
         renderableSaveCopy.set(DeepCopy.copy(renderable));
         frame = new JFrame();
         init();
@@ -83,6 +90,7 @@ public class Window {
         frame.setTitle("JavaTrafficSimulator");
         frame.setIgnoreRepaint(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setMinimumSize(new Dimension(800, 600));
         panel = new JPanel() {
             
             private static final long serialVersionUID = 1L;
@@ -95,6 +103,7 @@ public class Window {
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 8));
                     t = new AffineTransform();
+                    AffineTransform tConsole = new AffineTransform(t);
                     // move to offset
                     t.translate(offset.getX(), offset.getY());
                     // transformation (scroll and zoom)
@@ -124,6 +133,9 @@ public class Window {
                     // result all the agents are driving on the wrong side.
                     g2d.transform(AffineTransform.getScaleInstance(1, -1));
                     renderableSaveCopy.get().render(g2d);
+                    // render console
+                    g2d.setTransform(tConsole);
+                    console.render(g2d);
                     // Let the OS have a little time...
                     Thread.yield();
                 } finally {
@@ -187,6 +199,13 @@ public class Window {
             public void keyPressed(final KeyEvent keyEvent) {
                 final int keyCode = keyEvent.getKeyCode();
                 keys.add(keyCode);
+            }
+            
+            @Override
+            public void keyTyped(KeyEvent keyEvent) {
+                // keyCode is undefinet in this event
+                // so we use the character instead
+                console.keyTyped(keyEvent.getKeyChar());
             }
         });
         panel.addMouseListener(adapter);

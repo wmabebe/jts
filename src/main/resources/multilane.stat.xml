@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<city>
+	<general inhabitants="200" households="100" childrenAgeLimit="18" retirementAgeLimit="65" carRate="0.5" unemploymentRate="0.05" footDistanceLimit="500" incomingTraffic="100" outgoingTraffic="200" />
+
+	<parameters carPreference="0.50" meanTimePerKmInCity="360" freeTimeActivityRate="0.15" uniformRandomTraffic="0.20" departureVariation="120" />
+
+	<population>
+		<bracket beginAge="0" endAge="30" peopleNbr="1765" />
+		<bracket beginAge="30" endAge="75" peopleNbr="1290" />
+	</population>
+
+	<workHours>
+		<opening hour="30600" proportion="0.30" />
+		<opening hour="32400" proportion="0.70" />
+		<closing hour="43200" proportion="0.20" />
+		<closing hour="63000" proportion="0.20" />
+		<closing hour="64800" proportion="0.60" />
+    </workHours>
+
+	<streets>
+		<street edge="-3" population="1.0" workPosition="0.1" />
+		<street edge="11" population="1.0" workPosition="0.2" />
+		<street edge="3" population="1.0" workPosition="0.5" />
+	</streets>
+
+	<cityGates>
+		<entrance edge="-3" pos="0" incoming="1.0" outgoing="1.0"/>
+		<entrance edge="11" pos="0" incoming="1.0" outgoing="1.0"/>
+	</cityGates>
+
+	<schools>
+		<school edge="-3" pos="23" beginAge="12" endAge="18" capacity="400" opening="32400" closing="64800" />
+		<school edge="11" pos="23" beginAge="3" endAge="12" capacity="150" opening="30600" closing="64800" />
+	</schools>
+
+</city>
