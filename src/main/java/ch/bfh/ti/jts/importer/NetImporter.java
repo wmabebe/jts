@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -14,6 +16,7 @@ import ch.bfh.ti.jts.data.Edge;
 import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
+import ch.bfh.ti.jts.gui.App;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 
 public class NetImporter extends Importer<Net> {
@@ -25,6 +28,7 @@ public class NetImporter extends Importer<Net> {
     private final Map<String, Edge>     edges           = new LinkedHashMap<String, Edge>();
     private final Map<String, Lane>     lanes           = new LinkedHashMap<String, Lane>();
     
+    @Override
     protected Net extractData(final Document document) {
         net = new Net();
         final Node root = document.getDocumentElement();
@@ -121,5 +125,8 @@ public class NetImporter extends Importer<Net> {
         final Lane laneFrom = lanes.get(String.format("%s_%s", from, fromLane));
         final Lane laneTo = lanes.get(String.format("%s_%s", to, toLane));
         laneFrom.getLanes().add(laneTo);
+        if (App.DEBUG) {
+            Logger.getGlobal().log(Level.INFO, "Adding connection:" + laneFrom + " -> " + laneTo);
+        }
     }
 }

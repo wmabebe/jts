@@ -111,7 +111,7 @@ public class Lane extends Element implements Simulatable {
             final Agent thisAgent = agents.pollFirst();
             if (thisAgent.getLane() == this && agents.size() > 0) {
                 final Agent nextAgent = agents.first();
-                final double distanceLeft = thisAgent.getPosition().distance(nextAgent.getPosition()) - thisAgent.getVehicle().getLength() - nextAgent.getVehicle().getLength();
+                final double distanceLeft = thisAgent.getPosition().distance(nextAgent.getPosition()) - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
                 if (nextAgent.getLane() == this && distanceLeft <= 0) {
                     // collision!
                     thisAgent.setVelocity(0);

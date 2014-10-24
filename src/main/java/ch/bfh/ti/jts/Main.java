@@ -19,7 +19,7 @@ public class Main {
         
         // start app
         App app = new App();
-        app.loadNet("map1");
+        app.loadNet("multilane");
         app.run();
     }
 }

@@ -39,4 +39,9 @@ public abstract class Element implements Renderable, Serializable {
     public String getName() {
         return name;
     }
+    
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

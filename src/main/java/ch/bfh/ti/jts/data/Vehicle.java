@@ -76,9 +76,9 @@ public class Vehicle implements Serializable {
     
     private static final Shape buildShape() {
         final Path2D path = new Path2D.Double();
-        path.moveTo(1, 0.0);
-        path.lineTo(-1, 1);
-        path.lineTo(-1, -1);
+        path.moveTo(0.5, 0.0);
+        path.lineTo(-0.5, 0.5);
+        path.lineTo(-0.5, -0.5);
         path.closePath();
         return path;
     }
