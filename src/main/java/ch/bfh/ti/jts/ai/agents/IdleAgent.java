@@ -7,9 +7,9 @@ public class IdleAgent extends RandomAgent {
     private static final long serialVersionUID = 1L;
     
     @Override
-    public void think(Decision decision) {
-        super.think(decision);
-        decision.setAcceleration(0);
-        decision.setLaneChangeDirection(Decision.LaneChangeDirection.NONE);
+    public void think() {
+        super.think();
+        getDecision().setAcceleration(0);
+        getDecision().setLaneChangeDirection(Decision.LaneChangeDirection.NONE);
     }
 }

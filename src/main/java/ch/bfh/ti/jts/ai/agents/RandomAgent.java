@@ -3,8 +3,6 @@ package ch.bfh.ti.jts.ai.agents;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.data.Agent;
@@ -22,19 +20,19 @@ public class RandomAgent extends Agent {
     private static final long serialVersionUID = 1L;
     
     @Override
-    public void think(Decision decision) {
-        decision.setAcceleration(ThreadLocalRandom.current().nextDouble() * (getVehicle().getMaxAcceleration() - getVehicle().getMinAcceleration()) + getVehicle().getMinAcceleration());
-        decision.setLaneChangeDirection(Decision.LaneChangeDirection.randomLaneChange(ThreadLocalRandom.current()));
+    public void think() {
+        getDecision().setAcceleration(ThreadLocalRandom.current().nextDouble() * (getVehicle().getMaxAcceleration() - getVehicle().getMinAcceleration()) + getVehicle().getMinAcceleration());
+        getDecision().setLaneChangeDirection(Decision.LaneChangeDirection.randomLaneChange(ThreadLocalRandom.current()));
         Junction nextJunction = getLane().getEdge().getEnd();
         final List<Edge> nextEdges = new LinkedList<Edge>(nextJunction.getOutgoingEdges());
         if (nextEdges.size() == 0) {
-            //throw new RuntimeException("error: no next edges");
+            // throw new RuntimeException("error: no next edges");
         } else {
-        // get all lanes from a random next edge
-        final List<Lane> nextLanes = new LinkedList<Lane>(nextEdges.get(ThreadLocalRandom.current().nextInt(nextEdges.size())).getLanes());
-        // select a random lane
-        final Lane nextLane = nextLanes.get(ThreadLocalRandom.current().nextInt(nextLanes.size()));
-        decision.setNextJunctionLane(nextLane);
+            // get all lanes from a random next edge
+            final List<Lane> nextLanes = new LinkedList<Lane>(nextEdges.get(ThreadLocalRandom.current().nextInt(nextEdges.size())).getLanes());
+            // select a random lane
+            final Lane nextLane = nextLanes.get(ThreadLocalRandom.current().nextInt(nextLanes.size()));
+            getDecision().setNextJunctionLane(nextLane);
         }
     }
 }

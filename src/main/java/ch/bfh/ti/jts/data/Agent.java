@@ -24,6 +24,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
      * range [0 , AGENT_MAX_VELOCITY_COLOR]. 0.33 : Green
      */
     public final static double AGENT_MAX_VELOCITY_HUE = 0.33;
+    private final Decision     decision               = new Decision();
     private Lane               lane;
     /**
      * The relative position of the agent on the lane (>= 0.0 and <= 1.0)
@@ -42,6 +43,11 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
     public Agent() {
         super(null);
         this.vehicle = new Vehicle(-20, 20, 0, 33.3 /* 120 km/h */, 1);
+    }
+    
+    @Override
+    public Decision getDecision() {
+        return decision;
     }
     
     public void setVehicle(Vehicle vehicle) {
@@ -124,12 +130,12 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
      * @param decision
      *            the agents decision
      */
-    public void move(final double duration, final Decision decision) {
+    public void move(final double duration) {
         double deltaDistance = getVelocity() * duration;
-        followLane(deltaDistance, decision);
+        followLane(deltaDistance);
     }
     
-    private void followLane(final double distanceToDrive, final Decision decision) {
+    private void followLane(final double distanceToDrive) {
         double lengthLane = getLane().getLength();
         double distanceOnLaneLeft = lengthLane * (1 - getRelativePosition());
         if (distanceToDrive <= distanceOnLaneLeft) {
@@ -138,7 +144,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
         } else {
             // pass junction and switch to an other lane
             double distanceToDriveOnNextLane = distanceToDrive - distanceOnLaneLeft;
-            Lane nextLane = decision.getNextJunctionLane();
+            Lane nextLane = getDecision().getNextJunctionLane();
             if (nextLane == null) {
                 
                 // Agent didn't decide where to go.. go random
@@ -154,7 +160,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
             }
             setRelativePosition(0.0);
             setLane(nextLane);
-            followLane(distanceToDriveOnNextLane, decision);
+            followLane(distanceToDriveOnNextLane);
         }
     }
     
@@ -194,9 +200,9 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
     }
     
     @Override
-    public void simulate(final double duration, final Decision decision) {
-        setAcceleration(decision.getAcceleration());
+    public void simulate(final double duration) {
+        setAcceleration(getDecision().getAcceleration());
         accelerate(duration);
-        move(duration, decision);
+        move(duration);
     }
 }

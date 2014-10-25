@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 import ch.bfh.ti.jts.simulation.Simulatable;
 
@@ -104,7 +103,7 @@ public class Lane extends Element implements Simulatable {
     }
     
     @Override
-    public void simulate(double duration, Decision decision) {
+    public void simulate(double duration) {
         final ConcurrentSkipListSet<Agent> agentsBuffer = new ConcurrentSkipListSet<Agent>();
         // to through agents in order
         while (agents.size() > 0) {
