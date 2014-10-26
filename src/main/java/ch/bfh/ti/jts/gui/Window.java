@@ -26,9 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 import ch.bfh.ti.jts.console.Console;
@@ -85,7 +82,6 @@ public class Window {
     }
     
     private void init() {
-        // Create game window...
         frame = new JFrame();
         frame.setTitle("JavaTrafficSimulator");
         frame.setIgnoreRepaint(true);
@@ -172,13 +168,7 @@ public class Window {
             }
         };
         frame.setContentPane(panel);
-        /*
-         * TODO: don't uncomment this because if you do so the coordinate origin
-         * will be strange!
-         */
-        // initMenu();
         frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-        // app.setLocationRelativeTo(null);
         frame.addComponentListener(new ComponentAdapter() {
             
             @Override
@@ -237,33 +227,5 @@ public class Window {
                 }
             }
         });
-    }
-    
-    private void initMenu() {
-        final JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("File");
-        menu.setMnemonic(KeyEvent.VK_F);
-        menuBar.add(menu);
-        JMenuItem menuItem = new JMenuItem("Exit");
-        menuItem.addActionListener(x -> {
-            System.exit(0);
-        });
-        menu.add(menuItem);
-        menu = new JMenu("Simulation");
-        menu.setMnemonic(KeyEvent.VK_S);
-        menuBar.add(menu);
-        menuItem = new JMenuItem("Start");
-        menuItem.addActionListener(x -> {
-        });
-        menu.add(menuItem);
-        menuItem = new JMenuItem("Pause");
-        menuItem.addActionListener(x -> {
-        });
-        menu.add(menuItem);
-        menuItem = new JMenuItem("Stop");
-        menuItem.addActionListener(x -> {
-        });
-        menu.add(menuItem);
-        frame.setJMenuBar(menuBar);
-    }
+    }    
 }

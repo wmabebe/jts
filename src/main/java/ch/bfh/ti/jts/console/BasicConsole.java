@@ -4,36 +4,34 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
-import ch.bfh.ti.jts.data.Net;
+import ch.bfh.ti.jts.simulation.Simulation;
 
 public abstract class BasicConsole implements Console {
     
-    private final static String PROMPT            = "jts>";
-    private final static String CURSOR            = "█";
+    private final static String         PROMPT            = "jts>";
+    private final static String         CURSOR            = "█";
     /**
      * How many times per second the cursor blinks
      */
-    private final static double CURSOR_BLINK_RATE = 1.0;
-    private final static int    MAX_LINES         = 20;
-    private final static int    LINE_HIEGHT       = 20;
-    private final static int    POS_X             = 30;
-    private final static int    POS_Y             = 40;
-    private Font                font;
-    private final Queue<String> lines             = new LinkedList<String>();
-    private StringBuffer        buffer            = new StringBuffer();
-    private Net                 net;
+    private final static double         CURSOR_BLINK_RATE = 1.0;
+    private final static int            MAX_LINES         = 20;
+    private final static int            LINE_HIEGHT       = 20;
+    private final static int            POS_X             = 30;
+    private final static int            POS_Y             = 40;
+    private Font                        font;
+    private final BlockingQueue<String> lines             = new LinkedBlockingQueue<String>();
+    private StringBuffer                buffer            = new StringBuffer();
+    private Simulation                  simulation;
     
     public BasicConsole() {
         this.font = new Font("Courier New", Font.PLAIN, 14);
     }
     
-    public Net getNet() {
-        return net;
+    public Simulation getSimulation() {
+        return simulation;
     }
     
     protected void setFont(final Font font) {
@@ -64,8 +62,9 @@ public abstract class BasicConsole implements Console {
     }
     
     @Override
-    public void setNet(Net net) {
-        this.net = net;
+    public void setSimulation(Simulation simulation) {
+        this.simulation = simulation;
+        this.simulation.setConsole(this);
     }
     
     @Override
@@ -96,16 +95,17 @@ public abstract class BasicConsole implements Console {
     }
     
     @Override
-    public void writeLine(final String line) {
-        if (line.contains("\n")) {
+    public void write(final String text) {
+
+        if (text.contains("\n")) {
             // multiple lines
-            String[] helpLines = line.split("\n");
+            String[] helpLines = text.split("\n");
             for (String helpLine : helpLines) {
-                writeLine(helpLine);
+                write(helpLine);
             }
         } else {
             // single line
-            lines.add(line);
+            lines.add(text);
             if (lines.size() > MAX_LINES) {
                 lines.remove();
             }
@@ -114,11 +114,9 @@ public abstract class BasicConsole implements Console {
     
     @Override
     public void executeCommand(final String line) {
-        writeLine(PROMPT + line);
+        write(PROMPT + line);
         if (line.trim().length() > 0) {
-            Logger.getGlobal().log(Level.INFO, "console input: " + line);
             parseCommand(line);
-            writeLine("");
         }
     }
     

@@ -44,16 +44,17 @@ public class App implements Runnable {
     }
     
     private void init() {
-        // create console
-        console = new JtsConsole();
-        console.setNet(net);
-        
-        // create window
-        window = new Window(net, console);
-        
+
         // create simulation
         simulation = new Simulation(net);
         
+        // create console
+        console = new JtsConsole();
+        console.setSimulation(simulation);
+        
+        // create window
+        window = new Window(net, console);
+                
         isRunning = true;
         window.setVisible(true);
     }

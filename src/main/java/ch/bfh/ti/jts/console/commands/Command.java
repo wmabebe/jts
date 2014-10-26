@@ -1,9 +1,6 @@
 package ch.bfh.ti.jts.console.commands;
 
-import ch.bfh.ti.jts.console.Console;
-import ch.bfh.ti.jts.data.Net;
-
-import com.beust.jcommander.JCommander;
+import ch.bfh.ti.jts.simulation.Simulation;
 
 /**
  * Interface describing available console commands.
@@ -17,17 +14,16 @@ public interface Command {
      * 
      * @return name of the command
      */
-    public String getName();
-    
-    public Object getParameters();
+    String getName();
     
     /**
      * Executes the command.
      * 
      * @param jc
      *            JCommander objects with arguments
-     * @param net
-     *            the net object
+     * @param simulation
+     *            the simulation object
+     * @return console output
      */
-    public void execute(Console console, JCommander jc, Net net);
+    String execute(Simulation simulation);
 }

@@ -1,7 +1,7 @@
 package ch.bfh.ti.jts.console;
 
-import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.gui.Renderable;
+import ch.bfh.ti.jts.simulation.Simulation;
 
 /**
  * Interface for the gui console.
@@ -16,7 +16,7 @@ public interface Console extends Renderable {
      * @param net
      *            data object
      */
-    void setNet(final Net net);
+    void setSimulation(final Simulation simulation);
     
     /**
      * Key is typed on the console.
@@ -32,7 +32,7 @@ public interface Console extends Renderable {
      * @param line
      *            line to be printed
      */
-    void writeLine(final String line);
+    void write(final String line);
     
     /**
      * Write a line to the console which will be executed.

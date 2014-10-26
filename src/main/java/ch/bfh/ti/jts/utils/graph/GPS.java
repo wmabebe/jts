@@ -22,6 +22,7 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
      * This method updates GPS information. Should be called when the structure
      * of the underlying net has changed.
      */
+    @SuppressWarnings("unchecked")
     public void update() {
         // extract all edges and vertices
         vertices.clear();

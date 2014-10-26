@@ -4,8 +4,9 @@ import java.awt.Graphics2D;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Stream;
 
 import ch.bfh.ti.jts.ai.Thinkable;
@@ -20,13 +21,13 @@ import ch.bfh.ti.jts.utils.layers.Layers;
  */
 public class Net implements Serializable {
     
-    private static final long         serialVersionUID = 1L;
-    public final static int           NET_RENDER_LAYER = 0;
-    private final Set<Element>        elements         = new HashSet<Element>();
-    private final Layers<Element>     renderables      = new Layers<>();
-    private final Set<Thinkable>      thinkables       = new HashSet<Thinkable>();
-    private final Layers<Simulatable> simulatables     = new Layers<Simulatable>();
-    private final Collection<Route>   routes           = new LinkedList<Route>();
+    private static final long          serialVersionUID = 1L;
+    public final static int            NET_RENDER_LAYER = 0;
+    private final Set<Element>         elements         = new HashSet<Element>();
+    private final Layers<Element>      renderables      = new Layers<>();
+    private final Set<Thinkable>       thinkables       = new HashSet<Thinkable>();
+    private final Layers<Simulatable>  simulatables     = new Layers<Simulatable>();
+    private final BlockingQueue<Route> routes           = new LinkedBlockingQueue<Route>();
     
     public void addElement(final Element element) {
         elements.add(element);
@@ -47,7 +48,7 @@ public class Net implements Serializable {
         final Lane lane = route.getRouteStart().getFirstLane();
         agent.setLane(lane);
         agent.setVehicle(route.getVehicle());
-        final double relativePositionOnLane = route.getDeparturePos() / lane.getLength();
+        final double relativePositionOnLane = route.getDeparturePos();
         agent.setRelativePosition(Helpers.clamp(relativePositionOnLane, 0.0, 1.0));
         agent.setVelocity(route.getDepartureSpeed());
         addElement(agent);

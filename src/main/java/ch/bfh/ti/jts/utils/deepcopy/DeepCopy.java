@@ -25,6 +25,7 @@ public class DeepCopy {
      * @param <T>
      *            type of the object to copy
      */
+    @SuppressWarnings("unchecked")
     public static <T> T copy(final T orig) {
         T obj = null;
         try {

@@ -14,6 +14,15 @@ public interface Simulatable {
     void simulate(final double duration, final Decision decision);
 }
 ```
+
+* Integrated console engine with commands that are easy extensible
+
+```java
+public interface Command {
+    String getName();
+    String execute(Simulation simulation);
+}
+```
   
 * Import road map data from [OpenStreetMap][osm]
 * Graphical user interface with 2D output
@@ -84,7 +93,8 @@ winki
 Enteee
 
 winki
-* Embedded console [in progress]
+* Embedded console, thread-safe [done]
+* Spawn and time commands for console [done]
 
 
 ## Resources

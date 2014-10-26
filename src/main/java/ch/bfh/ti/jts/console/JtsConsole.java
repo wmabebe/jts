@@ -3,9 +3,7 @@ package ch.bfh.ti.jts.console;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import ch.bfh.ti.jts.console.commands.Command;
-import ch.bfh.ti.jts.console.commands.SimulationCommand;
-import ch.bfh.ti.jts.console.commands.TimeCommand;
+import ch.bfh.ti.jts.console.commands.*;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -15,7 +13,7 @@ public class JtsConsole extends BasicConsole {
     
     public class MainParams {
         
-        @Parameter(names = { "--help", "--h" }, description = "Help")
+        @Parameter(names = { "-help", "-h" }, description = "Help")
         private boolean help = false;
     }
     
@@ -23,23 +21,21 @@ public class JtsConsole extends BasicConsole {
     private MainParams                mainParams = new MainParams();
     private final Collection<Command> commands   = new LinkedList<>();
     
-    public JtsConsole() {
-        buildCommands();
-    }
-    
-    private void buildCommands() {
+    private JCommander buildCommander() {
         
-        jc = new JCommander(mainParams);
+        JCommander jcommander = new JCommander(mainParams);
         
-        // do this with reflection later...
-        
-        commands.add(new SimulationCommand());
+        // TODO: do this with reflection?        
+        commands.clear();
         commands.add(new TimeCommand());
+        commands.add(new SpawnCommand());
         
         commands.forEach(command -> {
             String name = command.getName();
-            jc.addCommand(name, command.getParameters());
+            jcommander.addCommand(name, command);
         });
+        
+        return jcommander;
     }
     
     @Override
@@ -48,28 +44,36 @@ public class JtsConsole extends BasicConsole {
             try {
                 String[] args = line.split(" ");
                 
-                buildCommands();
+                jc = buildCommander();
                 jc.parse(args);
                 
                 String commandName = jc.getParsedCommand();
                 if (commandName != null) {
                     Command command = commands.stream().filter(x -> x.getName().equals(commandName)).findFirst().orElse(null);
                     if (command != null) {
-                        command.execute(this, jc, getNet());
+                        execute(command);
                     }
                 } else {
                     // display help...
                     if (mainParams.help) {
                         StringBuilder sb = new StringBuilder();
                         jc.usage(sb);
-                        writeLine(sb.toString());
+                        write(sb.toString());
                     }
                 }
                 
             } catch (ParameterException ex) {
-                writeLine(ex.getMessage());
+                write(ex.getMessage());
                 ex.printStackTrace();
             }
+        }
+    }
+    
+    private void execute(final Command command) {
+        try {
+            getSimulation().getCommands().put(command);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
         }
     }
 }
