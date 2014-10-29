@@ -42,7 +42,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      */
     private double             distanceToDrive        = 0;
     /**
-     * Vehilce of this agent
+     * Vehicle of this agent
      */
     private Vehicle            vehicle;
     
