@@ -34,37 +34,32 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
     }
     
     @Override
-    public Junction getStart() {
-        return start;
-    }
-    
-    @Override
     public Junction getEnd() {
         return end;
-    }
-    
-    public int getPriority() {
-        return priority;
-    }
-    
-    public Collection<Lane> getLanes() {
-        return lanes;
     }
     
     public Lane getFirstLane() {
         return getLanes().stream().sequential().findFirst().orElse(null);
     }
     
+    public Collection<Lane> getLanes() {
+        return lanes;
+    }
+    
     @Override
     public double getLength() {
         double maxLenght = 0.0;
-        Optional<Lane> maxLane = lanes.stream().max((x, y) -> {
+        final Optional<Lane> maxLane = lanes.stream().max((x, y) -> {
             return new Double(x.getLength()).compareTo(y.getLength());
         });
         if (maxLane.isPresent()) {
             maxLenght = maxLane.get().getLength();
         }
         return maxLenght;
+    }
+    
+    public int getPriority() {
+        return priority;
     }
     
     @Override
@@ -78,12 +73,17 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
     }
     
     @Override
+    public Junction getStart() {
+        return start;
+    }
+    
+    @Override
     public void render(final Graphics2D g) {
         // do nothing
     }
     
     @Override
-    public void simulate(double duration) {
+    public void simulate(final double duration) {
         // do lane switching. only for moving agents.
         getLanes().forEach(lane -> {
             lane.getAgents().forEach(agent -> {

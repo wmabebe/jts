@@ -13,7 +13,7 @@ public interface Renderable {
     
     /**
      * Render the implementing object.
-     * 
+     *
      * @param g
      *            the object to render with.
      */

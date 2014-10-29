@@ -28,6 +28,22 @@ public class NetImporter extends Importer<Net> {
     private final Map<String, Edge>     edges           = new LinkedHashMap<String, Edge>();
     private final Map<String, Lane>     lanes           = new LinkedHashMap<String, Lane>();
     
+    private void extractConnection(final Node node) {
+        if (node == null) {
+            throw new IllegalArgumentException("node is null");
+        }
+        final String from = getAttribute(node, "from", String.class);
+        final String to = getAttribute(node, "to", String.class);
+        final String fromLane = getAttribute(node, "fromLane", String.class);
+        final String toLane = getAttribute(node, "toLane", String.class);
+        final Lane laneFrom = lanes.get(String.format("%s_%s", from, fromLane));
+        final Lane laneTo = lanes.get(String.format("%s_%s", to, toLane));
+        laneFrom.getLanes().add(laneTo);
+        if (App.DEBUG) {
+            Logger.getGlobal().log(Level.INFO, "Adding connection:" + laneFrom + " -> " + laneTo);
+        }
+    }
+    
     @Override
     protected Net extractData(final Document document) {
         net = new Net();
@@ -58,23 +74,6 @@ public class NetImporter extends Importer<Net> {
         return net;
     }
     
-    private void extractLocation(final Node node) {
-    }
-    
-    private void extractJunction(final Node node) {
-        if (node == null) {
-            throw new IllegalArgumentException("node is null");
-        }
-        final String id = getAttribute(node, "id", String.class);
-        final double x = getAttribute(node, "x", Double.class);
-        final double y = getAttribute(node, "y", Double.class);
-        final PolyShape polyShape = new PolyShape(getAttribute(node, "shape", String.class));
-        final Shape shape = polyShape.getShape();
-        final Junction junction = new Junction(id, x, y, shape);
-        junctions.put(id, junction);
-        net.addElement(junction);
-    }
-    
     private void extractEdge(final Node node) {
         if (node == null) {
             throw new IllegalArgumentException("node is null");
@@ -99,6 +98,20 @@ public class NetImporter extends Importer<Net> {
         }
     }
     
+    private void extractJunction(final Node node) {
+        if (node == null) {
+            throw new IllegalArgumentException("node is null");
+        }
+        final String id = getAttribute(node, "id", String.class);
+        final double x = getAttribute(node, "x", Double.class);
+        final double y = getAttribute(node, "y", Double.class);
+        final PolyShape polyShape = new PolyShape(getAttribute(node, "shape", String.class));
+        final Shape shape = polyShape.getShape();
+        final Junction junction = new Junction(id, x, y, shape);
+        junctions.put(id, junction);
+        net.addElement(junction);
+    }
+    
     private void extractLane(final Node node, final Edge edge) {
         if (node == null) {
             throw new IllegalArgumentException("node is null");
@@ -114,19 +127,6 @@ public class NetImporter extends Importer<Net> {
         lanes.put(id, lane);
     }
     
-    private void extractConnection(final Node node) {
-        if (node == null) {
-            throw new IllegalArgumentException("node is null");
-        }
-        final String from = getAttribute(node, "from", String.class);
-        final String to = getAttribute(node, "to", String.class);
-        final String fromLane = getAttribute(node, "fromLane", String.class);
-        final String toLane = getAttribute(node, "toLane", String.class);
-        final Lane laneFrom = lanes.get(String.format("%s_%s", from, fromLane));
-        final Lane laneTo = lanes.get(String.format("%s_%s", to, toLane));
-        laneFrom.getLanes().add(laneTo);
-        if (App.DEBUG) {
-            Logger.getGlobal().log(Level.INFO, "Adding connection:" + laneFrom + " -> " + laneTo);
-        }
+    private void extractLocation(final Node node) {
     }
 }

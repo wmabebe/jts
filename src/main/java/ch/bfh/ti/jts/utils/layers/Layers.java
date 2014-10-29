@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 /**
  * A data structure which holds its elements in layers.
- * 
+ *
  * @author ente
  * @param <T>
  *            the object to hold

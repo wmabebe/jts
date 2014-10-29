@@ -3,8 +3,6 @@ package ch.bfh.ti.jts.data;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import ch.bfh.ti.jts.gui.Renderable;
-
 /**
  * Base class for all the elements
  *
@@ -33,7 +31,7 @@ public abstract class Element implements Serializable {
     
     /**
      * Gets the id of this element (from xml source files)
-     * 
+     *
      * @return the xml name
      */
     public String getName() {

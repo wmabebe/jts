@@ -19,30 +19,8 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
     }
     
     /**
-     * This method updates GPS information. Should be called when the structure
-     * of the underlying net has changed.
-     */
-    @SuppressWarnings("unchecked")
-    public void update() {
-        // extract all edges and vertices
-        vertices.clear();
-        edges.clear();
-        net.getElementStream().forEach(x -> {
-            if (DirectedGraphVertex.class.isInstance(x)) {
-                vertices.add((DirectedGraphVertex<V, E>) x);
-            } else if (DirectedGraphEdge.class.isInstance(x)) {
-                edges.add((DirectedGraphEdge<E, V>) x);
-            }
-        });
-        // parallel compute dijekstra for each vertex
-        vertices.stream().parallel().forEach(x -> {
-            dijekstra(x);
-        });
-    }
-    
-    /**
      * Dijekstra algorithm. TODO: implement faster with priority queue
-     * 
+     *
      * @see http://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
      * @param source
      *            the vertex to start search with
@@ -78,7 +56,7 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
             u.getReachableVertices().stream().filter(v -> q.contains(v)).forEach(v -> {
                 final int vIndex = q.indexOf(v);
                 Double vDist = dist.get(vIndex);
-                double alt = uDistance + u.getEdgeBetween(v).get().getLength();
+                final double alt = uDistance + u.getEdgeBetween(v).get().getLength();
                 if (alt < vDist) {
                     vDist = alt;
                     previous.set(vIndex, u);
@@ -86,5 +64,27 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
             });
             // TODO: return something
         }
+    }
+    
+    /**
+     * This method updates GPS information. Should be called when the structure
+     * of the underlying net has changed.
+     */
+    @SuppressWarnings("unchecked")
+    public void update() {
+        // extract all edges and vertices
+        vertices.clear();
+        edges.clear();
+        net.getElementStream().forEach(x -> {
+            if (DirectedGraphVertex.class.isInstance(x)) {
+                vertices.add((DirectedGraphVertex<V, E>) x);
+            } else if (DirectedGraphEdge.class.isInstance(x)) {
+                edges.add((DirectedGraphEdge<E, V>) x);
+            }
+        });
+        // parallel compute dijekstra for each vertex
+        vertices.stream().parallel().forEach(x -> {
+            dijekstra(x);
+        });
     }
 }

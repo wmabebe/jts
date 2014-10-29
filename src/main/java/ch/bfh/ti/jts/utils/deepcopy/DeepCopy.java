@@ -21,7 +21,7 @@ public class DeepCopy {
     
     /**
      * Returns a copy of the object, or null if the object cannot be serialized.
-     * 
+     *
      * @param <T>
      *            type of the object to copy
      */

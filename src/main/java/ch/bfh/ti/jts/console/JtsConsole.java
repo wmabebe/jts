@@ -25,7 +25,7 @@ public class JtsConsole extends BasicConsole {
     
     private JCommander buildCommander() {
         
-        JCommander jcommander = new JCommander(mainParams);
+        final JCommander jcommander = new JCommander(mainParams);
         
         // TODO: do this with reflection?
         commands.clear();
@@ -33,45 +33,45 @@ public class JtsConsole extends BasicConsole {
         commands.add(new SpawnCommand());
         
         commands.forEach(command -> {
-            String name = command.getName();
+            final String name = command.getName();
             jcommander.addCommand(name, command);
         });
         
         return jcommander;
     }
     
+    private void execute(final Command command) {
+        getSimulation().addCommand(command);
+    }
+    
     @Override
-    protected void parseCommand(String line) {
+    protected void parseCommand(final String line) {
         if (line != null && !"".equals(line)) {
             try {
-                String[] args = line.split(" ");
+                final String[] args = line.split(" ");
                 
                 jc = buildCommander();
                 jc.parse(args);
                 
-                String commandName = jc.getParsedCommand();
+                final String commandName = jc.getParsedCommand();
                 if (commandName != null) {
-                    Command command = commands.stream().filter(x -> x.getName().equals(commandName)).findFirst().orElse(null);
+                    final Command command = commands.stream().filter(x -> x.getName().equals(commandName)).findFirst().orElse(null);
                     if (command != null) {
                         execute(command);
                     }
                 } else {
                     // display help...
                     if (mainParams.help) {
-                        StringBuilder sb = new StringBuilder();
+                        final StringBuilder sb = new StringBuilder();
                         jc.usage(sb);
                         write(sb.toString());
                     }
                 }
                 
-            } catch (ParameterException ex) {
+            } catch (final ParameterException ex) {
                 write(ex.getMessage());
                 ex.printStackTrace();
             }
         }
-    }
-    
-    private void execute(final Command command) {
-        getSimulation().addCommand(command);
     }
 }

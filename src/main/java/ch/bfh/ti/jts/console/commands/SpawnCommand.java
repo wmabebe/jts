@@ -20,18 +20,8 @@ public class SpawnCommand implements Command {
     private final int number = 1;
     
     @Override
-    public String getName() {
-        return "spawn";
-    }
-    
-    @Override
-    public Class<?> getTargetType() {
-        return Net.class;
-    }
-    
-    @Override
-    public String execute(Object executor) {
-        Net net = (Net) executor;
+    public String execute(final Object executor) {
+        final Net net = (Net) executor;
         
         // get net data
         final List<Element> edges = net.getElementStream(Edge.class).collect(Collectors.toList());
@@ -49,12 +39,22 @@ public class SpawnCommand implements Command {
             final double departureTime = net.getTimeTotal();
             final double speed = vehicle.getMaxVelocity();
             
-            Route route = new Route(vehicle, routeStart, routeEnd, departureTime, position, speed, 0.0, 0.0);
+            final Route route = new Route(vehicle, routeStart, routeEnd, departureTime, position, speed, 0.0, 0.0);
             routes.add(route);
         }
         net.addRoutes(routes);
         
         return String.format("%d vehicles spawned", number);
+    }
+    
+    @Override
+    public String getName() {
+        return "spawn";
+    }
+    
+    @Override
+    public Class<?> getTargetType() {
+        return Net.class;
     }
     
 }

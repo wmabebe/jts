@@ -72,10 +72,6 @@ public class Net extends Element implements Serializable, Simulatable {
         this.routes.addAll(routes);
     }
     
-    public Collection<Route> getRoutes() {
-        return routes;
-    }
-    
     public Element getElement(final int elementId) {
         return elements.stream().filter(x -> x.getId() == elementId).findAny().orElse(null);
     }
@@ -84,24 +80,20 @@ public class Net extends Element implements Serializable, Simulatable {
         return elements.stream().sequential();
     }
     
-    public Stream<Element> getElementStream(Class<?> filter) {
+    public Stream<Element> getElementStream(final Class<?> filter) {
         return elements.stream().sequential().filter(x -> x.getClass() == filter);
-    }
-    
-    public Stream<Thinkable> getThinkableStream() {
-        return thinkables.stream().parallel();
-    }
-    
-    public Layers<Simulatable> getSimulatable() {
-        return simulatables;
     }
     
     public Layers<Renderable> getRenderable() {
         return renderables;
     }
     
-    public double getTimeTotal() {
-        return timeTotal;
+    public Collection<Route> getRoutes() {
+        return routes;
+    }
+    
+    public Layers<Simulatable> getSimulatable() {
+        return simulatables;
     }
     
     @Override
@@ -109,12 +101,20 @@ public class Net extends Element implements Serializable, Simulatable {
         return NET_SIMULATION_LAYER;
     }
     
+    public Stream<Thinkable> getThinkableStream() {
+        return thinkables.stream().parallel();
+    }
+    
+    public double getTimeTotal() {
+        return timeTotal;
+    }
+    
     @Override
-    public void simulate(double duration) {
+    public void simulate(final double duration) {
         timeTotal += duration;
         // agent spawning
-        List<Route> routes = getRoutes().stream().sequential().filter(x -> x.getDepartureTime() < timeTotal * SPAWN_TIME_FACTOR).collect(Collectors.toList());
-        for (Route route : routes) {
+        final List<Route> routes = getRoutes().stream().sequential().filter(x -> x.getDepartureTime() < timeTotal * SPAWN_TIME_FACTOR).collect(Collectors.toList());
+        for (final Route route : routes) {
             final Agent agent = new FullSpeedAgent();
             final Lane lane = route.getRouteStart().getFirstLane();
             lane.getAgents().add(agent);

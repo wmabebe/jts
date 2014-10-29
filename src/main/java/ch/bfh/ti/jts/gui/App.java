@@ -19,32 +19,14 @@ public class App implements Runnable {
     private Collection<Route>   routes;
     private Window              window;
     private Simulation          simulation;
-    private Console            console;
+    private Console             console;
     
-    @Override
-    public void run() {
-        init();
-        while (isRunning() && !Thread.interrupted()) {
-            simulation.tick();
-            window.render();
-        }
-        end();
-    }
-    
-    public void loadNet(String netName) {
-        // import net
-        NetImporter netImporter = new NetImporter();
-        net = netImporter.importData(String.format("src/main/resources/%s.net.xml", netName));
-        
-        // import routes data
-        RoutesImporter routesImporter = new RoutesImporter();
-        routesImporter.setNet(net);
-        routes = routesImporter.importData(String.format("src/main/resources/%s.rou.xml", netName));
-        net.addRoutes(routes);
+    private void end() {
+        // free resources or clean up stuff...
     }
     
     private void init() {
-
+        
         // create simulation
         simulation = new Simulation(net);
         
@@ -54,7 +36,7 @@ public class App implements Runnable {
         
         // create window
         window = new Window(net, console);
-                
+        
         isRunning = true;
         window.setVisible(true);
     }
@@ -63,7 +45,25 @@ public class App implements Runnable {
         return isRunning;
     }
     
-    private void end() {
-        // free resources or clean up stuff...
+    public void loadNet(final String netName) {
+        // import net
+        final NetImporter netImporter = new NetImporter();
+        net = netImporter.importData(String.format("src/main/resources/%s.net.xml", netName));
+        
+        // import routes data
+        final RoutesImporter routesImporter = new RoutesImporter();
+        routesImporter.setNet(net);
+        routes = routesImporter.importData(String.format("src/main/resources/%s.rou.xml", netName));
+        net.addRoutes(routes);
+    }
+    
+    @Override
+    public void run() {
+        init();
+        while (isRunning() && !Thread.interrupted()) {
+            simulation.tick();
+            window.render();
+        }
+        end();
     }
 }

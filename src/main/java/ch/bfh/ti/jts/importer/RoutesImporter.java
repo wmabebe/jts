@@ -20,12 +20,8 @@ public class RoutesImporter extends Importer<Collection<Route>> {
     private Net                        net;
     private Collection<Route>          routes;
     
-    public void setNet(final Net net) {
-        this.net = net;
-    }
-    
     @Override
-    protected Collection<Route> extractData(Document document) {
+    protected Collection<Route> extractData(final Document document) {
         routes = new LinkedList<Route>();
         final Node root = document.getDocumentElement();
         final NodeList nodes = root.getChildNodes();
@@ -38,6 +34,45 @@ public class RoutesImporter extends Importer<Collection<Route>> {
             }
         }
         return routes;
+    }
+    
+    private String extractRouteEdges(final Node node) {
+        if (node == null) {
+            throw new IllegalArgumentException("node is null");
+        }
+        String routeEdges = null;
+        if (node.hasChildNodes()) {
+            final NodeList nodes = node.getChildNodes();
+            final Node child = nodes.item(1);
+            if (child != null && child.getNodeName().equals("route")) {
+                routeEdges = getAttribute(child, "edges", String.class);
+            }
+        }
+        return routeEdges;
+    }
+    
+    private void extractVecicle(final Node node) {
+        if (node == null) {
+            throw new IllegalArgumentException("node is null");
+        }
+        final String type = getAttribute(node, "type", String.class);
+        final double departureTime = getAttribute(node, "depart", Double.class);
+        final double departurePos = getAttribute(node, "departPos", Double.class);
+        final double departureSpeed = getAttribute(node, "departSpeed", Double.class);
+        final double arrivalPos = getAttribute(node, "arrivalPos", Double.class);
+        final double arrivalSpeed = getAttribute(node, "arrivalSpeed", Double.class);
+        final Vehicle vehicle = vehicles.get(type);
+        final String routeEdges = extractRouteEdges(node);
+        final String[] edges = routeEdges.split(" ");
+        if (edges.length < 2) {
+            throw new IllegalArgumentException("illegal format of attribute edges in node route");
+        }
+        final String edgeIdStart = edges[0];
+        final String edgeIdEnd = edges[edges.length - 1];
+        final Edge routeStart = (Edge) net.getElementStream(Edge.class).filter(x -> x.getName().equals(edgeIdStart)).findFirst().orElse(null);
+        final Edge routeEnd = (Edge) net.getElementStream(Edge.class).filter(x -> x.getName().equals(edgeIdEnd)).findFirst().orElse(null);
+        final Route route = new Route(vehicle, routeStart, routeEnd, departureTime, departurePos, departureSpeed, arrivalPos, arrivalSpeed);
+        routes.add(route);
     }
     
     private void extractVecicleType(final Node node) {
@@ -53,42 +88,7 @@ public class RoutesImporter extends Importer<Collection<Route>> {
         vehicles.put(id, vehicle);
     }
     
-    private void extractVecicle(final Node node) {
-        if (node == null) {
-            throw new IllegalArgumentException("node is null");
-        }
-        final String type = getAttribute(node, "type", String.class);
-        final double departureTime = getAttribute(node, "depart", Double.class);
-        final double departurePos = getAttribute(node, "departPos", Double.class);
-        final double departureSpeed = getAttribute(node, "departSpeed", Double.class);
-        final double arrivalPos = getAttribute(node, "arrivalPos", Double.class);
-        final double arrivalSpeed = getAttribute(node, "arrivalSpeed", Double.class);
-        final Vehicle vehicle = vehicles.get(type);
-        final String routeEdges = extractRouteEdges(node);
-        String[] edges = routeEdges.split(" ");
-        if (edges.length < 2) {
-            throw new IllegalArgumentException("illegal format of attribute edges in node route");
-        }
-        final String edgeIdStart = edges[0];
-        final String edgeIdEnd = edges[edges.length - 1];
-        final Edge routeStart = (Edge) net.getElementStream(Edge.class).filter(x -> x.getName().equals(edgeIdStart)).findFirst().orElse(null);
-        final Edge routeEnd = (Edge) net.getElementStream(Edge.class).filter(x -> x.getName().equals(edgeIdEnd)).findFirst().orElse(null);
-        Route route = new Route(vehicle, routeStart, routeEnd, departureTime, departurePos, departureSpeed, arrivalPos, arrivalSpeed);
-        routes.add(route);
-    }
-    
-    private String extractRouteEdges(final Node node) {
-        if (node == null) {
-            throw new IllegalArgumentException("node is null");
-        }
-        String routeEdges = null;
-        if (node.hasChildNodes()) {
-            final NodeList nodes = node.getChildNodes();
-            Node child = nodes.item(1);
-            if (child != null && child.getNodeName().equals("route")) {
-                routeEdges = getAttribute(child, "edges", String.class);
-            }
-        }
-        return routeEdges;
+    public void setNet(final Net net) {
+        this.net = net;
     }
 }

@@ -12,7 +12,7 @@ import ch.bfh.ti.jts.data.Lane;
 
 /**
  * A agent which does random stuff.
- * 
+ *
  * @author ente
  */
 public class RandomAgent extends Agent {
@@ -23,7 +23,7 @@ public class RandomAgent extends Agent {
     public void think() {
         getDecision().setAcceleration(ThreadLocalRandom.current().nextDouble() * (getVehicle().getMaxAcceleration() - getVehicle().getMinAcceleration()) + getVehicle().getMinAcceleration());
         getDecision().setLaneChangeDirection(Decision.LaneChangeDirection.randomLaneChange(ThreadLocalRandom.current()));
-        Junction nextJunction = getLane().getEdge().getEnd();
+        final Junction nextJunction = getLane().getEdge().getEnd();
         final List<Edge> nextEdges = new LinkedList<Edge>(nextJunction.getOutgoingEdges());
         if (nextEdges.size() == 0) {
             // throw new RuntimeException("error: no next edges");

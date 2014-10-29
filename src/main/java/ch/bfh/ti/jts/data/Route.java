@@ -26,20 +26,12 @@ public class Route implements Serializable {
         this.arrivalSpeed = arrivalSpeed;
     }
     
-    public Vehicle getVehicle() {
-        return vehicle;
+    public double getArrivalPos() {
+        return arrivalPos;
     }
     
-    public Edge getRouteStart() {
-        return routeStart;
-    }
-    
-    public Edge getRouteEnd() {
-        return routeEnd;
-    }
-    
-    public double getDepartureTime() {
-        return departureTime;
+    public double getArrivalSpeed() {
+        return arrivalSpeed;
     }
     
     public double getDeparturePos() {
@@ -50,11 +42,19 @@ public class Route implements Serializable {
         return departureSpeed;
     }
     
-    public double getArrivalPos() {
-        return arrivalPos;
+    public double getDepartureTime() {
+        return departureTime;
     }
     
-    public double getArrivalSpeed() {
-        return arrivalSpeed;
+    public Edge getRouteEnd() {
+        return routeEnd;
+    }
+    
+    public Edge getRouteStart() {
+        return routeStart;
+    }
+    
+    public Vehicle getVehicle() {
+        return vehicle;
     }
 }

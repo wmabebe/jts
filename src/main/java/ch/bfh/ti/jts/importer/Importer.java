@@ -8,7 +8,7 @@ import org.w3c.dom.Node;
 
 /**
  * Abstract class for XML file importers.
- * 
+ *
  * @author Mathias
  * @param <T>
  *            type of the imported class file.
@@ -30,8 +30,58 @@ public abstract class Importer<T> {
     }
     
     /**
+     * Converts a class into another.
+     *
+     * @param input
+     *            input class
+     * @param outputClass
+     *            output type
+     * @return converted object
+     * @throws Exception
+     */
+    private <I, O> O convert(final I input, final Class<O> outputClass) throws Exception {
+        return input == null ? null : outputClass.getConstructor(String.class).newInstance(input.toString());
+    }
+    
+    /**
+     * Abstract method that handles the data extraction.
+     *
+     * @param document
+     *            XML document
+     * @return object representation of the imported file
+     */
+    abstract T extractData(final Document document);
+    
+    /**
+     * Get the attribute value of a node with the specified type.
+     *
+     * @param node
+     *            document node
+     * @param attributeName
+     *            name of the attribute to convert
+     * @param outputClass
+     *            output type of the attribute
+     * @return attribute value
+     */
+    protected <O> O getAttribute(final Node node, final String attributeName, final Class<O> outputClass) {
+        O output = null;
+        try {
+            if (node.hasAttributes()) {
+                final Node attribute = node.getAttributes().getNamedItem(attributeName);
+                if (attribute != null) {
+                    final String value = attribute.getNodeValue();
+                    output = convert(value, outputClass);
+                }
+            }
+        } catch (final Exception ex) {
+            throw new RuntimeException("conversion failed", ex);
+        }
+        return output;
+    }
+    
+    /**
      * Imports data from a file into an object representation.
-     * 
+     *
      * @param path
      *            path to the file to import
      * @return object representation of the imported file
@@ -44,55 +94,5 @@ public abstract class Importer<T> {
             throw new RuntimeException("document parsing failed", ex);
         }
         return data;
-    }
-    
-    /**
-     * Abstract method that handles the data extraction.
-     * 
-     * @param document
-     *            XML document
-     * @return object representation of the imported file
-     */
-    abstract T extractData(final Document document);
-    
-    /**
-     * Converts a class into another.
-     * 
-     * @param input
-     *            input class
-     * @param outputClass
-     *            output type
-     * @return converted object
-     * @throws Exception
-     */
-    private <I, O> O convert(I input, Class<O> outputClass) throws Exception {
-        return input == null ? null : outputClass.getConstructor(String.class).newInstance(input.toString());
-    }
-    
-    /**
-     * Get the attribute value of a node with the specified type.
-     * 
-     * @param node
-     *            document node
-     * @param attributeName
-     *            name of the attribute to convert
-     * @param outputClass
-     *            output type of the attribute
-     * @return attribute value
-     */
-    protected <O> O getAttribute(final Node node, String attributeName, Class<O> outputClass) {
-        O output = null;
-        try {
-            if (node.hasAttributes()) {
-                Node attribute = node.getAttributes().getNamedItem(attributeName);
-                if (attribute != null) {
-                    String value = attribute.getNodeValue();
-                    output = convert(value, outputClass);
-                }
-            }
-        } catch (Exception ex) {
-            throw new RuntimeException("conversion failed", ex);
-        }
-        return output;
     }
 }

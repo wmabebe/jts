@@ -35,12 +35,16 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
         edges = new LinkedList<Edge>();
     }
     
-    public double getX() {
-        return x;
-    }
-    
-    public double getY() {
-        return y;
+    @Override
+    public Optional<Edge> getEdgeBetween(final Junction vertex) {
+        Optional<Edge> edgeBetween = Optional.empty();
+        for (final Edge edge : getOutgoingEdges()) {
+            if (edge.goesTo(vertex)) {
+                edgeBetween = Optional.of(edge);
+                break;
+            }
+        }
+        return edgeBetween;
     }
     
     public Collection<Edge> getEdges() {
@@ -64,18 +68,6 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
     }
     
     @Override
-    public Optional<Edge> getEdgeBetween(final Junction vertex) {
-        Optional<Edge> edgeBetween = Optional.empty();
-        for (Edge edge : getOutgoingEdges()) {
-            if (edge.goesTo(vertex)) {
-                edgeBetween = Optional.of(edge);
-                break;
-            }
-        }
-        return edgeBetween;
-    }
-    
-    @Override
     public int getRenderLayer() {
         return JUNCTION_RENDER_LAYER;
     }
@@ -83,6 +75,14 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
     @Override
     public int getSimulationLayer() {
         return JUNCTION_SIMULATION_LAYER;
+    }
+    
+    public double getX() {
+        return x;
+    }
+    
+    public double getY() {
+        return y;
     }
     
     @Override
@@ -93,7 +93,7 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
     }
     
     @Override
-    public void simulate(double duration) {
+    public void simulate(final double duration) {
         // move incoming agents over junction
         getEdges().stream().filter(edge -> edge.goesTo(this)).forEach(edge -> {
             edge.getLanes().forEach(lane -> {

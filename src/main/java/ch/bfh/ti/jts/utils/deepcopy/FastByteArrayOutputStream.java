@@ -35,6 +35,29 @@ public class FastByteArrayOutputStream extends OutputStream {
     }
     
     /**
+     * Returns the byte array containing the written data. Note that this array
+     * will almost always be larger than the amount of data actually written.
+     */
+    public byte[] getByteArray() {
+        return buf;
+    }
+    
+    /**
+     * Returns a ByteArrayInputStream for reading back the written data
+     */
+    public InputStream getInputStream() {
+        return new FastByteArrayInputStream(buf, size);
+    }
+    
+    public int getSize() {
+        return size;
+    }
+    
+    public void reset() {
+        size = 0;
+    }
+    
+    /**
      * Ensures that we have a large enough buffer for the given size.
      */
     private void verifyBufferSize(final int sz) {
@@ -44,18 +67,6 @@ public class FastByteArrayOutputStream extends OutputStream {
             System.arraycopy(old, 0, buf, 0, old.length);
             old = null;
         }
-    }
-    
-    public int getSize() {
-        return size;
-    }
-    
-    /**
-     * Returns the byte array containing the written data. Note that this array
-     * will almost always be larger than the amount of data actually written.
-     */
-    public byte[] getByteArray() {
-        return buf;
     }
     
     @Override
@@ -76,16 +87,5 @@ public class FastByteArrayOutputStream extends OutputStream {
     public final void write(final int b) {
         verifyBufferSize(size + 1);
         buf[size++] = (byte) b;
-    }
-    
-    public void reset() {
-        size = 0;
-    }
-    
-    /**
-     * Returns a ByteArrayInputStream for reading back the written data
-     */
-    public InputStream getInputStream() {
-        return new FastByteArrayInputStream(buf, size);
     }
 }

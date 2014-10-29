@@ -46,43 +46,19 @@ public class Lane extends Element implements Simulatable, Renderable {
         this.speed = speed;
         this.length = length;
         this.polyShape = polyShape;
-        this.lanes = new LinkedList<Lane>();
-        this.agents = new ConcurrentSkipListSet<Agent>();
-    }
-    
-    public Edge getEdge() {
-        return edge;
-    }
-    
-    public int getIndex() {
-        return index;
-    }
-    
-    public double getSpeed() {
-        return speed;
-    }
-    
-    public double getLength() {
-        return length;
-    }
-    
-    public Collection<Lane> getLanes() {
-        return lanes;
-    }
-    
-    public PolyShape getPolyShape() {
-        return polyShape;
-    }
-    
-    public boolean goesTo(final Junction junction) {
-        return getEdge().getEnd() == junction;
+        lanes = new LinkedList<Lane>();
+        agents = new ConcurrentSkipListSet<Agent>();
     }
     
     public boolean comesFrom(final Junction junction) {
         return getEdge().getStart() == junction;
     }
     
-    public Lane getDecisionLane(Decision decision) {
+    public ConcurrentSkipListSet<Agent> getAgents() {
+        return agents;
+    }
+    
+    public Lane getDecisionLane(final Decision decision) {
         Lane lane = null;
         switch (decision.getLaneChangeDirection()) {
             case RIGHT :
@@ -103,16 +79,28 @@ public class Lane extends Element implements Simulatable, Renderable {
         return lane;
     }
     
+    public Edge getEdge() {
+        return edge;
+    }
+    
+    public int getIndex() {
+        return index;
+    }
+    
+    public Collection<Lane> getLanes() {
+        return lanes;
+    }
+    
     public Lane getLeftLane() {
         return getEdge().getLanes().stream().filter(x -> x.index == index + 1).findAny().orElse(null);
     }
     
-    public Lane getRightLane() {
-        return getEdge().getLanes().stream().filter(x -> x.index == index - 1).findAny().orElse(null);
+    public double getLength() {
+        return length;
     }
     
-    public ConcurrentSkipListSet<Agent> getAgents() {
-        return agents;
+    public PolyShape getPolyShape() {
+        return polyShape;
     }
     
     @Override
@@ -120,13 +108,35 @@ public class Lane extends Element implements Simulatable, Renderable {
         return LANE_RENDER_LAYER;
     }
     
+    public Lane getRightLane() {
+        return getEdge().getLanes().stream().filter(x -> x.index == index - 1).findAny().orElse(null);
+    }
+    
     @Override
     public int getSimulationLayer() {
         return LANE_SIMULATION_LAYER;
     }
     
+    public double getSpeed() {
+        return speed;
+    }
+    
+    public boolean goesTo(final Junction junction) {
+        return getEdge().getEnd() == junction;
+    }
+    
     @Override
-    public void simulate(double duration) {
+    public void render(final Graphics2D g) {
+        g.setStroke(new BasicStroke(4));
+        g.setColor(Color.WHITE);
+        g.draw(polyShape.getShape());
+        g.setStroke(new BasicStroke(3));
+        g.setColor(Color.BLACK);
+        g.draw(polyShape.getShape());
+    }
+    
+    @Override
+    public void simulate(final double duration) {
         final ConcurrentSkipListSet<Agent> agentsBuffer = new ConcurrentSkipListSet<Agent>();
         // to through agents in order
         while (agents.size() > 0) {
@@ -146,15 +156,5 @@ public class Lane extends Element implements Simulatable, Renderable {
             agentsBuffer.add(thisAgent);
         }
         agents = agentsBuffer;
-    }
-    
-    @Override
-    public void render(final Graphics2D g) {
-        g.setStroke(new BasicStroke(4));
-        g.setColor(Color.WHITE);
-        g.draw(polyShape.getShape());
-        g.setStroke(new BasicStroke(3));
-        g.setColor(Color.BLACK);
-        g.draw(polyShape.getShape());
     }
 }

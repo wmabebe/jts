@@ -1,6 +1,7 @@
 package ch.bfh.ti.jts.gui.data;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
@@ -27,31 +28,22 @@ public class PolyShapeTest {
     }
     
     @Test
-    public void getLengthTwoPoints() {
-        final List<Point2D> points = new LinkedList<Point2D>();
-        points.add(new Point2D.Double(0.0, 0.0));
-        points.add(new Point2D.Double(0.0, 10.0));
-        PolyShape ps = new PolyShape(points);
-        assertTrue(ps.getLength() == 10.0);
-    }
-    
-    @Test
     public void getLengthMorePoints() {
         final List<Point2D> points = new LinkedList<Point2D>();
         points.add(new Point2D.Double(0.0, 0.0));
         points.add(new Point2D.Double(0.0, 10.0));
         points.add(new Point2D.Double(10.0, 10.0));
-        PolyShape ps = new PolyShape(points);
+        final PolyShape ps = new PolyShape(points);
         assertTrue(ps.getLength() == 20.0);
     }
     
     @Test
-    public void getRelativePosition() {
+    public void getLengthTwoPoints() {
         final List<Point2D> points = new LinkedList<Point2D>();
         points.add(new Point2D.Double(0.0, 0.0));
         points.add(new Point2D.Double(0.0, 10.0));
-        PolyShape ps = new PolyShape(points);
-        assertEquals(ps.getRelativePosition(0.5), new Point2D.Double(0, 5.0));
+        final PolyShape ps = new PolyShape(points);
+        assertTrue(ps.getLength() == 10.0);
     }
     
     @Test
@@ -86,5 +78,14 @@ public class PolyShapeTest {
         points.add(new Point2D.Double(0.0, -10.0));
         ps = new PolyShape(points);
         assertTrue(ps.getRelativeOrientation(0.5) == -Math.PI / 2);
+    }
+    
+    @Test
+    public void getRelativePosition() {
+        final List<Point2D> points = new LinkedList<Point2D>();
+        points.add(new Point2D.Double(0.0, 0.0));
+        points.add(new Point2D.Double(0.0, 10.0));
+        final PolyShape ps = new PolyShape(points);
+        assertEquals(ps.getRelativePosition(0.5), new Point2D.Double(0, 5.0));
     }
 }

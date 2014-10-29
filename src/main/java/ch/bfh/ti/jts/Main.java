@@ -18,7 +18,7 @@ public class Main {
         }
         
         // start app
-        App app = new App();
+        final App app = new App();
         app.loadNet("multilane");
         app.run();
     }

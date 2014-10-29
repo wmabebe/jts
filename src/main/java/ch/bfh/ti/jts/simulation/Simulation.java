@@ -49,6 +49,22 @@ public class Simulation {
         start();
     }
     
+    public void addCommand(final Command command) {
+        commands.add(command);
+    }
+    
+    public Console getConsole() {
+        return console;
+    }
+    
+    public Net getNet() {
+        return simulateNet;
+    }
+    
+    public void setConsole(final Console console) {
+        this.console = console;
+    }
+    
     public void start() {
         startTime = System.nanoTime();
         lastTick = startTime;
@@ -63,8 +79,8 @@ public class Simulation {
         timeDelta = (now - lastTick) * 1E-9 * TIME_FACTOR;
         // execute all commands
         while (commands.size() > 0) {
-            Command command = commands.poll();
-            Class<?> targetType = command.getTargetType();
+            final Command command = commands.poll();
+            final Class<?> targetType = command.getTargetType();
             simulateNet.getElementStream(targetType).forEach(element -> {
                 getConsole().write(command.execute(element));
             });
@@ -77,7 +93,7 @@ public class Simulation {
         // simulate
         // delegate simulation for all simulatables
         final Layers<Simulatable> simulatables = simulateNet.getSimulatable();
-        for (int layer : simulatables.getLayersIterator()) {
+        for (final int layer : simulatables.getLayersIterator()) {
             simulatables.getLayerStream(layer).sequential().forEach(e -> {
                 e.simulate(timeDelta);
             });
@@ -85,21 +101,5 @@ public class Simulation {
         
         // set lastTick for time difference
         lastTick = now;
-    }
-    
-    public void addCommand(final Command command) {
-        commands.add(command);
-    }
-    
-    public Console getConsole() {
-        return console;
-    }
-    
-    public void setConsole(Console console) {
-        this.console = console;
-    }
-    
-    public Net getNet() {
-        return simulateNet;
     }
 }

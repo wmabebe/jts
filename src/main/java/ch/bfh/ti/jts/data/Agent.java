@@ -48,107 +48,28 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     
     public Agent() {
         super(null);
-        this.vehicle = new Vehicle(-20, 20, 0, 33.3 /* 120 km/h */, 1);
-    }
-    
-    @Override
-    public Decision getDecision() {
-        return decision;
-    }
-    
-    public void setVehicle(Vehicle vehicle) {
-        if (vehicle == null) {
-            throw new IllegalArgumentException("vehicle is null");
-        }
-        this.vehicle = vehicle;
-    }
-    
-    public Lane getLane() {
-        return lane;
-    }
-    
-    public void setLane(final Lane lane) {
-        this.lane = lane;
-    }
-    
-    @Override
-    public int compareTo(Agent a) {
-        return new Double(getRelativePosition()).compareTo(a.getRelativePosition());
-    }
-    
-    public void setRelativePosition(final Double position) {
-        if (position < 0 || position > 1.0) {
-            throw new IllegalArgumentException("position");
-        }
-        this.relativePosition = position;
-    }
-    
-    public double getRelativePosition() {
-        return relativePosition;
-    }
-    
-    public Point2D getPosition() {
-        return getLane().getPolyShape().getRelativePosition(getRelativePosition());
-    }
-    
-    public Vehicle getVehicle() {
-        return vehicle;
-    }
-    
-    public void setVelocity(final double velocity) {
-        // check if out of bounds
-        this.velocity = Helpers.clamp(velocity, vehicle.getMinVelocity(), vehicle.getMaxVelocity());
-    }
-    
-    public double getVelocity() {
-        return velocity;
-    }
-    
-    public double getAcceleration() {
-        return acceleration;
-    }
-    
-    public void setAcceleration(final double acceleration) {
-        // check if out of bounds
-        this.acceleration = Helpers.clamp(acceleration, vehicle.getMinAcceleration(), vehicle.getMaxAcceleration());
-    }
-    
-    public double getDistanceToDrive() {
-        return distanceToDrive;
+        vehicle = new Vehicle(-20, 20, 0, 33.3 /* 120 km/h */, 1);
     }
     
     /**
      * Change velocity based on a specified amount of time. The agents current
      * acceleration is applied.
-     * 
+     *
      * @param duration
      *            the simulation duration
      */
     public void accelerate(final double duration) {
-        double deltaVelocity = getAcceleration() * duration;
+        final double deltaVelocity = getAcceleration() * duration;
         setVelocity(getVelocity() + deltaVelocity);
     }
     
-    /**
-     * Change position based on a specified amount of time. The agents current
-     * velocity is applied.
-     * 
-     * @param duration
-     *            the simulation duration
-     * @param decision
-     *            the agents decision
-     */
-    public void move(final double duration) {
-        // set new driving distance
-        distanceToDrive += getVelocity() * duration;
-        double lengthLane = getLane().getLength();
-        
-        double distanceOnLaneLeft = lengthLane * (1 - getRelativePosition());
-        double distanceToDriveOnNextLane = Math.max(distanceToDrive - distanceOnLaneLeft, 0.0);
-        double distanceToDriveOnThisLane = distanceToDrive - distanceToDriveOnNextLane;
-        setRelativePosition(Helpers.clamp(getRelativePosition() + distanceToDriveOnThisLane / lengthLane, 0.0, 1.0));
-        distanceToDrive = distanceToDriveOnNextLane;
-        Logger.getGlobal().info("distanceToDrive: " + distanceToDrive);
+    @Override
+    public int compareTo(final Agent a) {
+        return new Double(getRelativePosition()).compareTo(a.getRelativePosition());
+    }
+    
+    public double getAcceleration() {
+        return acceleration;
     }
     
     /**
@@ -163,8 +84,64 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     }
     
     @Override
+    public Decision getDecision() {
+        return decision;
+    }
+    
+    public double getDistanceToDrive() {
+        return distanceToDrive;
+    }
+    
+    public Lane getLane() {
+        return lane;
+    }
+    
+    public Point2D getPosition() {
+        return getLane().getPolyShape().getRelativePosition(getRelativePosition());
+    }
+    
+    public double getRelativePosition() {
+        return relativePosition;
+    }
+    
+    @Override
     public int getRenderLayer() {
         return AGENT_RENDER_LAYER;
+    }
+    
+    @Override
+    public int getSimulationLayer() {
+        return AGENT_SIMULATION_LAYER;
+    }
+    
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+    
+    public double getVelocity() {
+        return velocity;
+    }
+    
+    /**
+     * Change position based on a specified amount of time. The agents current
+     * velocity is applied.
+     *
+     * @param duration
+     *            the simulation duration
+     * @param decision
+     *            the agents decision
+     */
+    public void move(final double duration) {
+        // set new driving distance
+        distanceToDrive += getVelocity() * duration;
+        final double lengthLane = getLane().getLength();
+        
+        final double distanceOnLaneLeft = lengthLane * (1 - getRelativePosition());
+        final double distanceToDriveOnNextLane = Math.max(distanceToDrive - distanceOnLaneLeft, 0.0);
+        final double distanceToDriveOnThisLane = distanceToDrive - distanceToDriveOnNextLane;
+        setRelativePosition(Helpers.clamp(getRelativePosition() + distanceToDriveOnThisLane / lengthLane, 0.0, 1.0));
+        distanceToDrive = distanceToDriveOnNextLane;
+        Logger.getGlobal().info("distanceToDrive: " + distanceToDrive);
     }
     
     @Override
@@ -172,8 +149,8 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         final Point2D position = getPosition();
         final double x = position.getX();
         final double y = position.getY();
-        double orientation = getLane().getPolyShape().getRelativeOrientation(getRelativePosition());
-        AffineTransform at = AffineTransform.getRotateInstance(orientation);
+        final double orientation = getLane().getPolyShape().getRelativeOrientation(getRelativePosition());
+        final AffineTransform at = AffineTransform.getRotateInstance(orientation);
         g.setStroke(new BasicStroke(1));
         g.setColor(getColor());
         g.translate(x, y);
@@ -181,9 +158,32 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         g.translate(-x, -y);
     }
     
-    @Override
-    public int getSimulationLayer() {
-        return AGENT_SIMULATION_LAYER;
+    public void setAcceleration(final double acceleration) {
+        // check if out of bounds
+        this.acceleration = Helpers.clamp(acceleration, vehicle.getMinAcceleration(), vehicle.getMaxAcceleration());
+    }
+    
+    public void setLane(final Lane lane) {
+        this.lane = lane;
+    }
+    
+    public void setRelativePosition(final Double position) {
+        if (position < 0 || position > 1.0) {
+            throw new IllegalArgumentException("position");
+        }
+        relativePosition = position;
+    }
+    
+    public void setVehicle(final Vehicle vehicle) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("vehicle is null");
+        }
+        this.vehicle = vehicle;
+    }
+    
+    public void setVelocity(final double velocity) {
+        // check if out of bounds
+        this.velocity = Helpers.clamp(velocity, vehicle.getMinVelocity(), vehicle.getMaxVelocity());
     }
     
     @Override

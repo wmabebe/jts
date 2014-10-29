@@ -14,8 +14,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
@@ -73,15 +71,6 @@ public class Window {
         init();
     }
     
-    public void setVisible(final boolean visible) {
-        frame.setVisible(visible);
-    }
-    
-    public void render() {
-        renderableSaveCopy.set(DeepCopy.copy(renderable));
-        frame.repaint();
-    }
-    
     private void init() {
         frame = new JFrame();
         frame.setTitle("JavaTrafficSimulator");
@@ -99,7 +88,7 @@ public class Window {
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 8));
                     t = new AffineTransform();
-                    AffineTransform tConsole = new AffineTransform(t);
+                    final AffineTransform tConsole = new AffineTransform(t);
                     // move to offset
                     t.translate(offset.getX(), offset.getY());
                     // transformation (scroll and zoom)
@@ -129,8 +118,8 @@ public class Window {
                     // result all the agents are driving on the wrong side.
                     g2d.transform(AffineTransform.getScaleInstance(1, -1));
                     // render everything
-                    Layers<Renderable> renderables = renderableSaveCopy.get().getRenderable();
-                    for (int layer : renderables.getLayersIterator()) {
+                    final Layers<Renderable> renderables = renderableSaveCopy.get().getRenderable();
+                    for (final int layer : renderables.getLayersIterator()) {
                         renderables.getLayerStream(layer).sequential().forEach(e -> {
                             e.render(g2d);
                         });
@@ -153,6 +142,16 @@ public class Window {
             private Point   mousePressedPoint = new Point();
             
             @Override
+            public void mouseDragged(final MouseEvent mouseEvent) {
+                if (isDown) {
+                    final double deltaX = mouseEvent.getX() - mousePressedPoint.getX();
+                    final double deltaY = mouseEvent.getY() - mousePressedPoint.getY();
+                    offset.setLocation(offset.getX() + deltaX, offset.getY() + deltaY);
+                    mousePressedPoint = mouseEvent.getPoint();
+                }
+            }
+            
+            @Override
             public void mousePressed(final MouseEvent mouseEvent) {
                 mousePressedPoint = mouseEvent.getPoint();
                 isDown = true;
@@ -161,16 +160,6 @@ public class Window {
             @Override
             public void mouseReleased(final MouseEvent mouseEvent) {
                 isDown = false;
-            }
-            
-            @Override
-            public void mouseDragged(final MouseEvent mouseEvent) {
-                if (isDown) {
-                    double deltaX = mouseEvent.getX() - mousePressedPoint.getX();
-                    double deltaY = mouseEvent.getY() - mousePressedPoint.getY();
-                    offset.setLocation(offset.getX() + deltaX, offset.getY() + deltaY);
-                    mousePressedPoint = mouseEvent.getPoint();
-                }
             }
         };
         frame.setContentPane(panel);
@@ -186,19 +175,19 @@ public class Window {
         frame.addKeyListener(new KeyAdapter() {
             
             @Override
-            public void keyReleased(final KeyEvent keyEvent) {
-                final int keyCode = keyEvent.getKeyCode();
-                keys.remove(keyCode);
-            }
-            
-            @Override
             public void keyPressed(final KeyEvent keyEvent) {
                 final int keyCode = keyEvent.getKeyCode();
                 keys.add(keyCode);
             }
             
             @Override
-            public void keyTyped(KeyEvent keyEvent) {
+            public void keyReleased(final KeyEvent keyEvent) {
+                final int keyCode = keyEvent.getKeyCode();
+                keys.remove(keyCode);
+            }
+            
+            @Override
+            public void keyTyped(final KeyEvent keyEvent) {
                 // keyCode is undefinet in this event
                 // so we use the character instead
                 console.keyTyped(keyEvent.getKeyChar());
@@ -206,32 +195,37 @@ public class Window {
         });
         panel.addMouseListener(adapter);
         panel.addMouseMotionListener(adapter);
-        panel.addMouseWheelListener(new MouseWheelListener() {
-            
-            @Override
-            public void mouseWheelMoved(final MouseWheelEvent mouseEvent) {
-                final Point mousePoint = mouseEvent.getPoint();
-                // set zoom center relative to no zoom
-                final int rotation = mouseEvent.getWheelRotation();
-                double zoomDelta = 0;
-                if (rotation < 0 && zoom >= ZOOM_DELTA) {
-                    // zoom in
-                    zoomDelta = -ZOOM_DELTA;
-                } else if (rotation > 0) {
-                    // zoom out
-                    zoomDelta = ZOOM_DELTA;
-                }
-                // change zoom
-                zoom += zoomDelta;
-                try {
-                    final Point mousePointInverse = new Point();
-                    t.inverseTransform(mousePoint, mousePointInverse);
-                    zoomCenter.setLocation(mousePointInverse.getX(), mousePointInverse.getY());
-                    offset.setLocation(mousePoint.getX() - mousePointInverse.getX(), mousePoint.getY() - mousePointInverse.getY());
-                } catch (NoninvertibleTransformException e) {
-                    Logger.getGlobal().log(Level.SEVERE, "Can not invert mouse drag vector", e);
-                }
+        panel.addMouseWheelListener(mouseEvent -> {
+            final Point mousePoint = mouseEvent.getPoint();
+            // set zoom center relative to no zoom
+            final int rotation = mouseEvent.getWheelRotation();
+            double zoomDelta = 0;
+            if (rotation < 0 && zoom >= ZOOM_DELTA) {
+                // zoom in
+                zoomDelta = -ZOOM_DELTA;
+            } else if (rotation > 0) {
+                // zoom out
+                zoomDelta = ZOOM_DELTA;
+            }
+            // change zoom
+            zoom += zoomDelta;
+            try {
+                final Point mousePointInverse = new Point();
+                t.inverseTransform(mousePoint, mousePointInverse);
+                zoomCenter.setLocation(mousePointInverse.getX(), mousePointInverse.getY());
+                offset.setLocation(mousePoint.getX() - mousePointInverse.getX(), mousePoint.getY() - mousePointInverse.getY());
+            } catch (final NoninvertibleTransformException e) {
+                Logger.getGlobal().log(Level.SEVERE, "Can not invert mouse drag vector", e);
             }
         });
+    }
+    
+    public void render() {
+        renderableSaveCopy.set(DeepCopy.copy(renderable));
+        frame.repaint();
+    }
+    
+    public void setVisible(final boolean visible) {
+        frame.setVisible(visible);
     }
 }

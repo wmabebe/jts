@@ -7,6 +7,14 @@ import java.io.Serializable;
 
 public class Vehicle implements Serializable {
     
+    private static final Shape buildShape() {
+        final Path2D path = new Path2D.Double();
+        path.moveTo(0.5, 0.0);
+        path.lineTo(-0.5, 0.5);
+        path.lineTo(-0.5, -0.5);
+        path.closePath();
+        return path;
+    }
     private static final long  serialVersionUID = 1L;
     /**
      * Minimal acceleration (inclusive) [m/s^2]
@@ -32,6 +40,7 @@ public class Vehicle implements Serializable {
      * Width of the vehicle [m]
      */
     private final double       width            = 1.7;
+    
     private final static Shape SHAPE            = buildShape();
     
     public Vehicle() {
@@ -46,40 +55,31 @@ public class Vehicle implements Serializable {
         this.length = length;
     }
     
-    public Shape getShape() {
-        return AffineTransform.getScaleInstance(getLength(), getWidth()).createTransformedShape(SHAPE);
+    public double getLength() {
+        return length;
     }
     
     public double getMaxAcceleration() {
         return maxAcceleration;
     }
     
-    public double getMinAcceleration() {
-        return minAcceleration;
-    }
-    
     public double getMaxVelocity() {
         return maxVelocity;
+    }
+    
+    public double getMinAcceleration() {
+        return minAcceleration;
     }
     
     public double getMinVelocity() {
         return minVelocity;
     }
     
-    public double getLength() {
-        return length;
+    public Shape getShape() {
+        return AffineTransform.getScaleInstance(getLength(), getWidth()).createTransformedShape(SHAPE);
     }
     
     public double getWidth() {
         return width;
-    }
-    
-    private static final Shape buildShape() {
-        final Path2D path = new Path2D.Double();
-        path.moveTo(0.5, 0.0);
-        path.lineTo(-0.5, 0.5);
-        path.lineTo(-0.5, -0.5);
-        path.closePath();
-        return path;
     }
 }

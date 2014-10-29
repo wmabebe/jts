@@ -27,15 +27,15 @@ public abstract class BasicConsole implements Console {
     private Simulation          simulation;
     
     public BasicConsole() {
-        this.font = new Font("Courier New", Font.PLAIN, 14);
+        font = new Font("Courier New", Font.PLAIN, 14);
     }
     
-    public Simulation getSimulation() {
-        return simulation;
-    }
-    
-    protected void setFont(final Font font) {
-        this.font = font;
+    @Override
+    public void executeCommand(final String line) {
+        write(PROMPT + line);
+        if (line.trim().length() > 0) {
+            parseCommand(line);
+        }
     }
     
     @Override
@@ -44,27 +44,8 @@ public abstract class BasicConsole implements Console {
         return Integer.MAX_VALUE;
     }
     
-    @Override
-    public void render(Graphics2D g) {
-        g.setColor(Color.BLACK);
-        g.setFont(font);
-        // render last 20 inputs
-        int yoffset = 0;
-        for (String line : lines) {
-            g.drawString(line, POS_X, POS_Y + yoffset);
-            yoffset += LINE_HIEGHT;
-        }
-        String output = PROMPT + buffer.toString();
-        if (System.currentTimeMillis() % (1000 / CURSOR_BLINK_RATE) > (1000 / CURSOR_BLINK_RATE * 0.5)) {
-            output += CURSOR;
-        }
-        g.drawString(output, POS_X, POS_Y + yoffset);
-    }
-    
-    @Override
-    public void setSimulation(Simulation simulation) {
-        this.simulation = simulation;
-        this.simulation.setConsole(this);
+    public Simulation getSimulation() {
+        return simulation;
     }
     
     @Override
@@ -80,18 +61,43 @@ public abstract class BasicConsole implements Console {
         }
     }
     
-    private void writeChar(final char character) {
-        buffer.append(character);
+    protected abstract void parseCommand(final String line);
+    
+    private void pressEnter() {
+        final String line = buffer.toString();
+        buffer.setLength(0);
+        executeCommand(line);
     }
     
     private void removeChar() {
         buffer.deleteCharAt(buffer.length() - 1);
     }
     
-    private void pressEnter() {
-        String line = buffer.toString();
-        buffer.setLength(0);
-        executeCommand(line);
+    @Override
+    public void render(final Graphics2D g) {
+        g.setColor(Color.BLACK);
+        g.setFont(font);
+        // render last 20 inputs
+        int yoffset = 0;
+        for (final String line : lines) {
+            g.drawString(line, POS_X, POS_Y + yoffset);
+            yoffset += LINE_HIEGHT;
+        }
+        String output = PROMPT + buffer.toString();
+        if (System.currentTimeMillis() % (1000 / CURSOR_BLINK_RATE) > 1000 / CURSOR_BLINK_RATE * 0.5) {
+            output += CURSOR;
+        }
+        g.drawString(output, POS_X, POS_Y + yoffset);
+    }
+    
+    protected void setFont(final Font font) {
+        this.font = font;
+    }
+    
+    @Override
+    public void setSimulation(final Simulation simulation) {
+        this.simulation = simulation;
+        this.simulation.setConsole(this);
     }
     
     @Override
@@ -99,8 +105,8 @@ public abstract class BasicConsole implements Console {
         
         if (text.contains("\n")) {
             // multiple lines
-            String[] helpLines = text.split("\n");
-            for (String helpLine : helpLines) {
+            final String[] helpLines = text.split("\n");
+            for (final String helpLine : helpLines) {
                 write(helpLine);
             }
         } else {
@@ -112,13 +118,7 @@ public abstract class BasicConsole implements Console {
         }
     }
     
-    @Override
-    public void executeCommand(final String line) {
-        write(PROMPT + line);
-        if (line.trim().length() > 0) {
-            parseCommand(line);
-        }
+    private void writeChar(final char character) {
+        buffer.append(character);
     }
-    
-    protected abstract void parseCommand(final String line);
 }
