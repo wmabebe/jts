@@ -5,12 +5,15 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
 
+import ch.bfh.ti.jts.gui.Renderable;
+import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.graph.DirectedGraphEdge;
 
-public class Edge extends Element implements DirectedGraphEdge<Edge, Junction> {
+public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, Simulatable, Renderable {
     
-    private static final long      serialVersionUID  = 1L;
-    public static final int        EDGE_RENDER_LAYER = Net.NET_RENDER_LAYER + 1;
+    private static final long      serialVersionUID      = 1L;
+    public static final int        EDGE_RENDER_LAYER     = Net.NET_RENDER_LAYER + 1;
+    public static final int        EDGE_SIMULATION_LAYER = Lane.LANE_SIMULATION_LAYER + 1;
     private final Junction         start;
     private final Junction         end;
     private final int              priority;
@@ -70,7 +73,23 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction> {
     }
     
     @Override
+    public int getSimulationLayer() {
+        return EDGE_SIMULATION_LAYER;
+    }
+    
+    @Override
     public void render(final Graphics2D g) {
         // do nothing
+    }
+    
+    @Override
+    public void simulate(double duration) {
+        // do lane switching
+        getLanes().forEach(lane -> {
+            lane.getAgents().forEach(agent -> {
+                // lane.getAgents().remove(agent);
+                // lane.getDecisionLane(agent.getDecision()).getAgents().add(agent);
+                });
+        });
     }
 }

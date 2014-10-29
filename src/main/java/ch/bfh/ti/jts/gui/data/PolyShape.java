@@ -162,7 +162,7 @@ public class PolyShape implements Serializable {
     
     private double getSegmentLength(final int index) {
         if (index < 0 || index > points.size() - 2) {
-            throw new IndexOutOfBoundsException("index");
+            throw new IndexOutOfBoundsException("index: " + index + " points.size: " + points.size());
         }
         return points.get(index).distance(points.get(index + 1));
     }

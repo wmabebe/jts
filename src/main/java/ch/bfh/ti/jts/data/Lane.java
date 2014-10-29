@@ -9,10 +9,12 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import ch.bfh.ti.jts.ai.Decision;
+import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 import ch.bfh.ti.jts.simulation.Simulatable;
 
-public class Lane extends Element implements Simulatable {
+public class Lane extends Element implements Simulatable, Renderable {
     
     private static final long            serialVersionUID      = 1L;
     public final static int              LANE_RENDER_LAYER     = Edge.EDGE_RENDER_LAYER + 1;
@@ -78,6 +80,24 @@ public class Lane extends Element implements Simulatable {
     
     public boolean comesFrom(final Junction junction) {
         return getEdge().getStart() == junction;
+    }
+    
+    public Lane getDecisionLane(Decision decision) {
+        Lane lane = null;
+        switch (decision.getLaneChangeDirection()) {
+            case RIGHT :
+                lane = getRightLane();
+            break;
+            case LEFT :
+                lane = getLeftLane();
+            break;
+            default :
+            case NONE :
+                lane = this;
+            break;
+        }
+        return lane;
+        
     }
     
     public Lane getLeftLane() {

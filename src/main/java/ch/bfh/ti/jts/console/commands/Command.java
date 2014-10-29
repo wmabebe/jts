@@ -1,7 +1,5 @@
 package ch.bfh.ti.jts.console.commands;
 
-import ch.bfh.ti.jts.simulation.Simulation;
-
 /**
  * Interface describing available console commands.
  * 
@@ -17,13 +15,36 @@ public interface Command {
     String getName();
     
     /**
+     * The type of classes for which this command is intended
+     * 
+     * @return
+     */
+    Class<?> getTargetType();
+    
+    /**
+     * Is this a broadcast command: Will be executed for all element of the
+     * type: T.
+     * 
+     * @return
+     */
+    boolean isBroadcastCommand();
+    
+    /**
+     * If not a broadcast command this method should return the target element
+     * id.
+     * 
+     * @return
+     */
+    
+    int getTargetElement();
+    
+    /**
      * Executes the command.
      * 
-     * @param jc
-     *            JCommander objects with arguments
-     * @param simulation
-     *            the simulation object
+     * @param executor
+     *            the object on which to execute.
      * @return console output
      */
-    String execute(Simulation simulation);
+    String execute(Object executor);
+    
 }

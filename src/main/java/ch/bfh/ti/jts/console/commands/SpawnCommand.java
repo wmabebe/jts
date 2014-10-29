@@ -11,7 +11,6 @@ import ch.bfh.ti.jts.data.Element;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.Route;
 import ch.bfh.ti.jts.data.Vehicle;
-import ch.bfh.ti.jts.simulation.Simulation;
 
 import com.beust.jcommander.Parameter;
 
@@ -26,23 +25,38 @@ public class SpawnCommand implements Command {
     }
     
     @Override
-    public String execute(Simulation simulation) {
+    public boolean isBroadcastCommand() {
+        return false;
+    }
+    
+    @Override
+    public int getTargetElement() {
+        return 0;
+    }
+    
+    @Override
+    public Class<?> getTargetType() {
+        return Net.class;
+    }
+    
+    @Override
+    public String execute(Object executor) {
+        Net net = (Net) executor;
         
         // get net data
-        Net net = simulation.getNet();
         final List<Element> edges = net.getElementStream(Edge.class).collect(Collectors.toList());
         
         // generate routes
         final Collection<Route> routes = new LinkedList<>();
         for (int i = 0; i < number; i++) {
-
-            final Vehicle vehicle = new Vehicle();            
+            
+            final Vehicle vehicle = new Vehicle();
             
             // random route, random position
             final Edge routeStart = (Edge) edges.get(ThreadLocalRandom.current().nextInt(edges.size()));
             final Edge routeEnd = (Edge) edges.get(ThreadLocalRandom.current().nextInt(edges.size()));
             final double position = ThreadLocalRandom.current().nextDouble();
-            final double departureTime = simulation.getTimeTotal();
+            final double departureTime = net.getTimeTotal();
             final double speed = vehicle.getMaxVelocity();
             
             Route route = new Route(vehicle, routeStart, routeEnd, departureTime, position, speed, 0.0, 0.0);
@@ -52,4 +66,5 @@ public class SpawnCommand implements Command {
         
         return String.format("%d vehicles spawned", number);
     }
+    
 }

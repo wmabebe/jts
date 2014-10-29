@@ -1,6 +1,6 @@
 package ch.bfh.ti.jts.console.commands;
 
-import ch.bfh.ti.jts.simulation.Simulation;
+import ch.bfh.ti.jts.data.Net;
 
 public class TimeCommand implements Command {
     
@@ -10,7 +10,24 @@ public class TimeCommand implements Command {
     }
     
     @Override
-    public String execute(Simulation simulation) {
-        return String.format("time: %.2f seconds", simulation.getTimeTotal());
+    public boolean isBroadcastCommand() {
+        return false;
     }
+    
+    @Override
+    public int getTargetElement() {
+        return 0;
+    }
+    
+    @Override
+    public Class<?> getTargetType() {
+        return Net.class;
+    }
+    
+    @Override
+    public String execute(Object executor) {
+        Net net = (Net) executor;
+        return String.format("time: %.2f seconds", net.getTimeTotal());
+    }
+    
 }

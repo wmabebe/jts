@@ -19,10 +19,11 @@ public class Decision implements Serializable {
         public static LaneChangeDirection randomLaneChange(final Random random) {
             return VALUES.get(random.nextInt(VALUES.size()));
         }
+        
     }
-    private double              acceleration;
-    private LaneChangeDirection laneChangeDirection;
-    private Lane                nextJunctionLane;
+    private double              acceleration        = 0.0;
+    private LaneChangeDirection laneChangeDirection = LaneChangeDirection.NONE;
+    private Lane                nextJunctionLane    = null;
     
     public Decision() {
         laneChangeDirection = LaneChangeDirection.NONE;

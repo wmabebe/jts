@@ -5,16 +5,14 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Thinkable;
+import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
 
-public abstract class Agent extends Element implements Thinkable, Simulatable, Comparable<Agent> {
+public abstract class Agent extends Element implements Thinkable, Simulatable, Renderable, Comparable<Agent> {
     
     private static final long  serialVersionUID       = 1L;
     public final static int    AGENT_RENDER_LAYER     = Junction.JUNCTION_RENDER_LAYER + 1;
@@ -38,6 +36,10 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
      * The acceleration of a agent in m/s^2
      */
     private double             acceleration           = 0;
+    /**
+     * Distance to drive in m
+     */
+    double                     distanceToDrive;
     private Vehicle            vehicle;
     
     public Agent() {
@@ -57,14 +59,12 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
         this.vehicle = vehicle;
     }
     
-    public void setLane(final Lane lane) {
-        lane.getAgents().remove(this);
-        this.lane = lane;
-        lane.getAgents().add(this);
-    }
-    
     public Lane getLane() {
         return lane;
+    }
+    
+    public void setLane(final Lane lane) {
+        this.lane = lane;
     }
     
     @Override
@@ -131,37 +131,17 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, C
      *            the agents decision
      */
     public void move(final double duration) {
-        double deltaDistance = getVelocity() * duration;
-        followLane(deltaDistance);
-    }
-    
-    private void followLane(final double distanceToDrive) {
+        // set new driving distance
+        distanceToDrive += getVelocity() * duration;
         double lengthLane = getLane().getLength();
         double distanceOnLaneLeft = lengthLane * (1 - getRelativePosition());
-        if (distanceToDrive <= distanceOnLaneLeft) {
-            // stay on this lane
-            setRelativePosition(getRelativePosition() + distanceToDrive / lengthLane);
-        } else {
-            // pass junction and switch to an other lane
-            double distanceToDriveOnNextLane = distanceToDrive - distanceOnLaneLeft;
-            Lane nextLane = getDecision().getNextJunctionLane();
-            if (nextLane == null) {
-                
-                // Agent didn't decide where to go.. go random
-                final Junction nextJunction = getLane().getEdge().getEnd();
-                final List<Edge> nextEdges = new LinkedList<Edge>(nextJunction.getOutgoingEdges());
-                if (nextEdges.size() == 0) {
-                    throw new RuntimeException("no next edges available");
-                }
-                // get all lanes from a random next edge
-                final List<Lane> nextLanes = new LinkedList<Lane>(nextEdges.get(ThreadLocalRandom.current().nextInt(nextEdges.size())).getLanes());
-                // select a random lane
-                nextLane = nextLanes.get(ThreadLocalRandom.current().nextInt(nextLanes.size()));
-            }
-            setRelativePosition(0.0);
-            setLane(nextLane);
-            followLane(distanceToDriveOnNextLane);
-        }
+        double distanceToDriveOnNextLane = Helpers.clamp(distanceToDrive - distanceOnLaneLeft, 0.0, Double.MAX_VALUE);
+        double distanceToDriveOnThisLane = distanceToDrive - distanceToDriveOnNextLane;
+        // move
+        // TODO: 0.999 is a hotfix for index out of bounds in polyshape, set
+        // back to 1.0
+        setRelativePosition(Helpers.clamp(getRelativePosition() + distanceToDriveOnThisLane / lengthLane, 0.0, 0.999));
+        distanceToDrive = distanceToDriveOnNextLane;
     }
     
     /**

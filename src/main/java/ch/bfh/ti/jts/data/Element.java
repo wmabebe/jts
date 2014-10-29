@@ -11,7 +11,7 @@ import ch.bfh.ti.jts.gui.Renderable;
  * @author winki
  * @author ente
  */
-public abstract class Element implements Renderable, Serializable {
+public abstract class Element implements Serializable {
     
     private static final long          serialVersionUID = 1L;
     private final String               name;

@@ -1,17 +1,16 @@
 package ch.bfh.ti.jts.simulation;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-import ch.bfh.ti.jts.ai.agents.FullSpeedAgent;
 import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.console.commands.Command;
 import ch.bfh.ti.jts.data.Net;
-import ch.bfh.ti.jts.data.Route;
+import ch.bfh.ti.jts.utils.layers.Layers;
 
 /**
  * Simulates traffic on a @{link ch.bfh.ti.jts.data.Net}
@@ -21,22 +20,14 @@ import ch.bfh.ti.jts.data.Route;
 public class Simulation {
     
     /**
-     * Net for which to simulate traffic.
-     */
-    private final Net                    simulateNet;
-    /**
      * Factor by which the simulation should take place. 1 means real time
      * speed.
      */
-    private final double                 timeFactor      = 1;
+    private final static double          TIME_FACTOR = 1;
     /**
-     * Factor by which the spawning should take place. 1 means real time speed.
+     * Net for which to simulate traffic.
      */
-    private final double                 spawnTimeFactor = 1440;                       // 1
-                                                                                        // day
-                                                                                        // in
-                                                                                        // one
-                                                                                        // minute
+    private final Net                    simulateNet;
     /**
      * Absolute time at which the simulation started (nanoseconds).
      */
@@ -51,13 +42,9 @@ public class Simulation {
      */
     private double                       timeDelta;
     /**
-     * Total time that has passed since the begin of the simulation [s].
-     */
-    private double                       timeTotal;
-    /**
      * Commands the simulation should execute.
      */
-    private final BlockingQueue<Command> commands        = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Command> commands    = new LinkedBlockingQueue<>();
     
     private Console                      console;
     
@@ -77,47 +64,56 @@ public class Simulation {
     public void tick() {
         // do time calculations
         final long now = System.nanoTime();
-        timeDelta = (now - lastTick) * 1E-9 * timeFactor;
-        timeTotal = (now - startTime) * 1E-9 * timeFactor;
-        
-        // execute commands
+        timeDelta = (now - lastTick) * 1E-9 * TIME_FACTOR;
+        // poll all commands
+        final Map<Class<?>, List<Command>> broadcastCommand = new HashMap<>();
+        final Map<Integer, List<Command>> dedicatedCommands = new HashMap<>();
         while (!commands.isEmpty()) {
             Command command = commands.poll();
-            String output = command.execute(this);
-            getConsole().write(output);
+            List<Command> commandList;
+            if (command.isBroadcastCommand()) {
+                commandList = broadcastCommand.get(command.getTargetType());
+                if (commandList == null) {
+                    commandList = new LinkedList<>();
+                    broadcastCommand.put(command.getTargetType(), commandList);
+                }
+            } else {
+                commandList = dedicatedCommands.get(command.getTargetElement());
+                if (commandList == null) {
+                    commandList = new LinkedList<>();
+                    dedicatedCommands.put(command.getTargetElement(), commandList);
+                }
+            }
+            commandList.add(command);
         }
-        
-        // do agent spawning
-        spawn(timeTotal * spawnTimeFactor);
-        
+        // run broadcast commands
+        broadcastCommand.entrySet().forEach(entry -> {
+            final Class<?> clazz = entry.getKey();
+            final List<Command> commands = entry.getValue();
+            simulateNet.getElementStream(clazz).forEach(element -> {
+                commands.forEach(command -> {
+                    command.execute(element);
+                });
+            });
+            
+        });
+        // TODO: run dedicated commands
         // think
-        simulateNet.think();
+        simulateNet.getThinkableStream().forEach(e -> {
+            e.think();
+        });
         
         // simulate
-        simulateNet.simulate(timeDelta);
-        
-        // set lastTick for timediff
-        lastTick = now;
-    }
-    
-    /**
-     * Handles spawning of agents in the correct moment of the simulation.
-     * 
-     * @param totalDurationSeconds
-     *            total amount of time passed since begin of the simulation
-     */
-    // TODO: move into simulation method of Net class?
-    private void spawn(final double totalDurationSeconds) {
-        List<Route> routes = simulateNet.getRoutes().stream().sequential().filter(x -> x.getDepartureTime() < totalDurationSeconds).collect(Collectors.toList());
-        for (Route route : routes) {
-            simulateNet.addAgent(new FullSpeedAgent(), route);
-            simulateNet.getRoutes().remove(route);
-            Logger.getGlobal().log(Level.INFO, "agent spawned");
+        // delegate simulation for all simulatables
+        final Layers<Simulatable> simulatables = simulateNet.getSimulatable();
+        for (int layer : simulatables.getLayersIterator()) {
+            simulatables.getLayerStream(layer).sequential().forEach(e -> {
+                e.simulate(timeDelta);
+            });
         }
-    }
-    
-    public double getTimeTotal() {
-        return timeTotal;
+        
+        // set lastTick for time diff
+        lastTick = now;
     }
     
     public BlockingQueue<Command> getCommands() {

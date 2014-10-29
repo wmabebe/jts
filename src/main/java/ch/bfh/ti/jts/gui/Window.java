@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
+import ch.bfh.ti.jts.utils.layers.Layers;
 
 public class Window {
     
@@ -56,7 +57,7 @@ public class Window {
     private final Set<Integer>         keys               = new HashSet<Integer>();
     private final Net                  renderable;
     private final AtomicReference<Net> renderableSaveCopy = new AtomicReference<Net>();
-    private final Console             console;
+    private final Console              console;
     
     public Window(final Net renderable, final Console console) {
         if (renderable == null) {
@@ -93,9 +94,8 @@ public class Window {
             
             @Override
             public void paintComponent(final Graphics g) {
-                Graphics2D g2d = null;
+                final Graphics2D g2d = (Graphics2D) g;
                 try {
-                    g2d = (Graphics2D) g;
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 8));
                     t = new AffineTransform();
@@ -128,7 +128,13 @@ public class Window {
                     // Therefore the origin is in the left upper corner. As a
                     // result all the agents are driving on the wrong side.
                     g2d.transform(AffineTransform.getScaleInstance(1, -1));
-                    renderableSaveCopy.get().render(g2d);
+                    // render everything
+                    Layers<Renderable> renderables = renderableSaveCopy.get().getRenderable();
+                    for (int layer : renderables.getLayersIterator()) {
+                        renderables.getLayerStream(layer).sequential().forEach(e -> {
+                            e.render(g2d);
+                        });
+                    }
                     // render console
                     g2d.setTransform(tConsole);
                     console.render(g2d);
@@ -227,5 +233,5 @@ public class Window {
                 }
             }
         });
-    }    
+    }
 }
