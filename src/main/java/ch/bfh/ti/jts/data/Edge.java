@@ -84,12 +84,16 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
     
     @Override
     public void simulate(double duration) {
-        // do lane switching
+        // do lane switching. only for moving agents.
         getLanes().forEach(lane -> {
             lane.getAgents().forEach(agent -> {
-                // lane.getAgents().remove(agent);
-                // lane.getDecisionLane(agent.getDecision()).getAgents().add(agent);
-                });
+                if (agent.getVelocity() > 0) {
+                    lane.getAgents().remove(agent);
+                    final Lane decisionLane = lane.getDecisionLane(agent.getDecision());
+                    decisionLane.getAgents().add(agent);
+                    agent.setLane(decisionLane);
+                }
+            });
         });
     }
 }

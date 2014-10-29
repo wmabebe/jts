@@ -10,16 +10,6 @@ public class TimeCommand implements Command {
     }
     
     @Override
-    public boolean isBroadcastCommand() {
-        return false;
-    }
-    
-    @Override
-    public int getTargetElement() {
-        return 0;
-    }
-    
-    @Override
     public Class<?> getTargetType() {
         return Net.class;
     }

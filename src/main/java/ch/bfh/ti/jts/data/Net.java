@@ -76,6 +76,10 @@ public class Net extends Element implements Serializable, Simulatable {
         return routes;
     }
     
+    public Element getElement(final int elementId) {
+        return elements.stream().filter(x -> x.getId() == elementId).findAny().orElse(null);
+    }
+    
     public Stream<Element> getElementStream() {
         return elements.stream().sequential();
     }
@@ -105,6 +109,7 @@ public class Net extends Element implements Serializable, Simulatable {
         return NET_SIMULATION_LAYER;
     }
     
+    @Override
     public void simulate(double duration) {
         timeTotal += duration;
         // agent spawning
@@ -115,13 +120,12 @@ public class Net extends Element implements Serializable, Simulatable {
             lane.getAgents().add(agent);
             agent.setLane(lane);
             agent.setVehicle(route.getVehicle());
-            final double relativePositionOnLane = route.getDeparturePos();
+            final double relativePositionOnLane = route.getDeparturePos() / lane.getLength();
             agent.setRelativePosition(Helpers.clamp(relativePositionOnLane, 0.0, 1.0));
             agent.setVelocity(route.getDepartureSpeed());
             addElement(agent);
             getRoutes().remove(route);
-            Logger.getGlobal().log(Level.INFO, "agent spawned");
+            Logger.getGlobal().log(Level.INFO, "Agent spawned at " + relativePositionOnLane);
         }
     }
-    
 }

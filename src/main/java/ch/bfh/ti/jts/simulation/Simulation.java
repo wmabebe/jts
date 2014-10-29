@@ -1,11 +1,7 @@
 package ch.bfh.ti.jts.simulation;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.console.commands.Command;
@@ -23,30 +19,30 @@ public class Simulation {
      * Factor by which the simulation should take place. 1 means real time
      * speed.
      */
-    private final static double          TIME_FACTOR = 1;
+    private final static double  TIME_FACTOR = 1;
     /**
      * Net for which to simulate traffic.
      */
-    private final Net                    simulateNet;
+    private final Net            simulateNet;
     /**
      * Absolute time at which the simulation started (nanoseconds).
      */
-    private long                         startTime;
+    private long                 startTime;
     /**
      * Absolute time at which the the lastest simulation step took place
      * (nanoseconds).
      */
-    private long                         lastTick;
+    private long                 lastTick;
     /**
      * Time that has passed since the last simulation step [s].
      */
-    private double                       timeDelta;
+    private double               timeDelta;
     /**
      * Commands the simulation should execute.
      */
-    private final BlockingQueue<Command> commands    = new LinkedBlockingQueue<>();
+    private final Queue<Command> commands    = new ConcurrentLinkedQueue<>();
     
-    private Console                      console;
+    private Console              console;
     
     public Simulation(final Net simulateNet) {
         this.simulateNet = simulateNet;
@@ -65,39 +61,14 @@ public class Simulation {
         // do time calculations
         final long now = System.nanoTime();
         timeDelta = (now - lastTick) * 1E-9 * TIME_FACTOR;
-        // poll all commands
-        final Map<Class<?>, List<Command>> broadcastCommand = new HashMap<>();
-        final Map<Integer, List<Command>> dedicatedCommands = new HashMap<>();
-        while (!commands.isEmpty()) {
+        // execute all commands
+        while (commands.size() > 0) {
             Command command = commands.poll();
-            List<Command> commandList;
-            if (command.isBroadcastCommand()) {
-                commandList = broadcastCommand.get(command.getTargetType());
-                if (commandList == null) {
-                    commandList = new LinkedList<>();
-                    broadcastCommand.put(command.getTargetType(), commandList);
-                }
-            } else {
-                commandList = dedicatedCommands.get(command.getTargetElement());
-                if (commandList == null) {
-                    commandList = new LinkedList<>();
-                    dedicatedCommands.put(command.getTargetElement(), commandList);
-                }
-            }
-            commandList.add(command);
-        }
-        // run broadcast commands
-        broadcastCommand.entrySet().forEach(entry -> {
-            final Class<?> clazz = entry.getKey();
-            final List<Command> commands = entry.getValue();
-            simulateNet.getElementStream(clazz).forEach(element -> {
-                commands.forEach(command -> {
-                    command.execute(element);
-                });
+            Class<?> targetType = command.getTargetType();
+            simulateNet.getElementStream(targetType).forEach(element -> {
+                getConsole().write(command.execute(element));
             });
-            
-        });
-        // TODO: run dedicated commands
+        }
         // think
         simulateNet.getThinkableStream().forEach(e -> {
             e.think();
@@ -112,12 +83,12 @@ public class Simulation {
             });
         }
         
-        // set lastTick for time diff
+        // set lastTick for time difference
         lastTick = now;
     }
     
-    public BlockingQueue<Command> getCommands() {
-        return commands;
+    public void addCommand(final Command command) {
+        commands.add(command);
     }
     
     public Console getConsole() {

@@ -4,27 +4,27 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ch.bfh.ti.jts.simulation.Simulation;
 
 public abstract class BasicConsole implements Console {
     
-    private final static String         PROMPT            = "jts>";
-    private final static String         CURSOR            = "█";
+    private final static String PROMPT            = "jts>";
+    private final static String CURSOR            = "█";
     /**
      * How many times per second the cursor blinks
      */
-    private final static double         CURSOR_BLINK_RATE = 1.0;
-    private final static int            MAX_LINES         = 20;
-    private final static int            LINE_HIEGHT       = 20;
-    private final static int            POS_X             = 30;
-    private final static int            POS_Y             = 40;
-    private Font                        font;
-    private final BlockingQueue<String> lines             = new LinkedBlockingQueue<String>();
-    private StringBuffer                buffer            = new StringBuffer();
-    private Simulation                  simulation;
+    private final static double CURSOR_BLINK_RATE = 1.0;
+    private final static int    MAX_LINES         = 20;
+    private final static int    LINE_HIEGHT       = 20;
+    private final static int    POS_X             = 30;
+    private final static int    POS_Y             = 40;
+    private Font                font;
+    private final Queue<String> lines             = new ConcurrentLinkedQueue<String>();
+    private final StringBuffer  buffer            = new StringBuffer();
+    private Simulation          simulation;
     
     public BasicConsole() {
         this.font = new Font("Courier New", Font.PLAIN, 14);
@@ -69,7 +69,7 @@ public abstract class BasicConsole implements Console {
     
     @Override
     public void keyTyped(final char character) {
-        if ((int) character >= 32 && (int) character <= 127) {
+        if (character >= 32 && character <= 127) {
             writeChar(character);
         }
         if (character == (char) KeyEvent.VK_BACK_SPACE) {
@@ -96,7 +96,7 @@ public abstract class BasicConsole implements Console {
     
     @Override
     public void write(final String text) {
-
+        
         if (text.contains("\n")) {
             // multiple lines
             String[] helpLines = text.split("\n");

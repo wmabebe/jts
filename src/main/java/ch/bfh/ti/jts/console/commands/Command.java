@@ -22,23 +22,6 @@ public interface Command {
     Class<?> getTargetType();
     
     /**
-     * Is this a broadcast command: Will be executed for all element of the
-     * type: T.
-     * 
-     * @return
-     */
-    boolean isBroadcastCommand();
-    
-    /**
-     * If not a broadcast command this method should return the target element
-     * id.
-     * 
-     * @return
-     */
-    
-    int getTargetElement();
-    
-    /**
      * Executes the command.
      * 
      * @param executor

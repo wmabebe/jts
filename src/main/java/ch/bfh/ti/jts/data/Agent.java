@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Thinkable;
@@ -39,7 +40,10 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     /**
      * Distance to drive in m
      */
-    double                     distanceToDrive;
+    private double             distanceToDrive        = 0;
+    /**
+     * Vehilce of this agent
+     */
     private Vehicle            vehicle;
     
     public Agent() {
@@ -109,6 +113,10 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         this.acceleration = Helpers.clamp(acceleration, vehicle.getMinAcceleration(), vehicle.getMaxAcceleration());
     }
     
+    public double getDistanceToDrive() {
+        return distanceToDrive;
+    }
+    
     /**
      * Change velocity based on a specified amount of time. The agents current
      * acceleration is applied.
@@ -134,14 +142,13 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         // set new driving distance
         distanceToDrive += getVelocity() * duration;
         double lengthLane = getLane().getLength();
+        
         double distanceOnLaneLeft = lengthLane * (1 - getRelativePosition());
-        double distanceToDriveOnNextLane = Helpers.clamp(distanceToDrive - distanceOnLaneLeft, 0.0, Double.MAX_VALUE);
+        double distanceToDriveOnNextLane = Math.max(distanceToDrive - distanceOnLaneLeft, 0.0);
         double distanceToDriveOnThisLane = distanceToDrive - distanceToDriveOnNextLane;
-        // move
-        // TODO: 0.999 is a hotfix for index out of bounds in polyshape, set
-        // back to 1.0
-        setRelativePosition(Helpers.clamp(getRelativePosition() + distanceToDriveOnThisLane / lengthLane, 0.0, 0.999));
+        setRelativePosition(Helpers.clamp(getRelativePosition() + distanceToDriveOnThisLane / lengthLane, 0.0, 1.0));
         distanceToDrive = distanceToDriveOnNextLane;
+        Logger.getGlobal().info("distanceToDrive: " + distanceToDrive);
     }
     
     /**

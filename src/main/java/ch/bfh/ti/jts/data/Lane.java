@@ -96,8 +96,11 @@ public class Lane extends Element implements Simulatable, Renderable {
                 lane = this;
             break;
         }
+        // if the requested lane is not there we stay on the same lane
+        if (lane == null) {
+            lane = this;
+        }
         return lane;
-        
     }
     
     public Lane getLeftLane() {

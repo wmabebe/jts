@@ -94,7 +94,24 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
     
     @Override
     public void simulate(double duration) {
-        // TODO fill with switch edge for agents
+        // move incoming agents over junction
+        getEdges().stream().filter(edge -> edge.goesTo(this)).forEach(edge -> {
+            edge.getLanes().forEach(lane -> {
+                for (final Agent agent : lane.getAgents().descendingSet()) {
+                    // did we reach a agent which has no distance to drive left:
+                    // nothing to do here.
+                    if (agent.getDistanceToDrive() > 0) {
+                        final Lane nextJunctionLane = agent.getDecision().getNextJunctionLane();
+                        if (nextJunctionLane != null) {
+                            lane.getAgents().remove(agent);
+                            agent.setRelativePosition(0.0);
+                            agent.setLane(nextJunctionLane);
+                            nextJunctionLane.getAgents().add(agent);
+                        }
+                    }
+                }
+            });;
+        });
         
     }
 }

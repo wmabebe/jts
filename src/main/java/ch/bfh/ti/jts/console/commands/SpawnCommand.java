@@ -17,21 +17,11 @@ import com.beust.jcommander.Parameter;
 public class SpawnCommand implements Command {
     
     @Parameter(names = { "-number", "-n" }, description = "Number of vehicles to spawn")
-    private int number = 1;
+    private final int number = 1;
     
     @Override
     public String getName() {
         return "spawn";
-    }
-    
-    @Override
-    public boolean isBroadcastCommand() {
-        return false;
-    }
-    
-    @Override
-    public int getTargetElement() {
-        return 0;
     }
     
     @Override

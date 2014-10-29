@@ -3,7 +3,9 @@ package ch.bfh.ti.jts.console;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import ch.bfh.ti.jts.console.commands.*;
+import ch.bfh.ti.jts.console.commands.Command;
+import ch.bfh.ti.jts.console.commands.SpawnCommand;
+import ch.bfh.ti.jts.console.commands.TimeCommand;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -14,18 +16,18 @@ public class JtsConsole extends BasicConsole {
     public class MainParams {
         
         @Parameter(names = { "-help", "-h" }, description = "Help")
-        private boolean help = false;
+        private final boolean help = false;
     }
     
     private JCommander                jc;
-    private MainParams                mainParams = new MainParams();
+    private final MainParams          mainParams = new MainParams();
     private final Collection<Command> commands   = new LinkedList<>();
     
     private JCommander buildCommander() {
         
         JCommander jcommander = new JCommander(mainParams);
         
-        // TODO: do this with reflection?        
+        // TODO: do this with reflection?
         commands.clear();
         commands.add(new TimeCommand());
         commands.add(new SpawnCommand());
@@ -70,10 +72,6 @@ public class JtsConsole extends BasicConsole {
     }
     
     private void execute(final Command command) {
-        try {
-            getSimulation().getCommands().put(command);
-        } catch (InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
+        getSimulation().addCommand(command);
     }
 }
