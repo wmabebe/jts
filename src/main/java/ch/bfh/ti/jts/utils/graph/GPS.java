@@ -1,9 +1,11 @@
 package ch.bfh.ti.jts.utils.graph;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,10 +13,10 @@ import ch.bfh.ti.jts.data.Net;
 
 public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdge<E, V>> {
     
-    private final Net                                                                     net;
-    private final List<DirectedGraphVertex<V, E>>                                         vertices = new LinkedList<>();
-    private final List<DirectedGraphEdge<E, V>>                                           edges    = new LinkedList<>();
-    private ConcurrentHashMap<DirectedGraphVertex<V, E>, List<DirectedGraphVertex<V, E>>> routes;
+    private final Net                                                                                                                         net;
+    private final List<DirectedGraphVertex<V, E>>                                                                                             vertices = new LinkedList<>();
+    private final List<DirectedGraphEdge<E, V>>                                                                                               edges    = new LinkedList<>();
+    private final ConcurrentHashMap<DirectedGraphVertex<V, E>, ConcurrentHashMap<DirectedGraphVertex<V, E>, List<DirectedGraphVertex<V, E>>>> routes   = new ConcurrentHashMap<>();
     
     public GPS(final Net net) {
         this.net = net;
@@ -22,7 +24,7 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
     }
     
     public Optional<E> getNextEdge(V from, V to) {
-        final DirectedGraphVertex<V, E> nextVertex = routes.get(from).get(vertices.indexOf(to));
+        final DirectedGraphVertex<V, E> nextVertex = routes.get(from).get(to).get(0);
         return nextVertex.getEdgeBetween(from);
     }
     
@@ -33,41 +35,45 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
      * @param source
      *            the vertex to start search with
      */
-    private List<DirectedGraphVertex<V, E>> dijekstra(final DirectedGraphVertex<V, E> source) {
+    private Map<DirectedGraphVertex<V, E>, DirectedGraphVertex<V, E>> dijekstra(final DirectedGraphVertex<V, E> source) {
         // initialize
-        final int sourceIndex = vertices.indexOf(source);
-        final List<Double> dist = new ArrayList<>(vertices.size());
-        dist.forEach(x -> x = Double.POSITIVE_INFINITY);
-        dist.set(sourceIndex, 0.0);
-        final List<DirectedGraphVertex<V, E>> previous = new ArrayList<>(vertices.size());
-        previous.forEach(x -> x = null);
+        final Map<DirectedGraphVertex<V, E>, Double> dist = new HashMap<>();
+        final Map<DirectedGraphVertex<V, E>, DirectedGraphVertex<V, E>> previous = new HashMap<>();
+        vertices.forEach(x -> {
+            dist.put(x, Double.POSITIVE_INFINITY);
+            previous.put(x, null);
+        });
+        dist.put(source, 0.0);
         final List<DirectedGraphVertex<V, E>> q = new ArrayList<>(vertices);
         // algorithm
         while (q.size() > 0) {
             // find vertex with min distance
-            final Iterator<Double> distIter = dist.iterator();
-            double maxDistance = distIter.next();
             final Iterator<DirectedGraphVertex<V, E>> qIter = q.iterator();
-            DirectedGraphVertex<V, E> max = qIter.next();
-            while (distIter.hasNext() && qIter.hasNext()) {
+            DirectedGraphVertex<V, E> min = qIter.next();
+            double minDistance = dist.get(min);
+            while (qIter.hasNext()) {
                 final DirectedGraphVertex<V, E> nextVertex = qIter.next();
-                final double nextVertexDistance = distIter.next();
-                if (nextVertexDistance < maxDistance) {
-                    maxDistance = nextVertexDistance;
-                    max = nextVertex;
+                final double nextVertexDistance = dist.get(nextVertex);
+                if (nextVertexDistance < minDistance) {
+                    minDistance = nextVertexDistance;
+                    min = nextVertex;
                 }
             }
-            final DirectedGraphVertex<V, E> u = max;
-            final double uDistance = maxDistance;
+            final DirectedGraphVertex<V, E> u = min;
+            final double uDistance = minDistance;
             // remove vertex
             q.remove(u);
+            // update all reachable vertices
             u.getReachableVertices().stream().filter(v -> q.contains(v)).forEach(v -> {
-                final int vIndex = q.indexOf(v);
-                Double vDist = dist.get(vIndex);
-                final double alt = uDistance + u.getEdgeBetween(v).get().getLength();
+                double vDist = dist.get(v);
+                Optional<E> edgeBetween = u.getEdgeBetween(v);
+                double alt = uDistance;
+                if (edgeBetween.isPresent()) {
+                    alt += edgeBetween.get().getWeight();
+                }
                 if (alt < vDist) {
-                    vDist = alt;
-                    previous.set(vIndex, u);
+                    dist.put(v, alt);
+                    previous.put(v, u);
                 }
             });
         }
@@ -80,9 +86,11 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
      */
     @SuppressWarnings("unchecked")
     public void update() {
-        // extract all edges and vertices
+        // clear all information
         vertices.clear();
         edges.clear();
+        routes.clear();
+        // extract all edges and vertices
         net.getElementStream().forEach(x -> {
             if (DirectedGraphVertex.class.isInstance(x)) {
                 vertices.add((DirectedGraphVertex<V, E>) x);
@@ -91,8 +99,19 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
             }
         });
         // parallel compute dijekstra for each vertex
-        vertices.stream().parallel().forEach(x -> {
-            routes.put(x, dijekstra(x));
+        vertices.stream().sequential().forEach(start -> {
+            final Map<DirectedGraphVertex<V, E>, DirectedGraphVertex<V, E>> previous = dijekstra(start);
+            final ConcurrentHashMap<DirectedGraphVertex<V, E>, List<DirectedGraphVertex<V, E>>> destinations = new ConcurrentHashMap<>();
+            vertices.stream().sequential().forEach(destination -> {
+                final List<DirectedGraphVertex<V, E>> route = new LinkedList<>();
+                DirectedGraphVertex<V, E> next = destination;
+                while (previous.containsKey(next)) {
+                    next = previous.get(next);
+                    route.add(0, next); // prepend
+                }
+                destinations.put(destination, route);
+            });
+            routes.put(start, destinations);
         });
     }
 }

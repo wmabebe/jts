@@ -85,8 +85,6 @@ public class NetImporter extends Importer<Net> {
         final Junction start = junctions.get(from);
         final Junction end = junctions.get(to);
         final Edge edge = new Edge(id, start, end, priority);
-        start.getEdges().add(edge);
-        end.getEdges().add(edge);
         edges.put(id, edge);
         net.addElement(edge);
         final NodeList nodes = node.getChildNodes();
@@ -122,7 +120,6 @@ public class NetImporter extends Importer<Net> {
         final double length = getAttribute(node, "length", Double.class);
         final PolyShape polyShape = new PolyShape(getAttribute(node, "shape", String.class));
         final Lane lane = new Lane(id, edge, index, speed, length, polyShape);
-        edge.getLanes().add(lane);
         net.addElement(lane);
         lanes.put(id, lane);
     }

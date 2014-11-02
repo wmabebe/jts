@@ -21,4 +21,16 @@ public class Helpers {
         }
         return value;
     }
+    
+    /**
+     * @see Helpers#clamp(double, double, double)
+     */
+    public static int clamp(int value, final int min, final int max) {
+        if (value < min) {
+            value = min;
+        } else if (value > max) {
+            value = max;
+        }
+        return value;
+    }
 }

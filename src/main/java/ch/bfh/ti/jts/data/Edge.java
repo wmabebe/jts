@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
+import ch.bfh.ti.jts.utils.Helpers;
 import ch.bfh.ti.jts.utils.graph.DirectedGraphEdge;
 
 public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, Simulatable, Renderable {
@@ -16,6 +17,9 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
     public static final int        EDGE_SIMULATION_LAYER = Lane.LANE_SIMULATION_LAYER + 1;
     private final Junction         start;
     private final Junction         end;
+    /**
+     * A priority of this lane. 1 := Min priority, INT.MAX:= Max priority.
+     */
     private final int              priority;
     private final Collection<Lane> lanes;
     
@@ -28,8 +32,10 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
             throw new IllegalArgumentException("end is null");
         }
         this.start = start;
+        this.start.addEdge(this);
         this.end = end;
-        this.priority = priority;
+        this.end.addEdge(this);
+        this.priority = Helpers.clamp(priority, 1, Integer.MAX_VALUE);
         lanes = new LinkedList<Lane>();
     }
     
@@ -46,16 +52,20 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
         return lanes;
     }
     
+    public void addLane(final Lane lane) {
+        lanes.add(lane);
+    }
+    
     @Override
-    public double getLength() {
-        double maxLenght = 0.0;
+    public double getWeight() {
+        double maxLenght = Double.POSITIVE_INFINITY;
         final Optional<Lane> maxLane = lanes.stream().max((x, y) -> {
             return new Double(x.getLength()).compareTo(y.getLength());
         });
         if (maxLane.isPresent()) {
             maxLenght = maxLane.get().getLength();
         }
-        return maxLenght;
+        return maxLenght / getPriority();
     }
     
     public int getPriority() {

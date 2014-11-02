@@ -21,11 +21,11 @@ public interface DirectedGraphEdge<E extends DirectedGraphEdge<E, V>, V extends 
     public V getEnd();
     
     /**
-     * Get the length of this edge
+     * Get the weight of this edge
      *
-     * @return the lenght of this edge
+     * @return the weight of this edge
      */
-    public double getLength();
+    public double getWeight();
     
     /**
      * Get the vertex at the start of this edge

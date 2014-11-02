@@ -42,6 +42,7 @@ public class Lane extends Element implements Simulatable, Renderable {
             throw new IllegalArgumentException("polyShape is null");
         }
         this.edge = edge;
+        this.edge.addLane(this);
         this.index = index;
         this.speed = speed;
         this.length = length;
