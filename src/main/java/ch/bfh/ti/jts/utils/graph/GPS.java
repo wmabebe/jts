@@ -4,18 +4,26 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import ch.bfh.ti.jts.data.Net;
 
 public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdge<E, V>> {
     
-    private final Net                             net;
-    private final List<DirectedGraphVertex<V, E>> vertices = new LinkedList<>();
-    private final List<DirectedGraphEdge<E, V>>   edges    = new LinkedList<>();
+    private final Net                                                                     net;
+    private final List<DirectedGraphVertex<V, E>>                                         vertices = new LinkedList<>();
+    private final List<DirectedGraphEdge<E, V>>                                           edges    = new LinkedList<>();
+    private ConcurrentHashMap<DirectedGraphVertex<V, E>, List<DirectedGraphVertex<V, E>>> routes;
     
     public GPS(final Net net) {
         this.net = net;
         update();
+    }
+    
+    public Optional<E> getNextEdge(V from, V to) {
+        final DirectedGraphVertex<V, E> nextVertex = routes.get(from).get(vertices.indexOf(to));
+        return nextVertex.getEdgeBetween(from);
     }
     
     /**
@@ -25,7 +33,7 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
      * @param source
      *            the vertex to start search with
      */
-    private void dijekstra(final DirectedGraphVertex<V, E> source) {
+    private List<DirectedGraphVertex<V, E>> dijekstra(final DirectedGraphVertex<V, E> source) {
         // initialize
         final int sourceIndex = vertices.indexOf(source);
         final List<Double> dist = new ArrayList<>(vertices.size());
@@ -62,8 +70,8 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
                     previous.set(vIndex, u);
                 }
             });
-            // TODO: return something
         }
+        return previous;
     }
     
     /**
@@ -84,7 +92,7 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
         });
         // parallel compute dijekstra for each vertex
         vertices.stream().parallel().forEach(x -> {
-            dijekstra(x);
+            routes.put(x, dijekstra(x));
         });
     }
 }

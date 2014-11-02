@@ -72,8 +72,8 @@ winku
 
 Enteee
 * Zooming [done]
-* Collisions [partially done, buggy]
-* Lane switching
+* Collisions [done]
+* Lane switching [done]
 
 winki
 * Render agents on polygons [done]
@@ -91,6 +91,8 @@ winki
 #### Calendar week 44
 
 Enteee
+* Commands to element redirection [done]
+* Smarter agent
 
 winki
 * Embedded console, thread-safe [done]
