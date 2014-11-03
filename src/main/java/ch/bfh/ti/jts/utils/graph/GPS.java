@@ -13,10 +13,10 @@ import ch.bfh.ti.jts.data.Net;
 
 public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdge<E, V>> {
     
-    private final Net                                                                                                                         net;
-    private final List<DirectedGraphVertex<V, E>>                                                                                             vertices = new LinkedList<>();
-    private final List<DirectedGraphEdge<E, V>>                                                                                               edges    = new LinkedList<>();
-    private final ConcurrentHashMap<DirectedGraphVertex<V, E>, ConcurrentHashMap<DirectedGraphVertex<V, E>, List<DirectedGraphVertex<V, E>>>> routes   = new ConcurrentHashMap<>();
+    private final Net                                                 net;
+    private final List<V>                                             vertices = new LinkedList<>();
+    private final List<E>                                             edges    = new LinkedList<>();
+    private final ConcurrentHashMap<V, ConcurrentHashMap<V, List<V>>> routes   = new ConcurrentHashMap<>();
     
     public GPS(final Net net) {
         this.net = net;
@@ -24,8 +24,12 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
     }
     
     public Optional<E> getNextEdge(V from, V to) {
-        final DirectedGraphVertex<V, E> nextVertex = routes.get(from).get(to).get(0);
-        return nextVertex.getEdgeBetween(from);
+        Optional<E> edgeBetween = Optional.empty();
+        final List<V> path = routes.get(from).get(to);
+        if (path.size() > 0) {
+            edgeBetween = from.getEdgeBetween(path.get(0));
+        }
+        return edgeBetween;
     }
     
     /**
@@ -35,31 +39,31 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
      * @param source
      *            the vertex to start search with
      */
-    private Map<DirectedGraphVertex<V, E>, DirectedGraphVertex<V, E>> dijekstra(final DirectedGraphVertex<V, E> source) {
+    private Map<V, V> dijekstra(final V source) {
         // initialize
-        final Map<DirectedGraphVertex<V, E>, Double> dist = new HashMap<>();
-        final Map<DirectedGraphVertex<V, E>, DirectedGraphVertex<V, E>> previous = new HashMap<>();
+        final Map<V, Double> dist = new HashMap<>();
+        final Map<V, V> previous = new HashMap<>();
         vertices.forEach(x -> {
             dist.put(x, Double.POSITIVE_INFINITY);
             previous.put(x, null);
         });
         dist.put(source, 0.0);
-        final List<DirectedGraphVertex<V, E>> q = new ArrayList<>(vertices);
+        final List<V> q = new ArrayList<>(vertices);
         // algorithm
         while (q.size() > 0) {
             // find vertex with min distance
-            final Iterator<DirectedGraphVertex<V, E>> qIter = q.iterator();
-            DirectedGraphVertex<V, E> min = qIter.next();
+            final Iterator<V> qIter = q.iterator();
+            V min = qIter.next();
             double minDistance = dist.get(min);
             while (qIter.hasNext()) {
-                final DirectedGraphVertex<V, E> nextVertex = qIter.next();
+                final V nextVertex = qIter.next();
                 final double nextVertexDistance = dist.get(nextVertex);
                 if (nextVertexDistance < minDistance) {
                     minDistance = nextVertexDistance;
                     min = nextVertex;
                 }
             }
-            final DirectedGraphVertex<V, E> u = min;
+            final V u = min;
             final double uDistance = minDistance;
             // remove vertex
             q.remove(u);
@@ -93,21 +97,21 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
         // extract all edges and vertices
         net.getElementStream().forEach(x -> {
             if (DirectedGraphVertex.class.isInstance(x)) {
-                vertices.add((DirectedGraphVertex<V, E>) x);
+                vertices.add((V) x);
             } else if (DirectedGraphEdge.class.isInstance(x)) {
-                edges.add((DirectedGraphEdge<E, V>) x);
+                edges.add((E) x);
             }
         });
         // parallel compute dijekstra for each vertex
         vertices.stream().sequential().forEach(start -> {
-            final Map<DirectedGraphVertex<V, E>, DirectedGraphVertex<V, E>> previous = dijekstra(start);
-            final ConcurrentHashMap<DirectedGraphVertex<V, E>, List<DirectedGraphVertex<V, E>>> destinations = new ConcurrentHashMap<>();
+            final Map<V, V> previous = dijekstra(start);
+            final ConcurrentHashMap<V, List<V>> destinations = new ConcurrentHashMap<>();
             vertices.stream().sequential().forEach(destination -> {
-                final List<DirectedGraphVertex<V, E>> route = new LinkedList<>();
-                DirectedGraphVertex<V, E> next = destination;
-                while (previous.containsKey(next)) {
-                    next = previous.get(next);
+                final List<V> route = new LinkedList<>();
+                V next = destination;
+                while (previous.get(next) != null) {
                     route.add(0, next); // prepend
+                    next = previous.get(next);
                 }
                 destinations.put(destination, route);
             });

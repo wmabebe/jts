@@ -6,11 +6,12 @@ import java.util.Optional;
 public interface DirectedGraphVertex<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdge<E, V>> {
     
     /**
-     * Get the edge between this and the given vertex
+     * Get the edge going from this to the given vertex
      *
      * @param vertex
      *            the 'other' vertex
-     * @return the edge between, might be null if there is no connection
+     * @return the edge between, Optional might be not set if there is no
+     *         connection
      */
     public Optional<E> getEdgeBetween(final V vertex);
     
