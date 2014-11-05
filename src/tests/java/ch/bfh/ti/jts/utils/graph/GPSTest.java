@@ -68,6 +68,8 @@ public class GPSTest {
          *    \      /
          *     v    /
          *       j6
+         *
+         *  j7 <-(e9,e10)-> j8
          *       
          * Whereas :
          *  e6.priority = 1
@@ -79,18 +81,28 @@ public class GPSTest {
         j[4] = new Junction("j4", 0, 0, s);
         j[5] = new Junction("j5", 0, 0, s);
         j[6] = new Junction("j6", 0, 0, s);
+        j[7] = new Junction("j7", 0, 0, s);
+        j[8] = new Junction("j8", 0, 0, s);
         net[1].addElement(j[4]);
         net[1].addElement(j[5]);
         net[1].addElement(j[6]);
+        net[1].addElement(j[7]);
+        net[1].addElement(j[8]);
         e[6] = new Edge("e6", j[4], j[5], 1);
         new Lane("l", e[6], 0, 1, 1, p);
         e[7] = new Edge("e7", j[4], j[6], 3);
         new Lane("l", e[7], 0, 1, 1, p);
         e[8] = new Edge("e8", j[6], j[5], 3);
         new Lane("l", e[8], 0, 1, 1, p);
+        e[9] = new Edge("e9", j[7], j[8], 3);
+        new Lane("l", e[9], 0, 1, 1, p);
+        e[10] = new Edge("e10", j[8], j[7], 3);
+        new Lane("l", e[10], 0, 1, 1, p);
         net[1].addElement(e[6]);
         net[1].addElement(e[7]);
         net[1].addElement(e[8]);
+        net[1].addElement(e[9]);
+        net[1].addElement(e[10]);
     }
     
     @Test
@@ -129,19 +141,32 @@ public class GPSTest {
         Assert.assertFalse(gps1.getNextEdge(j[4], j[4]).isPresent());
         Assert.assertEquals(e[7], gps1.getNextEdge(j[4], j[5]).get()); // priority!
         Assert.assertEquals(e[7], gps1.getNextEdge(j[4], j[6]).get());
+        Assert.assertFalse(gps1.getNextEdge(j[4], j[7]).isPresent());
+        Assert.assertFalse(gps1.getNextEdge(j[4], j[8]).isPresent());
         // j5 outbound
         Assert.assertFalse(gps1.getNextEdge(j[5], j[4]).isPresent());
         Assert.assertFalse(gps1.getNextEdge(j[5], j[5]).isPresent());
         Assert.assertFalse(gps1.getNextEdge(j[5], j[6]).isPresent());
+        Assert.assertFalse(gps1.getNextEdge(j[5], j[7]).isPresent());
+        Assert.assertFalse(gps1.getNextEdge(j[5], j[8]).isPresent());
         // j6 outbound
         Assert.assertFalse(gps1.getNextEdge(j[6], j[4]).isPresent());
         Assert.assertEquals(e[8], gps1.getNextEdge(j[6], j[5]).get());
         Assert.assertFalse(gps1.getNextEdge(j[6], j[6]).isPresent());
-    }
-    
-    @Test
-    public final void testUpdate() {
-        
+        Assert.assertFalse(gps1.getNextEdge(j[6], j[7]).isPresent());
+        Assert.assertFalse(gps1.getNextEdge(j[6], j[8]).isPresent());
+        // j7 outbound
+        Assert.assertFalse(gps1.getNextEdge(j[7], j[4]).isPresent());
+        Assert.assertFalse(gps1.getNextEdge(j[7], j[5]).isPresent());
+        Assert.assertFalse(gps1.getNextEdge(j[7], j[6]).isPresent());
+        Assert.assertFalse(gps1.getNextEdge(j[7], j[7]).isPresent());
+        Assert.assertEquals(e[9], gps1.getNextEdge(j[7], j[8]).get());
+        // j8 outbound
+        Assert.assertFalse(gps1.getNextEdge(j[8], j[4]).isPresent());
+        Assert.assertFalse(gps1.getNextEdge(j[8], j[5]).isPresent());
+        Assert.assertFalse(gps1.getNextEdge(j[8], j[6]).isPresent());
+        Assert.assertEquals(e[10], gps1.getNextEdge(j[8], j[7]).get());
+        Assert.assertFalse(gps1.getNextEdge(j[8], j[8]).isPresent());
     }
     
 }

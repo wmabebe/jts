@@ -122,6 +122,12 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return velocity;
     }
     
+    public double getDistanceOnLaneLeft() {
+        final double lengthLane = getLane().getLength();
+        final double distanceOnLaneLeft = lengthLane * (1 - getRelativePosition());
+        return distanceOnLaneLeft;
+    }
+    
     /**
      * Change position based on a specified amount of time. The agents current
      * velocity is applied.
@@ -134,12 +140,10 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     public void move(final double duration) {
         // set new driving distance
         distanceToDrive += getVelocity() * duration;
-        final double lengthLane = getLane().getLength();
-        
-        final double distanceOnLaneLeft = lengthLane * (1 - getRelativePosition());
+        final double distanceOnLaneLeft = getDistanceOnLaneLeft();
         final double distanceToDriveOnNextLane = Math.max(distanceToDrive - distanceOnLaneLeft, 0.0);
         final double distanceToDriveOnThisLane = distanceToDrive - distanceToDriveOnNextLane;
-        setRelativePosition(Helpers.clamp(getRelativePosition() + distanceToDriveOnThisLane / lengthLane, 0.0, 1.0));
+        setRelativePosition(Helpers.clamp(getRelativePosition() + distanceToDriveOnThisLane / getLane().getLength(), 0.0, 1.0));
         distanceToDrive = distanceToDriveOnNextLane;
         Logger.getGlobal().info("distanceToDrive: " + distanceToDrive);
     }

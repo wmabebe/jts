@@ -20,7 +20,29 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
     
     public GPS(final Net net) {
         this.net = net;
-        update();
+        // extract all edges and vertices
+        net.getElementStream().forEach(x -> {
+            if (DirectedGraphVertex.class.isInstance(x)) {
+                vertices.add((V) x);
+            } else if (DirectedGraphEdge.class.isInstance(x)) {
+                edges.add((E) x);
+            }
+        });
+        // parallel compute dijekstra for each vertex
+        vertices.stream().sequential().forEach(start -> {
+            final Map<V, V> previous = dijekstra(start);
+            final ConcurrentHashMap<V, List<V>> destinations = new ConcurrentHashMap<>();
+            vertices.stream().sequential().forEach(destination -> {
+                final List<V> route = new LinkedList<>();
+                V next = destination;
+                while (previous.get(next) != null) {
+                    route.add(0, next); // prepend
+                    next = previous.get(next);
+                }
+                destinations.put(destination, route);
+            });
+            routes.put(start, destinations);
+        });
     }
     
     public Optional<E> getNextEdge(V from, V to) {
@@ -84,38 +106,4 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
         return previous;
     }
     
-    /**
-     * This method updates GPS information. Should be called when the structure
-     * of the underlying net has changed.
-     */
-    @SuppressWarnings("unchecked")
-    public void update() {
-        // clear all information
-        vertices.clear();
-        edges.clear();
-        routes.clear();
-        // extract all edges and vertices
-        net.getElementStream().forEach(x -> {
-            if (DirectedGraphVertex.class.isInstance(x)) {
-                vertices.add((V) x);
-            } else if (DirectedGraphEdge.class.isInstance(x)) {
-                edges.add((E) x);
-            }
-        });
-        // parallel compute dijekstra for each vertex
-        vertices.stream().sequential().forEach(start -> {
-            final Map<V, V> previous = dijekstra(start);
-            final ConcurrentHashMap<V, List<V>> destinations = new ConcurrentHashMap<>();
-            vertices.stream().sequential().forEach(destination -> {
-                final List<V> route = new LinkedList<>();
-                V next = destination;
-                while (previous.get(next) != null) {
-                    route.add(0, next); // prepend
-                    next = previous.get(next);
-                }
-                destinations.put(destination, route);
-            });
-            routes.put(start, destinations);
-        });
-    }
 }
