@@ -82,7 +82,7 @@ winki
 #### Calendar week 43
 
 Enteee
-* GPS-helper
+* GPS-helper [done]
 
 winki
 * Import of route-files [done]
@@ -92,12 +92,27 @@ winki
 
 Enteee
 * Commands to element redirection [done]
-* Smarter agent
 
 winki
 * Embedded console, thread-safe [done]
 * Spawn and time commands for console [done]
 
+### Calendar week 45
+
+Enteee
+* GPS unit tests [done]
+* Smarter agent, empty [done]
+
+winki
+
+### Calendar week 46
+
+Enteee
+* Draw simulation decoupling
+* Draw fake laneswitch
+
+winki
+* Smart agent writedown
 
 ## Resources
 
