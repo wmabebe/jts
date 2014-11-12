@@ -28,7 +28,7 @@ public class App implements Runnable {
     private void init() {
         
         // create simulation
-        simulation = new Simulation(net);
+        simulation = new Simulation();
         
         // create console
         console = new JtsConsole();
@@ -61,8 +61,13 @@ public class App implements Runnable {
     public void run() {
         init();
         while (isRunning() && !Thread.interrupted()) {
-            simulation.tick();
-            window.render();
+            simulation.tick(net);
+            window.setNet(net);
+            // Sleep some time to simulate heavy simulation load.
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
         }
         end();
     }

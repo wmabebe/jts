@@ -40,12 +40,18 @@ public class Net extends Element implements Serializable, Simulatable {
     private final Layers<Simulatable>  simulatables         = new Layers<>();
     private final BlockingQueue<Route> routes               = new LinkedBlockingQueue<>();
     /**
-     * Total time that has passed since the begin of the simulation [s].
+     * Absolute time at which the simulation started [s].
      */
-    private double                     timeTotal;
+    private final double               startTime;
+    /**
+     * Absolute time at which the the latest simulation tick took place [s].
+     */
+    private double                     lastTick;
     
     public Net() {
         super("Net");
+        startTime = System.nanoTime() * 1E-9;
+        lastTick = startTime;
         addElement(this);
     }
     
@@ -105,15 +111,31 @@ public class Net extends Element implements Serializable, Simulatable {
         return thinkables.stream().parallel();
     }
     
+    /**
+     * Get the total ticked time in [s]
+     * 
+     * @return total ticked time in [s]
+     */
     public double getTimeTotal() {
-        return timeTotal;
+        return lastTick - startTime;
+    }
+    
+    /**
+     * Do tick time.
+     * 
+     * @return delta time since last tick in [s]
+     */
+    public double tick() {
+        double now = System.nanoTime() * 1E-9;
+        double tickDelta = now - lastTick;
+        lastTick = now;
+        return tickDelta;
     }
     
     @Override
     public void simulate(final double duration) {
-        timeTotal += duration;
         // agent spawning
-        final List<Route> routes = getRoutes().stream().sequential().filter(x -> x.getDepartureTime() < timeTotal * SPAWN_TIME_FACTOR).collect(Collectors.toList());
+        final List<Route> routes = getRoutes().stream().sequential().filter(x -> x.getDepartureTime() < getTimeTotal() * SPAWN_TIME_FACTOR).collect(Collectors.toList());
         for (final Route route : routes) {
             final Agent agent = new FullSpeedAgent();
             final Lane lane = route.getRouteStart().getFirstLane();

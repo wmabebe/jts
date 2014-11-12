@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 
 import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.data.Net;
+import ch.bfh.ti.jts.simulation.Simulation;
 import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
@@ -37,41 +38,38 @@ public class Window {
      * Zoom delta. Determines how much to change the zoom when scrolling. Also
      * sets the minimum zoom
      */
-    private static final double        ZOOM_DELTA         = 0.05;
-    private JFrame                     frame;
-    private JPanel                     panel;
-    private int                        windoww            = 1000;
-    private int                        windowh            = 600;
+    private static final double        ZOOM_DELTA      = 0.05;
+    private final JFrame               frame;
+    private final JPanel               panel;
+    private int                        windoww         = 1000;
+    private int                        windowh         = 600;
     /**
      * Offset in x and y direction from (0/0)
      */
-    private final Point2D              offset             = new Point2D.Double();
+    private final Point2D              offset          = new Point2D.Double();
     /**
      * Zoom factor
      */
-    private double                     zoom               = 1;
-    private AffineTransform            t                  = new AffineTransform();
-    private final Point2D              zoomCenter         = new Point2D.Double();
-    private final Set<Integer>         keys               = new HashSet<Integer>();
-    private final Net                  renderable;
-    private final AtomicReference<Net> renderableSaveCopy = new AtomicReference<Net>();
+    private double                     zoom            = 1;
+    private AffineTransform            t               = new AffineTransform();
+    private final Point2D              zoomCenter      = new Point2D.Double();
+    private final Set<Integer>         keys            = new HashSet<Integer>();
+    private final AtomicReference<Net> netSaveCopy     = new AtomicReference<Net>();
+    private final AtomicReference<Net> lastNetSaveCopy = new AtomicReference<Net>();
+    private final Simulation           windowSimulation;
     private final Console              console;
     
-    public Window(final Net renderable, final Console console) {
-        if (renderable == null) {
-            throw new IllegalArgumentException("renderable is null");
+    public Window(final Net net, final Console console) {
+        if (net == null) {
+            throw new IllegalArgumentException("net is null");
         }
         if (console == null) {
             throw new IllegalArgumentException("console is null");
         }
-        this.renderable = renderable;
         this.console = console;
-        renderableSaveCopy.set(DeepCopy.copy(renderable));
-        frame = new JFrame();
-        init();
-    }
-    
-    private void init() {
+        netSaveCopy.set(DeepCopy.copy(net));
+        lastNetSaveCopy.set(DeepCopy.copy(net));
+        windowSimulation = new Simulation();
         frame = new JFrame();
         frame.setTitle("JavaTrafficSimulator");
         frame.setIgnoreRepaint(true);
@@ -84,6 +82,8 @@ public class Window {
             @Override
             public void paintComponent(final Graphics g) {
                 final Graphics2D g2d = (Graphics2D) g;
+                // simulate parts of the net
+                windowSimulation.tick(netSaveCopy.get());
                 try {
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 8));
@@ -118,7 +118,7 @@ public class Window {
                     // result all the agents are driving on the wrong side.
                     g2d.transform(AffineTransform.getScaleInstance(1, -1));
                     // render everything
-                    final Layers<Renderable> renderables = renderableSaveCopy.get().getRenderable();
+                    final Layers<Renderable> renderables = netSaveCopy.get().getRenderable();
                     for (final int layer : renderables.getLayersIterator()) {
                         renderables.getLayerStream(layer).sequential().forEach(e -> {
                             e.render(g2d);
@@ -134,6 +134,7 @@ public class Window {
                         g2d.dispose();
                     }
                 }
+                
             }
         };
         final MouseAdapter adapter = new MouseAdapter() {
@@ -220,8 +221,9 @@ public class Window {
         });
     }
     
-    public void render() {
-        renderableSaveCopy.set(DeepCopy.copy(renderable));
+    public void setNet(final Net net) {
+        lastNetSaveCopy.set(netSaveCopy.get());
+        netSaveCopy.set(DeepCopy.copy(net));
         frame.repaint();
     }
     

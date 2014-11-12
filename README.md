@@ -21,9 +21,19 @@ public interface Simulatable {
 public interface Command {
     String getName();
     String execute(Simulation simulation);
+    Class<?> getTargetType();
 }
 ```
-  
+
+* Easy interface for smart new agents.
+
+```java
+public interface Thinkable {
+    public Decision getDecision();
+    public void think();
+}
+```
+
 * Import road map data from [OpenStreetMap][osm]
 * Graphical user interface with 2D output
   * Allows scrolling and zooming
@@ -113,6 +123,7 @@ Enteee
 
 winki
 * Smart agent writedown
+* Fix index out of bounds bug in ployshape
 
 ## Resources
 
