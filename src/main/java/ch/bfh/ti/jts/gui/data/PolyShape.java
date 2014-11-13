@@ -110,8 +110,21 @@ public class PolyShape implements Serializable {
         followPolygon(lengthOnPolyline, 0);
     }
     
-    private void followPolygon(final double distanceToFollow, final int segment) {
-        final double distanceOnSegment = getSegmentLength(segment);
+    private void followPolygon(double distanceToFollow, int segment) {
+        double distanceOnSegment;
+        if (segment > points.size() - 2) {
+            // if distance to follow is very small, we got an exception here
+            // so this trick solves the problem
+            segment = points.size() - 2; // last segment
+            final double relativePositionOnSegment = 1.0;
+            final Point2D segmentStart = points.get(segment);
+            final Point2D segmentEnd = points.get(segment + 1);
+            final double x = segmentStart.getX() + relativePositionOnSegment * (segmentEnd.getX() - segmentStart.getX());
+            final double y = segmentStart.getY() + relativePositionOnSegment * (segmentEnd.getY() - segmentStart.getY());
+            position = new Point2D.Double(x, y);
+            orientation = getAngleBetweenTwoPoints(segmentStart, segmentEnd);
+        }
+        distanceOnSegment = getSegmentLength(segment);
         if (distanceToFollow <= distanceOnSegment) {
             final double relativePositionOnSegment = distanceToFollow / distanceOnSegment;
             final Point2D segmentStart = points.get(segment);
