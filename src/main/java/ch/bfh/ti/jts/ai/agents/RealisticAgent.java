@@ -1,7 +1,6 @@
 package ch.bfh.ti.jts.ai.agents;
 
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.data.Agent;
@@ -12,7 +11,7 @@ import ch.bfh.ti.jts.utils.Helpers;
  *
  * @author ente
  */
-public class RealisticAgent extends Agent {
+public class RealisticAgent extends FullSpeedAgent {
     
     private static final long serialVersionUID = 1L;
     
@@ -32,6 +31,7 @@ public class RealisticAgent extends Agent {
         double tAbsPosOnLane = getAbsPosOnLane();
         
         final Agent o = getLane().getAgents().ceiling(this);
+        Logger.getLogger(RealisticAgent.class.getName()).info("all agents on lane: " + getLane().getAgents().size());
         if (o != null) {
             // other agent in front of this agent on the same lane
             
