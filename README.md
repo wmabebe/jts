@@ -122,8 +122,9 @@ Enteee
 * Draw fake laneswitch
 
 winki
-* Smart agent writedown
-* Fix index out of bounds bug in ployshape
+* Simple map for developing agent [done]
+* Fix index out of bounds bug in polyshape class [done]
+* Realistic agent [progess]
 
 ## Resources
 
