@@ -155,7 +155,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         final double distanceToDriveOnThisLane = distanceToDrive - distanceToDriveOnNextLane;
         setRelativePosition(Helpers.clamp(getRelativePosition() + distanceToDriveOnThisLane / getLane().getLength(), 0.0, 1.0));
         distanceToDrive = distanceToDriveOnNextLane;
-        Logger.getGlobal().info("distanceToDrive: " + distanceToDrive);
+        Logger.getLogger(Agent.class.getName()).info("distanceToDrive: " + distanceToDrive);
     }
     
     @Override

@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import ch.bfh.ti.jts.console.Console;
+import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.simulation.Simulation;
 import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
@@ -220,7 +221,7 @@ public class Window {
                 zoomCenter.setLocation(mousePointInverse.getX(), mousePointInverse.getY());
                 offset.setLocation(mousePoint.getX() - mousePointInverse.getX(), mousePoint.getY() - mousePointInverse.getY());
             } catch (final NoninvertibleTransformException e) {
-                Logger.getGlobal().log(Level.SEVERE, "Can not invert mouse drag vector", e);
+                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, "Can not invert mouse drag vector", e);
             }
         });
     }

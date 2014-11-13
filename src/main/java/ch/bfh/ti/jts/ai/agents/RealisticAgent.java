@@ -1,6 +1,7 @@
 package ch.bfh.ti.jts.ai.agents;
 
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.data.Agent;
@@ -12,12 +13,12 @@ import ch.bfh.ti.jts.utils.Helpers;
  * @author ente
  */
 public class RealisticAgent extends Agent {
-
+    
     private static final long serialVersionUID = 1L;
     
-    private final double niggleChance = 0.5;
-    private final double niggleFactor = 0.1;
-    private final Random rand = new Random();
+    private final double      niggleChance     = 0.5;
+    private final double      niggleFactor     = 0.1;
+    private final Random      rand             = new Random();
     
     @Override
     public void think() {
@@ -38,24 +39,28 @@ public class RealisticAgent extends Agent {
             double oAbsPosOnLane = o.getAbsPosOnLane();
             
             double maxVelocity = getVelocityToNotHitNextAgent(nextDecisionTime, t, o);
-
+            
             // TODO: secure distance!
             
             // niggle?
             if (rand.nextDouble() < niggleChance) {
-                
+                Logger.getLogger(RealisticAgent.class.getName()).info("niggle...");
+                Logger.getLogger(RealisticAgent.class.getName()).info("before: " + maxVelocity);
                 maxVelocity = Helpers.clamp(maxVelocity * niggleFactor, 0.01, Double.MAX_VALUE);
+                Logger.getLogger(RealisticAgent.class.getName()).info("after:" + maxVelocity);
             }
             
             double maxAcceleration = getAccelerationToReachVelocity(nextDecisionTime, tVelocity, maxVelocity);
-                        
+            
             // set max acceleration
             getDecision().setAcceleration(maxAcceleration);
+            Logger.getLogger(RealisticAgent.class.getName()).info("secure speed");
             
         } else {
             // no other agent front of this agent on the same lane
             // attention: next junction!
             getDecision().setAcceleration(getVehicle().getMaxAcceleration());
+            Logger.getLogger(RealisticAgent.class.getName()).info("full speed");
         }
         
         final double distanceOnLaneLeft = getDistanceOnLaneLeft();

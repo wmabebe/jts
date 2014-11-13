@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 11/13/14 11:33:18 by SUMO netgenerate Version 0.21.0
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo-sim.org/xsd/netgenerateConfiguration.xsd">
+
+    <spider_network>
+        <spider value="true"/>
+        <spider.arm-number value="10"/>
+        <spider.circle-number value="1"/>
+        <spider.space-radius value="200"/>
+    </spider_network>
+
+    <random_network>
+        <rand.bidi-probability value="1"/>
+    </random_network>
+
+    <output>
+        <output-file value="..\round.net.xml"/>
+    </output>
+
+    <processing>
+        <no-internal-links value="true"/>
+    </processing>
+
+    <building_defaults>
+        <default.lanenumber value="2"/>
+    </building_defaults>
+
+    <random_number>
+        <seed value="88"/>
+    </random_number>
+
+</configuration>
+-->
+
+<net version="0.13" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo-sim.org/xsd/net_file.xsd">
+
+	<location />
+
+	<edge id="e0" from="j0" to="j1" priority="-1">
+		<lane id="e0_0" index="0" speed="13.90" length="10000.00" shape="0.0,-6.0 10000.0,-6.0"/>
+		<lane id="e0_1" index="1" speed="13.90" length="10000.00" shape="0.0,-2.0 10000.0,-2.0"/>
+	</edge>
+	<edge id="e1" from="j1" to="j0" priority="-1">
+		<lane id="e1_0" index="0" speed="13.90" length="10000.00" shape="10000.0,2.0 0.0,2.0"/>
+		<lane id="e1_1" index="1" speed="13.90" length="10000.00" shape="10000.0,6.0 0.0,6.0"/>
+	</edge>
+
+	<junction id="j0" x="0.0" y="0.0" shape="0.0,0.0 0.0,0.0" />
+	<junction id="j1" x="10000.0" y="0.0" shape="0.0,0.0 0.0,0.0" />
+
+	<connection from="e0" to="e1" fromLane="0" toLane="0" />
+	<connection from="e0" to="e1" fromLane="0" toLane="1" />
+	<connection from="e0" to="e1" fromLane="1" toLane="0" />
+	<connection from="e0" to="e1" fromLane="1" toLane="1" />
+	<connection from="e1" to="e0" fromLane="0" toLane="0" />
+	<connection from="e1" to="e0" fromLane="0" toLane="1" />
+	<connection from="e1" to="e0" fromLane="1" toLane="0" />
+	<connection from="e1" to="e0" fromLane="1" toLane="1" />
+
+</net>

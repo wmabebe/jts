@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -150,7 +149,7 @@ public class Net extends Element implements Serializable, Simulatable {
             agent.setVelocity(route.getDepartureSpeed());
             addElement(agent);
             getRoutes().remove(route);
-            Logger.getGlobal().log(Level.INFO, "Agent spawned at " + relativePositionOnLane);
+            Logger.getLogger(Net.class.getName()).info("Agent spawned at " + relativePositionOnLane);
         }
     }
     

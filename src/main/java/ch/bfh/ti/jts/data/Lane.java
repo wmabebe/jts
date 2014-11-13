@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.ai.Decision;
@@ -149,9 +148,9 @@ public class Lane extends Element implements Simulatable, Renderable {
                     // collision!
                     thisAgent.setVelocity(0);
                     nextAgent.setVelocity(0);
-                    Logger.getGlobal().log(Level.INFO, "collision happened");
+                    Logger.getLogger(Lane.class.getName()).info("collision happened");
                 } else if (distanceLeft <= 0) {
-                    Logger.getGlobal().log(Level.INFO, "collision not on same lane");
+                    Logger.getLogger(Lane.class.getName()).info("collision not on same lane");
                 }
             }
             agentsBuffer.add(thisAgent);
