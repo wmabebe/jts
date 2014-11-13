@@ -149,7 +149,7 @@ public class Lane extends Element implements Simulatable, Renderable {
                     // collision!
                     thisAgent.setVelocity(0);
                     nextAgent.setVelocity(0);
-                    // Logger.getGlobal().log(Level.INFO, "collision happened");
+                    Logger.getGlobal().log(Level.INFO, "collision happened");
                 } else if (distanceLeft <= 0) {
                     Logger.getGlobal().log(Level.INFO, "collision not on same lane");
                 }

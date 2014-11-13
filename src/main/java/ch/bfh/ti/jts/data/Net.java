@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ch.bfh.ti.jts.ai.Thinkable;
-import ch.bfh.ti.jts.ai.agents.FullSpeedAgent;
+import ch.bfh.ti.jts.ai.agents.RealisticAgent;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
@@ -134,10 +134,13 @@ public class Net extends Element implements Serializable, Simulatable {
     
     @Override
     public void simulate(final double duration) {
-        // agent spawning
+        spawn();
+    }
+    
+    private void spawn() {
         final List<Route> routes = getRoutes().stream().sequential().filter(x -> x.getDepartureTime() < getTimeTotal() * SPAWN_TIME_FACTOR).collect(Collectors.toList());
         for (final Route route : routes) {
-            final Agent agent = new FullSpeedAgent();
+            final Agent agent = createAgent();
             final Lane lane = route.getRouteStart().getFirstLane();
             lane.getAgents().add(agent);
             agent.setLane(lane);
@@ -149,5 +152,10 @@ public class Net extends Element implements Serializable, Simulatable {
             getRoutes().remove(route);
             Logger.getGlobal().log(Level.INFO, "Agent spawned at " + relativePositionOnLane);
         }
+    }
+    
+    // TODO: create different types of agents here
+    private Agent createAgent() {
+        return new RealisticAgent();
     }
 }

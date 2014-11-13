@@ -84,7 +84,7 @@ public class RoutesImporter extends Importer<Collection<Route>> {
         final double decel = getAttribute(node, "decel", Double.class);
         final double length = getAttribute(node, "length", Double.class);
         final double maxSpeed = getAttribute(node, "maxSpeed", Double.class);
-        final Vehicle vehicle = new Vehicle(decel, accel, 0, maxSpeed, length);
+        final Vehicle vehicle = new Vehicle(-decel, accel, 0, maxSpeed, length);
         vehicles.put(id, vehicle);
     }
     

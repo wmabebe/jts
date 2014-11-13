@@ -10,6 +10,7 @@ import ch.bfh.ti.jts.gui.App;
 public class Main {
     
     public static void main(final String[] args) {
+
         try {
             // set look and feel to native
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -19,7 +20,8 @@ public class Main {
         
         // start app
         final App app = new App();
-        app.loadNet("map1");
+        app.loadNet("round");
+        app.setSimulationStepDuration(1000);
         app.run();
     }
 }

@@ -20,6 +20,11 @@ public class App implements Runnable {
     private Window              window;
     private Simulation          simulation;
     private Console             console;
+    private int                 simulationStepDuration;
+    
+    public App() {
+        this.simulationStepDuration = 1000; // one second is default
+    }
     
     private void end() {
         // free resources or clean up stuff...
@@ -57,6 +62,16 @@ public class App implements Runnable {
         net.addRoutes(routes);
     }
     
+    /**
+     * Set the duration of one simulation step in miliseconds.
+     * 
+     * @param simulationStepDuration
+     *            duration in miliseconds
+     */
+    public void setSimulationStepDuration(int simulationStepDuration) {
+        this.simulationStepDuration = simulationStepDuration;
+    }
+    
     @Override
     public void run() {
         init();
@@ -65,7 +80,7 @@ public class App implements Runnable {
             window.setNet(net);
             // Sleep some time to simulate heavy simulation load.
             try {
-                Thread.sleep(1000);
+                Thread.sleep(simulationStepDuration);
             } catch (InterruptedException e) {
             }
         }

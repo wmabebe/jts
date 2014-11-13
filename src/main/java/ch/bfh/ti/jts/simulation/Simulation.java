@@ -28,6 +28,21 @@ public class Simulation {
     
     private Console              console;
     
+    /**
+     * If the simulation should call the think method of each agent in every
+     * step. If false, the simulation is "dumb" and does only the basic physics
+     * (for example the gui thred).
+     */
+    private boolean              doThink;
+    
+    public Simulation() {
+        this(true);
+    }
+    
+    public Simulation(boolean doThink) {
+        this.doThink = doThink;
+    }
+    
     public void addCommand(final Command command) {
         commands.add(command);
     }
@@ -54,10 +69,13 @@ public class Simulation {
                 getConsole().write(command.execute(element));
             });
         }
-        // think
-        simulateNet.getThinkableStream().forEach(e -> {
-            e.think();
-        });
+        
+        if (doThink) {
+            // think
+            simulateNet.getThinkableStream().forEach(e -> {
+                e.think();
+            });
+        }
         
         // simulate
         // delegate simulation for all simulatables

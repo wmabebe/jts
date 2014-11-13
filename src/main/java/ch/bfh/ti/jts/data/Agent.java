@@ -104,6 +104,16 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return relativePosition;
     }
     
+    /**
+     * The absolute position of the agent on the lane. From the start to the
+     * current position of the agent.
+     * 
+     * @return
+     */
+    public double getAbsPosOnLane() {
+        return getRelativePosition() * getLane().getLength();
+    }
+    
     @Override
     public int getRenderLayer() {
         return AGENT_RENDER_LAYER;

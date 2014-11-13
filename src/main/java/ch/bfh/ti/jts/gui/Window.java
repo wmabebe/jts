@@ -69,7 +69,7 @@ public class Window {
         this.console = console;
         netSaveCopy.set(DeepCopy.copy(net));
         lastNetSaveCopy.set(DeepCopy.copy(net));
-        windowSimulation = new Simulation();
+        windowSimulation = new Simulation(false); // no ai
         frame = new JFrame();
         frame.setTitle("JavaTrafficSimulator");
         frame.setIgnoreRepaint(true);
@@ -127,6 +127,10 @@ public class Window {
                     // render console
                     g2d.setTransform(tConsole);
                     console.render(g2d);
+                    
+                    // repaint in every step
+                    frame.repaint();
+                                        
                     // Let the OS have a little time...
                     Thread.yield();
                 } finally {
