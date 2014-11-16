@@ -5,15 +5,18 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
-import ch.bfh.ti.jts.ai.Decision;
+import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 import ch.bfh.ti.jts.simulation.Simulatable;
+import ch.bfh.ti.jts.utils.exceptions.PositionOccupiedException;
 
 public class Lane extends Element implements Simulatable, Renderable {
     
@@ -56,43 +59,60 @@ public class Lane extends Element implements Simulatable, Renderable {
         return getEdge().getStart() == junction;
     }
     
-    public NavigableSet<Agent> getAgents() {
-        return agents;
-    }
-    
     /**
-     * Add a agent to the list of agents on this list TODO: this is a ugly hack
-     * right now we might change this to NavagableSet<List<Agent>>
+     * Add a agent to the list of agents on this list.
      * 
      * @param agent
      *            the agent to add
+     * @throws PositionOccupiedException
+     *             agent position already occupied
      */
-    public void addAgent(final Agent agent) {
-        while (agents.contains(agent)) {
-            agent.setRelativePosition(agent.getRelativePosition() + Double.MIN_NORMAL);
+    public void addAgent(final Agent agent) throws PositionOccupiedException {
+        if (agents.contains(agent)) {
+            throw new PositionOccupiedException();
         }
         agents.add(agent);
     }
     
-    public Lane getDecisionLane(final Decision decision) {
-        Lane lane = null;
-        switch (decision.getLaneChangeDirection()) {
-            case RIGHT :
-                lane = getRightLane();
-            break;
-            case LEFT :
-                lane = getLeftLane();
-            break;
-            default :
-            case NONE :
-                lane = this;
-            break;
-        }
-        // if the requested lane is not there we stay on the same lane
-        if (lane == null) {
-            lane = this;
-        }
-        return lane;
+    /**
+     * Remove agent from this lane
+     * 
+     * @param agent
+     *            agent to remove
+     */
+    public void removeAgent(final Agent agent) {
+        agents.remove(agent);
+    }
+    
+    /**
+     * Returns the next agent on line
+     * 
+     * @param agent
+     *            the relative position on this lane
+     * @return the next @{link Agent} on line, null if there is none.
+     */
+    public Agent nextAgentOnLine(final Agent agent) {
+        return agents.higher(agent);
+    }
+    
+    public Map<Agent, Lane> getLaneSwitchCandidates() {
+        final Map<Agent, Lane> switchAgents = new ConcurrentHashMap<>();
+        agents.stream().filter(agent -> {
+            // agents which want to change and are moving
+                return agent.getDecision().getLaneChangeDirection() != LaneChangeDirection.NONE && agent.getVelocity() > 0;
+            }).forEach(agent -> {
+            switch (agent.getDecision().getLaneChangeDirection()) {
+                case RIGHT :
+                    switchAgents.put(agent, getRightLane());
+                break;
+                case LEFT :
+                    switchAgents.put(agent, getLeftLane());
+                break;
+                default :
+                    throw new IllegalAccessError("lane change direction");
+            }
+        });
+        return switchAgents;
     }
     
     public Edge getEdge() {

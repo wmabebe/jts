@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
@@ -94,14 +95,14 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
     
     @Override
     public void simulate(final double duration) {
-        // do lane switching for moving agents.
+        // do lane switching
         getLanes().forEach(lane -> {
-            lane.getAgents().forEach(agent -> {
-                if (agent.getVelocity() > 0) {
-                    lane.getAgents().remove(agent);
-                    final Lane decisionLane = lane.getDecisionLane(agent.getDecision());
-                    decisionLane.addAgent(agent);
-                    agent.setLane(decisionLane);
+            lane.getLaneSwitchCandidates().forEach((agent, switchlane) -> {
+                try {
+                    switchlane.addAgent(agent);
+                    lane.removeAgent(agent);
+                } catch (Exception e) {
+                    Logger.getGlobal().info("Agent cannot swith lane");
                 }
             });
         });

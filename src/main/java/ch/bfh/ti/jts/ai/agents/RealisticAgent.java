@@ -30,7 +30,7 @@ public class RealisticAgent extends Agent {
         double tVelocity = getVelocity();
         double tAbsPosOnLane = getAbsPosOnLane();
         
-        final Agent o = getLane().getAgents().higher(this);
+        final Agent o = getLane().nextAgentOnLine(this);
         if (o != null) {
             // other agent in front of this agent on the same lane
             
