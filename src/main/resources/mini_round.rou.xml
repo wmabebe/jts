@@ -30,65 +30,35 @@
 	<vType id="car" accel="4.0" decel="8.0" sigma="0.0" length="5" minGap="2.5" maxSpeed="90"/>
 
 	<vehicle id="v0" type="car" depart="0" departPos="0" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e1"/>
+		<route edges="e0 e0"/>
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="10" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e1"/>
+		<route edges="e0 e0"/>
 	</vehicle>
+<!--
 	<vehicle id="v0" type="car" depart="0" departPos="20" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e1"/>
+		<route edges="e0 e0"/>
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="30" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e1"/>
+		<route edges="e0 e0"/>
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="40" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e1"/>
+		<route edges="e0 e0"/>
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="50" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e1"/>
+		<route edges="e0 e0"/>
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="60" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e1"/>
+		<route edges="e0 e0"/>
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="70" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e1"/>
+		<route edges="e0 e0"/>
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="80" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e1"/>
+		<route edges="e0 e0"/>
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="90" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e1"/>
-	</vehicle>
+		<route edges="e0 e0"/>
 	
-	<vehicle id="v0" type="car" depart="0" departPos="0" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e1 e0"/>
-	</vehicle>
-	<vehicle id="v0" type="car" depart="0" departPos="100" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e1 e0"/>
-	</vehicle>
-	<vehicle id="v0" type="car" depart="0" departPos="200" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e1 e0"/>
-	</vehicle>
-	<vehicle id="v0" type="car" depart="0" departPos="300" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e1 e0"/>
-	</vehicle>
-	<vehicle id="v0" type="car" depart="0" departPos="400" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e1 e0"/>
-	</vehicle>
-	<vehicle id="v0" type="car" depart="0" departPos="500" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e1 e0"/>
-	</vehicle>
-	<vehicle id="v0" type="car" depart="0" departPos="600" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e1 e0"/>
-	</vehicle>
-	<vehicle id="v0" type="car" depart="0" departPos="700" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e1 e0"/>
-	</vehicle>
-	<vehicle id="v0" type="car" depart="0" departPos="800" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e1 e0"/>
-	</vehicle>
-	<vehicle id="v0" type="car" depart="0" departPos="900" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e1 e0"/>
-	</vehicle>
-	
+	-->
 </routes>

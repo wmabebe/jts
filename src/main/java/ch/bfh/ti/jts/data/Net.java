@@ -143,7 +143,7 @@ public class Net extends Element implements Serializable, Simulatable {
             
             final Agent agent = createAgent();
             final Lane lane = route.getRouteStart().getFirstLane();
-            lane.getAgents().add(agent);
+            lane.addAgent(agent);
             agent.setLane(lane);
             agent.setVehicle(route.getVehicle());
             final double relativePositionOnLane = route.getDeparturePos() / lane.getLength();
