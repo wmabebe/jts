@@ -51,16 +51,9 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         vehicle = new Vehicle(-20, 20, 0, 33.3 /* 120 km/h */, 1);
     }
     
-    /**
-     * Change velocity based on a specified amount of time. The agents current
-     * acceleration is applied.
-     *
-     * @param duration
-     *            the simulation duration
-     */
-    public void accelerate(final double duration) {
-        final double deltaVelocity = getAcceleration() * duration;
-        setVelocity(getVelocity() + deltaVelocity);
+    @Override
+    public String toString() {
+        return "Agent x: " + relativePosition + " v: " + velocity + " a: " + acceleration + " dx: " + distanceToDrive;
     }
     
     @Override
@@ -86,6 +79,10 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     @Override
     public Decision getDecision() {
         return decision;
+    }
+    
+    public void setDistanceToDrive(final double distanceToDrive) {
+        this.distanceToDrive = distanceToDrive;
     }
     
     public double getDistanceToDrive() {
@@ -138,6 +135,46 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return distanceOnLaneLeft;
     }
     
+    public void setAcceleration(final double acceleration) {
+        // check if out of bounds
+        this.acceleration = Helpers.clamp(acceleration, vehicle.getMinAcceleration(), vehicle.getMaxAcceleration());
+    }
+    
+    public void setLane(final Lane lane) {
+        this.lane = lane;
+    }
+    
+    public void setRelativePosition(final Double position) {
+        if (position < 0 || position > 1.0) {
+            throw new IllegalArgumentException("position");
+        }
+        relativePosition = position;
+    }
+    
+    public void setVehicle(final Vehicle vehicle) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("vehicle is null");
+        }
+        this.vehicle = vehicle;
+    }
+    
+    public void setVelocity(final double velocity) {
+        // check if out of bounds
+        this.velocity = Helpers.clamp(velocity, vehicle.getMinVelocity(), vehicle.getMaxVelocity());
+    }
+    
+    /**
+     * Change velocity based on a specified amount of time. The agents current
+     * acceleration is applied.
+     *
+     * @param duration
+     *            the simulation duration
+     */
+    public void accelerate(final double duration) {
+        final double deltaVelocity = getAcceleration() * duration;
+        setVelocity(getVelocity() + deltaVelocity);
+    }
+    
     /**
      * Change position based on a specified amount of time. The agents current
      * velocity is applied.
@@ -170,34 +207,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         g.translate(x, y);
         g.fill(at.createTransformedShape(vehicle.getShape()));
         g.translate(-x, -y);
-    }
-    
-    public void setAcceleration(final double acceleration) {
-        // check if out of bounds
-        this.acceleration = Helpers.clamp(acceleration, vehicle.getMinAcceleration(), vehicle.getMaxAcceleration());
-    }
-    
-    public void setLane(final Lane lane) {
-        this.lane = lane;
-    }
-    
-    public void setRelativePosition(final Double position) {
-        if (position < 0 || position > 1.0) {
-            throw new IllegalArgumentException("position");
-        }
-        relativePosition = position;
-    }
-    
-    public void setVehicle(final Vehicle vehicle) {
-        if (vehicle == null) {
-            throw new IllegalArgumentException("vehicle is null");
-        }
-        this.vehicle = vehicle;
-    }
-    
-    public void setVelocity(final double velocity) {
-        // check if out of bounds
-        this.velocity = Helpers.clamp(velocity, vehicle.getMinVelocity(), vehicle.getMaxVelocity());
     }
     
     @Override

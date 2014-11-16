@@ -100,7 +100,7 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
                 for (final Agent agent : lane.getAgents().descendingSet()) {
                     
                     // did we reach a agent which has no distance to drive left:
-                    // nothing to do here.                    
+                    // nothing to do here.
                     if (agent.getDistanceToDrive() > 0) {
                         final Lane nextJunctionLane = agent.getDecision().getNextJunctionLane();
                         if (nextJunctionLane != null) {
@@ -108,11 +108,14 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
                             agent.setRelativePosition(0.0);
                             agent.setLane(nextJunctionLane);
                             nextJunctionLane.getAgents().add(agent);
+                        } else {
+                            agent.setVelocity(0.0);
+                            agent.setDistanceToDrive(0.0);
                         }
                     }
                 }
             });
         });
         
-    }    
+    }
 }

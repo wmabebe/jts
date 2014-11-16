@@ -29,6 +29,11 @@ public class Decision implements Serializable {
         laneChangeDirection = LaneChangeDirection.NONE;
     }
     
+    @Override
+    public String toString() {
+        return "Decision a: " + acceleration + " laneChangeDirection: " + laneChangeDirection + " nextJunctionLane: " + nextJunctionLane;
+    }
+    
     public double getAcceleration() {
         return acceleration;
     }

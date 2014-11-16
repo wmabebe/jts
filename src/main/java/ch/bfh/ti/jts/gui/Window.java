@@ -27,7 +27,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import ch.bfh.ti.jts.console.Console;
-import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.simulation.Simulation;
 import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
@@ -112,10 +111,12 @@ public class Window {
                     }
                     // center on screen
                     g2d.transform(AffineTransform.getTranslateInstance(windoww / 2, windowh / 2));
-                    // affine transformation y = -y. We've to do this because
+                    // affine transformation y = -y. We've to do this
+                    // because
                     // the coordinates imported expect a origin in the
                     // left bottom corner. But java does stuff different.
-                    // Therefore the origin is in the left upper corner. As a
+                    // Therefore the origin is in the left upper corner. As
+                    // a
                     // result all the agents are driving on the wrong side.
                     g2d.transform(AffineTransform.getScaleInstance(1, -1));
                     // render everything
@@ -129,18 +130,18 @@ public class Window {
                     g2d.setTransform(tConsole);
                     console.render(g2d);
                     
-                    // repaint in every step
-                    frame.repaint();
-                                        
                     // Let the OS have a little time...
                     Thread.yield();
+                    // repaint in every step
+                    frame.repaint();
+                    
                 } finally {
                     if (g2d != null) {
                         g2d.dispose();
                     }
                 }
-                
             }
+            
         };
         final MouseAdapter adapter = new MouseAdapter() {
             
@@ -229,10 +230,10 @@ public class Window {
     public void setNet(final Net net) {
         lastNetSaveCopy.set(netSaveCopy.get());
         netSaveCopy.set(DeepCopy.copy(net));
-        frame.repaint();
     }
     
     public void setVisible(final boolean visible) {
         frame.setVisible(visible);
     }
+    
 }

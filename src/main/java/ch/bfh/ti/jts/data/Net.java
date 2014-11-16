@@ -137,8 +137,10 @@ public class Net extends Element implements Serializable, Simulatable {
     }
     
     private void spawn() {
+        
         final List<Route> routes = getRoutes().stream().sequential().filter(x -> x.getDepartureTime() < getTimeTotal() * SPAWN_TIME_FACTOR).collect(Collectors.toList());
         for (final Route route : routes) {
+            
             final Agent agent = createAgent();
             final Lane lane = route.getRouteStart().getFirstLane();
             lane.getAgents().add(agent);
@@ -149,7 +151,7 @@ public class Net extends Element implements Serializable, Simulatable {
             agent.setVelocity(route.getDepartureSpeed());
             addElement(agent);
             getRoutes().remove(route);
-            Logger.getLogger(Net.class.getName()).info("Agent spawned at " + relativePositionOnLane);
+            Logger.getLogger(Net.class.getName()).info("Agent spawned at: " + lane + " pos:" + relativePositionOnLane);
         }
     }
     

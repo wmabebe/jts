@@ -11,7 +11,7 @@ import ch.bfh.ti.jts.utils.Helpers;
  *
  * @author ente
  */
-public class RealisticAgent extends FullSpeedAgent {
+public class RealisticAgent extends Agent {
     
     private static final long serialVersionUID = 1L;
     
@@ -30,8 +30,7 @@ public class RealisticAgent extends FullSpeedAgent {
         double tVelocity = getVelocity();
         double tAbsPosOnLane = getAbsPosOnLane();
         
-        final Agent o = getLane().getAgents().ceiling(this);
-        Logger.getLogger(RealisticAgent.class.getName()).info("all agents on lane: " + getLane().getAgents().size());
+        final Agent o = getLane().getAgents().higher(this);
         if (o != null) {
             // other agent in front of this agent on the same lane
             
