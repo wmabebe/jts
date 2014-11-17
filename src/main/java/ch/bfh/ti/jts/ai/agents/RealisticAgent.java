@@ -26,41 +26,28 @@ public class RealisticAgent extends Agent {
         double nextDecisionTime = 1.0;
         
         // current properties of this agent
-        Agent t = this;
         double tVelocity = getVelocity();
         double tAbsPosOnLane = getAbsPosOnLane();
         
-        final Agent o = getLane().nextAgentOnLine(this);
-        if (o != null) {
+        double minMaxVelocity = Double.MAX_VALUE;
+        
+        for (final Agent o : getLane().nextAgentsOnLine(this)) {
             // other agent in front of this agent on the same lane
-            
-            double oVelocity = o.getVelocity();
-            double oAbsPosOnLane = o.getAbsPosOnLane();
-            
-            double maxVelocity = getVelocityToNotHitNextAgent(nextDecisionTime, t, o);
-            
+            minMaxVelocity = Math.min(minMaxVelocity, getVelocityToNotHitNextAgent(nextDecisionTime, this, o));
             // TODO: secure distance!
-            
-            // niggle?
-            if (rand.nextDouble() < niggleChance) {
-                Logger.getLogger(RealisticAgent.class.getName()).info("niggle...");
-                Logger.getLogger(RealisticAgent.class.getName()).info("before: " + maxVelocity);
-                maxVelocity = Helpers.clamp(maxVelocity * niggleFactor, 0.01, Double.MAX_VALUE);
-                Logger.getLogger(RealisticAgent.class.getName()).info("after:" + maxVelocity);
-            }
-            
-            double maxAcceleration = getAccelerationToReachVelocity(nextDecisionTime, tVelocity, maxVelocity);
-            
-            // set max acceleration
-            getDecision().setAcceleration(maxAcceleration);
-            Logger.getLogger(RealisticAgent.class.getName()).info("secure speed");
-            
-        } else {
-            // no other agent front of this agent on the same lane
-            // attention: next junction!
-            getDecision().setAcceleration(getVehicle().getMaxAcceleration());
-            Logger.getLogger(RealisticAgent.class.getName()).info("full speed");
         }
+        
+        // niggle?
+        if (rand.nextDouble() < niggleChance) {
+            Logger.getLogger(RealisticAgent.class.getName()).info("niggle...");
+            minMaxVelocity = Helpers.clamp(minMaxVelocity * niggleFactor, 0.01, Double.MAX_VALUE);
+        }
+        
+        double maxAcceleration = getAccelerationToReachVelocity(nextDecisionTime, tVelocity, minMaxVelocity);
+        
+        // set max acceleration
+        getDecision().setAcceleration(maxAcceleration);
+        Logger.getLogger(RealisticAgent.class.getName()).info("secure speed");
         
         final double distanceOnLaneLeft = getDistanceOnLaneLeft();
         

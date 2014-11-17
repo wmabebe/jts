@@ -3,7 +3,9 @@ package ch.bfh.ti.jts.data;
 import java.awt.Graphics2D;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.gui.Renderable;
@@ -93,16 +95,26 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
         // do nothing
     }
     
+    public Map<Agent, Lane> getEdgeSwitchCandidates() {
+        final Map<Agent, Lane> switchAgents = new ConcurrentHashMap<>();
+        lanes.forEach(lane -> {
+            switchAgents.putAll(lane.getLaneLeaveCandidates());
+        });
+        return switchAgents;
+    }
+    
     @Override
     public void simulate(final double duration) {
         // do lane switching
         getLanes().forEach(lane -> {
             lane.getLaneSwitchCandidates().forEach((agent, switchlane) -> {
                 try {
-                    switchlane.addAgent(agent);
-                    lane.removeAgent(agent);
+                    if (switchlane.isPresent()) {
+                        switchlane.get().addAgent(agent);
+                        lane.removeAgent(agent);
+                    }
                 } catch (Exception e) {
-                    Logger.getGlobal().info("Agent cannot swith lane");
+                    Logger.getLogger(Edge.class.getName()).info("Agent cannot swith lane");
                 }
             });
         });

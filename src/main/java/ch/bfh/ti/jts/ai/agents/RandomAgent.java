@@ -25,9 +25,7 @@ public class RandomAgent extends Agent {
         getDecision().setLaneChangeDirection(Decision.LaneChangeDirection.randomLaneChange(ThreadLocalRandom.current()));
         final Junction nextJunction = getLane().getEdge().getEnd();
         final List<Edge> nextEdges = new LinkedList<Edge>(nextJunction.getOutgoingEdges());
-        if (nextEdges.size() == 0) {
-            // throw new RuntimeException("error: no next edges");
-        } else {
+        if (nextEdges.size() > 0) {
             // get all lanes from a random next edge
             final List<Lane> nextLanes = new LinkedList<Lane>(nextEdges.get(ThreadLocalRandom.current().nextInt(nextEdges.size())).getLanes());
             // select a random lane

@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Thinkable;
@@ -13,7 +12,7 @@ import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
 
-public abstract class Agent extends Element implements Thinkable, Simulatable, Renderable, Comparable<Agent> {
+public abstract class Agent extends Element implements Thinkable, Simulatable, Renderable {
     
     private static final long  serialVersionUID       = 1L;
     public final static int    AGENT_RENDER_LAYER     = Junction.JUNCTION_RENDER_LAYER + 1;
@@ -54,11 +53,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     @Override
     public String toString() {
         return "Agent x: " + relativePosition + " v: " + velocity + " a: " + acceleration + " dx: " + distanceToDrive;
-    }
-    
-    @Override
-    public int compareTo(final Agent a) {
-        return new Double(getRelativePosition()).compareTo(a.getRelativePosition());
     }
     
     public double getAcceleration() {
@@ -192,7 +186,8 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         final double distanceToDriveOnThisLane = distanceToDrive - distanceToDriveOnNextLane;
         setRelativePosition(Helpers.clamp(getRelativePosition() + distanceToDriveOnThisLane / getLane().getLength(), 0.0, 1.0));
         distanceToDrive = distanceToDriveOnNextLane;
-        Logger.getLogger(Agent.class.getName()).info("distanceToDrive: " + distanceToDrive);
+        // Logger.getLogger(Agent.class.getName()).info("distanceToDrive: " +
+        // distanceToDrive);
     }
     
     @Override

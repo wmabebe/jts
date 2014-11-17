@@ -33,7 +33,7 @@ public class Simulation {
      * step. If false, the simulation is "dumb" and does only the basic physics
      * (for example the gui thred).
      */
-    private boolean              doThink;
+    private final boolean        doThink;
     
     public Simulation() {
         this(true);
@@ -78,7 +78,7 @@ public class Simulation {
         }
         
         // simulate
-        // delegate simulation for all simulatables
+        // delegate simulation to @{link Simulatable}s
         final Layers<Simulatable> simulatables = simulateNet.getSimulatable();
         for (final int layer : simulatables.getLayersIterator()) {
             simulatables.getLayerStream(layer).sequential().forEach(e -> {

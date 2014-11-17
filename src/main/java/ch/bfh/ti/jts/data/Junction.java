@@ -53,8 +53,8 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
     
     @Override
     public Collection<Edge> getOutgoingEdges() {
-        return edges.stream().filter(x -> {
-            return x.comesFrom(this);
+        return edges.stream().filter(edge -> {
+            return edge.comesFrom(this);
         }).collect(Collectors.toList());
     }
     
@@ -96,24 +96,12 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
     public void simulate(final double duration) {
         // move incoming agents over junction
         edges.stream().filter(edge -> edge.goesTo(this)).forEach(edge -> {
-            edge.getLanes().forEach(lane -> {
-                for (final Agent agent : lane.getAgents().descendingSet()) {
-                    
-                    // did we reach a agent which has no distance to drive left:
-                    // nothing to do here.
-                    if (agent.getDistanceToDrive() > 0) {
-                        final Lane nextJunctionLane = agent.getDecision().getNextJunctionLane();
-                        if (nextJunctionLane != null) {
-                            lane.getAgents().remove(agent);
-                            agent.setRelativePosition(0.0);
-                            agent.setLane(nextJunctionLane);
-                            nextJunctionLane.addAgent(agent);
-                        } else {
-                            agent.setVelocity(0.0);
-                            agent.setDistanceToDrive(0.0);
-                        }
-                    }
-                }
+            edge.getEdgeSwitchCandidates().forEach((agent, lane) -> {
+                agent.getLane().removeAgent(agent);
+                agent.setRelativePosition(0.0);
+                agent.setLane(lane);
+                lane.addAgent(agent);
+                agent.move(duration);
             });
         });
         
