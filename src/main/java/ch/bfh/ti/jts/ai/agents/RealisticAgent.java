@@ -23,7 +23,7 @@ public class RealisticAgent extends Agent {
     public void think() {
         
         // time in seconds to the next decision
-        double nextDecisionTime = 1.0;
+        double nextDecisionTime = 0.25;
         
         // current properties of this agent
         double tVelocity = getVelocity();
@@ -31,23 +31,25 @@ public class RealisticAgent extends Agent {
         
         double minMaxVelocity = Double.MAX_VALUE;
         
+        if (getLane() == null) {
+            throw new RuntimeException("no lane!");
+        }
+        
         for (final Agent o : getLane().nextAgentsOnLine(this)) {
             // other agent in front of this agent on the same lane
             minMaxVelocity = Math.min(minMaxVelocity, getVelocityToNotHitNextAgent(nextDecisionTime, this, o));
-            // TODO: secure distance!
         }
         
         // niggle?
         if (rand.nextDouble() < niggleChance) {
-            Logger.getLogger(RealisticAgent.class.getName()).info("niggle...");
-            minMaxVelocity = Helpers.clamp(minMaxVelocity * niggleFactor, 0.01, Double.MAX_VALUE);
+            minMaxVelocity = Helpers.clamp(minMaxVelocity * niggleFactor, 0.001, Double.MAX_VALUE);
         }
         
         double maxAcceleration = getAccelerationToReachVelocity(nextDecisionTime, tVelocity, minMaxVelocity);
         
         // set max acceleration
         getDecision().setAcceleration(maxAcceleration);
-        Logger.getLogger(RealisticAgent.class.getName()).info("secure speed");
+        // Logger.getLogger(RealisticAgent.class.getName()).info("secure speed");
         
         final double distanceOnLaneLeft = getDistanceOnLaneLeft();
         
@@ -75,8 +77,10 @@ public class RealisticAgent extends Agent {
         if (o == null)
             throw new IllegalArgumentException("agent o is null");
         
-        // where is other agent in the specified amount of time?
-        double oPos = o.getAbsPosOnLane() + o.getVelocity() * time;
+        // where is other agent in the specified amount of time if he decelerate
+        // the maximum?
+        double pMinVelocity = o.getVelocity() + time * o.getVehicle().getMinAcceleration();
+        double oPos = o.getAbsPosOnLane() + pMinVelocity * time;
         
         // calculate maximum possible speed
         return (oPos - t.getAbsPosOnLane()) / time;

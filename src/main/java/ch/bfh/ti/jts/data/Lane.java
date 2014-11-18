@@ -99,7 +99,7 @@ public class Lane extends Element implements Simulatable, Renderable {
     }
     
     /**
-     * Returns the next agents on line
+     * Returns the next agents on line.
      * 
      * @param agent
      *            the relative position on this lane
@@ -107,7 +107,7 @@ public class Lane extends Element implements Simulatable, Renderable {
      */
     public Set<Agent> nextAgentsOnLine(final Agent agent) {
         Entry<Double, Set<Agent>> nextAgentsEntry = laneAgents.higherEntry(agent.getRelativePosition());
-        Set<Agent> nextAgents = null;
+        Set<Agent> nextAgents = new HashSet<>();
         if (nextAgentsEntry != null) {
             nextAgents = nextAgentsEntry.getValue();
         }

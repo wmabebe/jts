@@ -35,8 +35,8 @@ public class Main {
         
         // start app
         final App app = new App();
-        app.loadNet("mini_round");
-        app.setSimulationStepDuration(1000);
+        app.loadNet("round");
+        app.setSimulationStepDuration(250);
         app.run();
     }
 }
