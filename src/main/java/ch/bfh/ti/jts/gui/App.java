@@ -78,7 +78,7 @@ public class App implements Runnable {
         while (isRunning() && !Thread.interrupted()) {
             simulation.tick(net);
             window.setNet(net);
-            // Sleep some time to simulate heavy simulation load.
+            // Sleep some time
             try {
                 Thread.sleep(simulationStepDuration);
             } catch (InterruptedException e) {

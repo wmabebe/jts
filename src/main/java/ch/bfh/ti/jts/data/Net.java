@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ch.bfh.ti.jts.ai.Thinkable;
-import ch.bfh.ti.jts.ai.agents.RealisticAgent;
+import ch.bfh.ti.jts.ai.agents.FullSpeedAgent;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
@@ -149,7 +149,7 @@ public class Net extends Element implements Serializable, Simulatable {
     
     // TODO: create different types of agents here
     private Agent createAgent() {
-        return new RealisticAgent();
-        //return new FullSpeedAgent();
+        // return new RealisticAgent();
+        return new FullSpeedAgent();
     }
 }

@@ -16,7 +16,6 @@ import ch.bfh.ti.jts.importer.NetImporter;
 public class Main {
     
     public static void main(final String[] args) {
-        
         // configure loggers
         Logger.getLogger(Main.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(Window.class.getName()).setLevel(Level.OFF);
@@ -25,7 +24,6 @@ public class Main {
         Logger.getLogger(Net.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(NetImporter.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(RealisticAgent.class.getName()).setLevel(Level.ALL);
-        
         try {
             // set look and feel to native
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -35,8 +33,8 @@ public class Main {
         
         // start app
         final App app = new App();
-        app.loadNet("round");
-        app.setSimulationStepDuration(250);
+        app.loadNet("mini_round");
+        app.setSimulationStepDuration(1000);
         app.run();
     }
 }

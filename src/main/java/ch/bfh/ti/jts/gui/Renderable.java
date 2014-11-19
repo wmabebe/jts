@@ -20,9 +20,9 @@ public interface Renderable {
                                                     private static final long serialVersionUID = 1L;
                                                     
                                                     {
-                                                        put(Agent.class, 3);
-                                                        put(Lane.class, 2);
-                                                        put(Edge.class, 1);
+                                                        put(Agent.class, 4);
+                                                        put(Lane.class, 3);
+                                                        put(Edge.class, 2);
                                                         put(Junction.class, 1);
                                                         put(Net.class, 0);
                                                     }

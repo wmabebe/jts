@@ -38,7 +38,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     /**
      * Distance to drive in m
      */
-    private double             distanceToDrive        = 0;
+    private double             distanceDriven        = 0;
     /**
      * Vehicle of this agent
      */
@@ -51,7 +51,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     
     @Override
     public String toString() {
-        return "Agent x: " + relativePosition + " v: " + velocity + " a: " + acceleration + " dx: " + distanceToDrive;
+        return "Agent x: " + relativePosition + " v: " + velocity + " a: " + acceleration + " dx: " + distanceDriven;
     }
     
     public double getAcceleration() {
@@ -75,11 +75,11 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     }
     
     public void setDistanceToDrive(final double distanceToDrive) {
-        this.distanceToDrive = distanceToDrive;
+        this.distanceDriven = distanceToDrive;
     }
     
     public double getDistanceToDrive() {
-        return distanceToDrive;
+        return distanceDriven;
     }
     
     public Lane getLane() {
@@ -179,12 +179,12 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      */
     public void move(final double duration) {
         // set new driving distance
-        distanceToDrive += getVelocity() * duration;
+        distanceDriven += getVelocity() * duration;
         final double distanceOnLaneLeft = getDistanceOnLaneLeft();
-        final double distanceToDriveOnNextLane = Math.max(distanceToDrive - distanceOnLaneLeft, 0.0);
-        final double distanceToDriveOnThisLane = distanceToDrive - distanceToDriveOnNextLane;
+        final double distanceToDriveOnNextLane = Math.max(distanceDriven - distanceOnLaneLeft, 0.0);
+        final double distanceToDriveOnThisLane = distanceDriven - distanceToDriveOnNextLane;
         setRelativePosition(Helpers.clamp(getRelativePosition() + distanceToDriveOnThisLane / getLane().getLength(), 0.0, 1.0));
-        distanceToDrive = distanceToDriveOnNextLane;
+        distanceDriven = distanceToDriveOnNextLane;
         // Logger.getLogger(Agent.class.getName()).info("distanceToDrive: " +
         // distanceToDrive);
     }
