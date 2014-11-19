@@ -43,7 +43,7 @@ public class App implements Runnable {
         window = new Window(net, console);
         
         isRunning = true;
-        // window.setVisible(true);
+        window.setVisible(true);
     }
     
     private boolean isRunning() {

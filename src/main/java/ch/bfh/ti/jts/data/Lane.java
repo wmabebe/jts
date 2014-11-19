@@ -16,7 +16,6 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 import ch.bfh.ti.jts.simulation.Simulatable;
@@ -36,13 +35,14 @@ public class Lane extends Element implements Simulatable, Renderable {
      */
     private final Collection<Lane>                 lanes;
     /**
-     * Unordered agents on this lane.
-     */
-    private final Set<Agent>                       agents;
-    /**
      * Agents on line. Key: RelativePosition, Value: List of @{link Agent}s
      */
     private final NavigableMap<Double, Set<Agent>> laneAgents;
+    
+    /**
+     * Agents which have reached the end of the lane.
+     */
+    final Set<Agent>                               laneLeaveCandidates;
     
     public Lane(final String name, final Edge edge, final int index, final double speed, final double length, final PolyShape polyShape) {
         super(name);
@@ -59,8 +59,8 @@ public class Lane extends Element implements Simulatable, Renderable {
         this.length = length;
         this.polyShape = polyShape;
         lanes = new LinkedList<>();
-        agents = new HashSet<>();
         laneAgents = new TreeMap<>();
+        laneLeaveCandidates = new HashSet<>();
     }
     
     public boolean comesFrom(final Junction junction) {
@@ -74,14 +74,19 @@ public class Lane extends Element implements Simulatable, Renderable {
      *            the agent to add
      */
     public void addAgent(final Agent agent) {
-        agents.add(agent);
-        Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePosition());
-        if (agentsAtPosition == null) {
-            // position not yet known.
-            agentsAtPosition = new HashSet<>();
-            laneAgents.put(agent.getRelativePosition(), agentsAtPosition);
+        if (agent.isLaneLeaveCandidate()) {
+            laneLeaveCandidates.add(agent);
+        } else {
+            Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePosition());
+            if (agentsAtPosition == null) {
+                // position not yet known.
+                agentsAtPosition = new HashSet<>();
+                laneAgents.put(agent.getRelativePosition(), agentsAtPosition);
+            }
+            agentsAtPosition.add(agent);
+            
         }
-        agentsAtPosition.add(agent);
+        agent.setLane(this);
     }
     
     /**
@@ -91,10 +96,13 @@ public class Lane extends Element implements Simulatable, Renderable {
      *            agent to remove
      */
     public void removeAgent(final Agent agent) {
-        agents.remove(agent);
-        Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePosition());
-        if (agentsAtPosition != null) {
-            agentsAtPosition.remove(agent);
+        if (agent.isLaneLeaveCandidate()) {
+            laneLeaveCandidates.remove(agent);
+        } else {
+            Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePosition());
+            if (agentsAtPosition != null) {
+                agentsAtPosition.remove(agent);
+            }
         }
     }
     
@@ -116,10 +124,18 @@ public class Lane extends Element implements Simulatable, Renderable {
     
     public Map<Agent, Optional<Lane>> getLaneSwitchCandidates() {
         final Map<Agent, Optional<Lane>> switchAgents = new ConcurrentHashMap<>();
-        agents.stream().filter(agent -> {
-            // agents which want to change and are moving
-                return agent.getDecision().getLaneChangeDirection() != LaneChangeDirection.NONE && agent.getVelocity() > 0;
-            }).forEach(agent -> {
+        final Set<Agent> laneSwitchCandidates = new HashSet<>();
+        // TODO: this as stream
+        for (Set<Agent> agents : laneAgents.values()) {
+            for (Agent agent : agents) {
+                if (agent.isLaneSwitchCandidate()) {
+                    laneSwitchCandidates.add(agent);
+                }
+                
+            }
+            
+        }
+        laneSwitchCandidates.forEach(agent -> {
             switch (agent.getDecision().getLaneChangeDirection()) {
                 case RIGHT :
                     switchAgents.put(agent, getRightLane());
@@ -136,16 +152,14 @@ public class Lane extends Element implements Simulatable, Renderable {
     
     public Map<Agent, Lane> getLaneLeaveCandidates() {
         final Map<Agent, Lane> leaveAgents = new HashMap<>();
-        for (final Agent agent : agents) {
+        for (final Agent agent : laneLeaveCandidates) {
             if (agent.getDistanceToDrive() > 0) {
                 final Lane nextJunctionLane = agent.getDecision().getNextJunctionLane();
                 if (nextJunctionLane != null && lanes.contains(nextJunctionLane)) {
                     leaveAgents.put(agent, nextJunctionLane);
                 } else {
                     // not a valid decision, stop agent.
-                    agent.setVelocity(0.0);
-                    agent.setDistanceToDrive(0.0);
-                    
+                    agent.collide();
                 }
             }
         }
@@ -218,14 +232,14 @@ public class Lane extends Element implements Simulatable, Renderable {
             for (final Agent thisAgent : entry.getValue()) {
                 // check for collision with next, if there is a next and
                 // thisAgent was fully moved
-                if (oldAgents.size() > 0 && thisAgent.getDistanceOnLaneLeft() <= 0) {
+                if (thisAgent.isOnLane() && oldAgents.size() > 0) {
                     final Entry<Double, Set<Agent>> nextEntry = oldAgents.firstEntry();
                     for (final Agent nextAgent : nextEntry.getValue()) {
                         final double distanceLeft = thisAgent.getPosition().distance(nextAgent.getPosition()) - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
-                        if (distanceLeft <= 0) {
+                        if (nextAgent.isOnLane() && distanceLeft <= 0) {
                             // collision!
-                            thisAgent.setVelocity(0);
-                            nextAgent.setVelocity(0);
+                            thisAgent.collide();
+                            nextAgent.collide();
                             Logger.getLogger(Lane.class.getName()).info("Collision: [" + thisAgent + "] <->[" + nextAgent + "]");
                         }
                     }

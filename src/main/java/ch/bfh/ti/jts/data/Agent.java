@@ -7,6 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 import ch.bfh.ti.jts.ai.Decision;
+import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
 import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
@@ -188,6 +189,53 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         distanceToDrive = distanceToDriveOnNextLane;
         // Logger.getLogger(Agent.class.getName()).info("distanceToDrive: " +
         // distanceToDrive);
+    }
+    
+    public boolean isOnLane() {
+        //@formatter:off
+        return  !isLaneSwitchCandidate() 
+                && !isLaneLeaveCandidate();
+        // @formatter:on
+    }
+    
+    /**
+     * @return @{code true} if agent want's to switch lane to an other lane on
+     *         the same edge, @{code false} otherwise.
+     */
+    public boolean isLaneSwitchCandidate() {
+        //@formatter:off
+        return  getVelocity() > 0 
+                && (
+                        (   
+                                getDecision().getLaneChangeDirection() == LaneChangeDirection.RIGHT 
+                                && getLane().getRightLane().isPresent()
+                        )||(
+                                getDecision().getLaneChangeDirection() == LaneChangeDirection.LEFT 
+                                && getLane().getLeftLane().isPresent()
+                        )
+                );
+        //@formatter:on
+    }
+    
+    /**
+     * @return @{code true} if agent is at end of lane and want's to leave the
+     *         edge, @{code false} otherwise
+     */
+    public boolean isLaneLeaveCandidate() {
+        //@formatter:off
+        return  getDistanceToDrive() > 0
+                && getRelativePosition() == 1.0
+                && getDecision().getNextJunctionLane() != null;
+        //@formatter:on
+    }
+    
+    /**
+     * This agent collided for some reason with something
+     */
+    public void collide() {
+        setVelocity(0.0);
+        setDistanceToDrive(0.0);
+        
     }
     
     @Override

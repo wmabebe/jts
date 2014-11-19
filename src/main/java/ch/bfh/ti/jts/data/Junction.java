@@ -99,7 +99,6 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
             edge.getEdgeSwitchCandidates().forEach((agent, lane) -> {
                 agent.getLane().removeAgent(agent);
                 agent.setRelativePosition(0.0);
-                agent.setLane(lane);
                 lane.addAgent(agent);
                 agent.move(duration);
             });
