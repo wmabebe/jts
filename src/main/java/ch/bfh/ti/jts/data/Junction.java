@@ -16,9 +16,7 @@ import ch.bfh.ti.jts.utils.graph.DirectedGraphVertex;
 
 public class Junction extends Element implements DirectedGraphVertex<Junction, Edge>, Renderable, Simulatable {
     
-    private static final long      serialVersionUID          = 1L;
-    public final static int        JUNCTION_RENDER_LAYER     = Lane.LANE_RENDER_LAYER + 1;
-    public final static int        JUNCTION_SIMULATION_LAYER = Edge.EDGE_SIMULATION_LAYER + 1;
+    private static final long      serialVersionUID = 1L;
     private final double           x;
     private final double           y;
     private final Shape            shape;
@@ -65,16 +63,6 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
             neighbours.add(x.getEnd());
         });
         return neighbours;
-    }
-    
-    @Override
-    public int getRenderLayer() {
-        return JUNCTION_RENDER_LAYER;
-    }
-    
-    @Override
-    public int getSimulationLayer() {
-        return JUNCTION_SIMULATION_LAYER;
     }
     
     public double getX() {

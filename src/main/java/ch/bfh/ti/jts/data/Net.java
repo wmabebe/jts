@@ -25,19 +25,17 @@ import ch.bfh.ti.jts.utils.layers.Layers;
  */
 public class Net extends Element implements Serializable, Simulatable {
     
-    private static final long          serialVersionUID     = 1L;
-    public final static int            NET_RENDER_LAYER     = 0;
-    public final static int            NET_SIMULATION_LAYER = Junction.JUNCTION_SIMULATION_LAYER + 1;
+    private static final long          serialVersionUID  = 1L;
     /**
      * Factor by which the spawning should take place. 1 means real time speed.
      * 1440 = 1 day in one minute
      */
-    private final double               SPAWN_TIME_FACTOR    = 1440;
-    private final Set<Element>         elements             = new HashSet<>();
-    private final Layers<Renderable>   renderables          = new Layers<>();
-    private final Set<Thinkable>       thinkables           = new HashSet<>();
-    private final Layers<Simulatable>  simulatables         = new Layers<>();
-    private final BlockingQueue<Route> routes               = new LinkedBlockingQueue<>();
+    private final double               SPAWN_TIME_FACTOR = 1440;
+    private final Set<Element>         elements          = new HashSet<>();
+    private final Layers<Renderable>   renderables       = new Layers<>();
+    private final Set<Thinkable>       thinkables        = new HashSet<>();
+    private final Layers<Simulatable>  simulatables      = new Layers<>();
+    private final BlockingQueue<Route> routes            = new LinkedBlockingQueue<>();
     /**
      * Absolute time at which the simulation started [s].
      */
@@ -99,11 +97,6 @@ public class Net extends Element implements Serializable, Simulatable {
     
     public Layers<Simulatable> getSimulatable() {
         return simulatables;
-    }
-    
-    @Override
-    public int getSimulationLayer() {
-        return NET_SIMULATION_LAYER;
     }
     
     public Stream<Thinkable> getThinkableStream() {

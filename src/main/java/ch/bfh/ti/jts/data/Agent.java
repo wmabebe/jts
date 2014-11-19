@@ -16,8 +16,6 @@ import ch.bfh.ti.jts.utils.Helpers;
 public abstract class Agent extends Element implements Thinkable, Simulatable, Renderable {
     
     private static final long  serialVersionUID       = 1L;
-    public final static int    AGENT_RENDER_LAYER     = Junction.JUNCTION_RENDER_LAYER + 1;
-    public final static int    AGENT_SIMULATION_LAYER = 0;
     /**
      * The hue of the agent when driving with maximum velocity. Slower is in the
      * range [0 , AGENT_MAX_VELOCITY_COLOR]. 0.33 : Green
@@ -106,16 +104,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return getRelativePosition() * getLane().getLength();
     }
     
-    @Override
-    public int getRenderLayer() {
-        return AGENT_RENDER_LAYER;
-    }
-    
-    @Override
-    public int getSimulationLayer() {
-        return AGENT_SIMULATION_LAYER;
-    }
-    
     public Vehicle getVehicle() {
         return vehicle;
     }
@@ -156,6 +144,16 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     public void setVelocity(final double velocity) {
         // check if out of bounds
         this.velocity = Helpers.clamp(velocity, vehicle.getMinVelocity(), vehicle.getMaxVelocity());
+    }
+    
+    @Override
+    public int getRenderLayer() {
+        return Renderable.KNOWN_CLASSES.get(Agent.class);
+    }
+    
+    @Override
+    public int getSimulationLayer() {
+        return Simulatable.KNOWN_CLASSES.get(Agent.class);
     }
     
     /**

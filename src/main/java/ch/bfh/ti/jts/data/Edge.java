@@ -15,9 +15,7 @@ import ch.bfh.ti.jts.utils.graph.DirectedGraphEdge;
 
 public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, Simulatable, Renderable {
     
-    private static final long      serialVersionUID      = 1L;
-    public static final int        EDGE_RENDER_LAYER     = Net.NET_RENDER_LAYER + 1;
-    public static final int        EDGE_SIMULATION_LAYER = Lane.LANE_SIMULATION_LAYER + 1;
+    private static final long      serialVersionUID = 1L;
     private final Junction         start;
     private final Junction         end;
     /**
@@ -73,16 +71,6 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
     
     public int getPriority() {
         return priority;
-    }
-    
-    @Override
-    public int getRenderLayer() {
-        return EDGE_RENDER_LAYER;
-    }
-    
-    @Override
-    public int getSimulationLayer() {
-        return EDGE_SIMULATION_LAYER;
     }
     
     @Override

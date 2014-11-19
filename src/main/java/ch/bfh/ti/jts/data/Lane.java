@@ -22,9 +22,7 @@ import ch.bfh.ti.jts.simulation.Simulatable;
 
 public class Lane extends Element implements Simulatable, Renderable {
     
-    private static final long                      serialVersionUID      = 1L;
-    public final static int                        LANE_RENDER_LAYER     = Edge.EDGE_RENDER_LAYER + 1;
-    public final static int                        LANE_SIMULATION_LAYER = Agent.AGENT_SIMULATION_LAYER + 1;
+    private static final long                      serialVersionUID = 1L;
     private final Edge                             edge;
     private final int                              index;
     private final double                           speed;
@@ -190,18 +188,8 @@ public class Lane extends Element implements Simulatable, Renderable {
         return polyShape;
     }
     
-    @Override
-    public int getRenderLayer() {
-        return LANE_RENDER_LAYER;
-    }
-    
     public Optional<Lane> getRightLane() {
         return getEdge().getLanes().stream().filter(x -> x.index == index - 1).findAny();
-    }
-    
-    @Override
-    public int getSimulationLayer() {
-        return LANE_SIMULATION_LAYER;
     }
     
     public double getSpeed() {

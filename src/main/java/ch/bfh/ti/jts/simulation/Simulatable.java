@@ -1,6 +1,14 @@
 package ch.bfh.ti.jts.simulation;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import ch.bfh.ti.jts.data.Agent;
+import ch.bfh.ti.jts.data.Edge;
 import ch.bfh.ti.jts.data.Element;
+import ch.bfh.ti.jts.data.Junction;
+import ch.bfh.ti.jts.data.Lane;
+import ch.bfh.ti.jts.data.Net;
 
 /**
  * Interface implemented by {@link Element} which can be simulated.
@@ -10,11 +18,29 @@ import ch.bfh.ti.jts.data.Element;
 public interface Simulatable {
     
     /**
+     * Known classes to layer mappings
+     */
+    static Map<Class<?>, Integer> KNOWN_CLASSES = new HashMap<Class<?>, Integer>() {
+                                                    
+                                                    private static final long serialVersionUID = 1L;
+                                                    
+                                                    {
+                                                        put(Agent.class, 0);
+                                                        put(Lane.class, 1);
+                                                        put(Edge.class, 2);
+                                                        put(Junction.class, 3);
+                                                        put(Net.class, 4);
+                                                    }
+                                                };
+    
+    /**
      * The simulation layer of the object. 0: Simulate first 1: Simulate second
      *
      * @return the layer
      */
-    int getSimulationLayer();
+    default int getSimulationLayer() {
+        return KNOWN_CLASSES.get(this.getClass());
+    }
     
     /**
      * Called in each simulation step
