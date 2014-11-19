@@ -3,6 +3,7 @@ package ch.bfh.ti.jts.ai.agents;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.utils.Helpers;
 
@@ -11,7 +12,7 @@ import ch.bfh.ti.jts.utils.Helpers;
  *
  * @author ente
  */
-public class RealisticAgent extends Agent {
+public class RealisticAgent extends RandomAgent {
     
     private static final long serialVersionUID = 1L;
     
@@ -21,6 +22,7 @@ public class RealisticAgent extends Agent {
     
     @Override
     public void think() {
+        super.think();
         
         // time in seconds to the next decision
         double nextDecisionTime = 0.25;
@@ -57,16 +59,24 @@ public class RealisticAgent extends Agent {
         
         // getDecision().setAcceleration();
         
-        // lane change direction
+        // lane change direction, turn
+        // TODO: better criteria
+        boolean changeOnFastLane = maxAcceleration < getVehicle().getMaxAcceleration();
+        double distToNextAgent = getDistanceToNextAgent();
         
-        // getDecision().setLaneChangeDirection();
+        if (distToNextAgent < 100.0) {
+            getDecision().setLaneChangeDirection(LaneChangeDirection.LEFT);
+        } else {
+            getDecision().setLaneChangeDirection(LaneChangeDirection.NONE);
+        }
         
-        // turn
+        //LaneChangeDirection[] directions = new LaneChangeDirection[] { LaneChangeDirection.LEFT, LaneChangeDirection.RIGHT, LaneChangeDirection.NONE };
+        //int index = (int) (Math.random() * 3);
+        //Logger.getLogger(RealisticAgent.class.getName()).info("direction: " + directions[index]);
+        //getDecision().setLaneChangeDirection(directions[index]);
         
+        // TODO: set
         // getDecision().setNextJunctionLane();
-        
-        // TODO: see below
-        // getDecision().setLaneChangeDirection();
     }
     
     private double getVelocityToNotHitNextAgent(double time, Agent t, Agent o) {

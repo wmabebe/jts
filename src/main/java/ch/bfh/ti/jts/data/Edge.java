@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
@@ -110,6 +111,7 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
             lane.getLaneSwitchCandidates().forEach((agent, switchlane) -> {
                 try {
                     if (switchlane.isPresent()) {
+                        Logger.getLogger(Edge.class.getName()).info("switch!");
                         switchlane.get().addAgent(agent);
                         lane.removeAgent(agent);
                     }

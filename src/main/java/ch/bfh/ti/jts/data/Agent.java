@@ -129,6 +129,13 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return distanceOnLaneLeft;
     }
     
+    public double getDistanceToNextAgent() {
+        double oPosition = getLane().nextAgentsOnLine(this).stream().mapToDouble(x -> x.getAbsPosOnLane()).min().orElse(0.0);
+        double tPosition = getAbsPosOnLane();
+        double delta = oPosition - tPosition;
+        return Helpers.clamp(delta, 0.0, Double.MAX_VALUE);
+    }
+    
     public void setAcceleration(final double acceleration) {
         // check if out of bounds
         this.acceleration = Helpers.clamp(acceleration, vehicle.getMinAcceleration(), vehicle.getMaxAcceleration());

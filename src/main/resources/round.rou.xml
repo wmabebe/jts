@@ -47,7 +47,7 @@
 	<vehicle id="v0" type="car" depart="0" departPos="500" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
 		<route edges="e0 e1"/>
 	</vehicle>
-	<vehicle id="v0" type="car" depart="0" departPos="600" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
+	<vehicle id="v0" type="car" depart="0" departPos="520" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
 		<route edges="e0 e1"/>
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="700" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
