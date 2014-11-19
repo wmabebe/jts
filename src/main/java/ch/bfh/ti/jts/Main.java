@@ -36,7 +36,6 @@ public class Main {
         // start app
         final App app = new App();
         app.loadNet("round");
-        app.setSimulationStepDuration(250);
         app.run();
     }
 }

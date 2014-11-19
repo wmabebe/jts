@@ -130,7 +130,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     }
     
     public double getDistanceToNextAgent() {
-        double oPosition = getLane().nextAgentsOnLine(this).stream().mapToDouble(x -> x.getAbsPosOnLane()).min().orElse(0.0);
+        double oPosition = getLane().getNextAgentsOnLine(this).stream().mapToDouble(x -> x.getAbsPosOnLane()).min().orElse(0.0);
         double tPosition = getAbsPosOnLane();
         double delta = oPosition - tPosition;
         return Helpers.clamp(delta, 0.0, Double.MAX_VALUE);
@@ -193,8 +193,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         final double distanceToDriveOnThisLane = distanceToDrive - distanceToDriveOnNextLane;
         setRelativePosition(Helpers.clamp(getRelativePosition() + distanceToDriveOnThisLane / getLane().getLength(), 0.0, 1.0));
         distanceToDrive = distanceToDriveOnNextLane;
-        // Logger.getLogger(Agent.class.getName()).info("distanceToDrive: " +
-        // distanceToDrive);
     }
     
     @Override
