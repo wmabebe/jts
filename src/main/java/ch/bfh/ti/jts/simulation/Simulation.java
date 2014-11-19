@@ -81,7 +81,7 @@ public class Simulation {
         // delegate simulation to @{link Simulatable}s
         final Layers<Simulatable> simulatables = simulateNet.getSimulatable();
         for (final int layer : simulatables.getLayersIterator()) {
-            simulatables.getLayerStream(layer).sequential().forEach(e -> {
+            simulatables.getLayerStream(layer).parallel().forEach(e -> {
                 e.simulate(timeDelta);
             });
         }

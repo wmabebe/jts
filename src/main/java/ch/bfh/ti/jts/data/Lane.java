@@ -216,7 +216,9 @@ public class Lane extends Element implements Simulatable, Renderable {
         while (oldAgents.size() > 0) {
             final Entry<Double, Set<Agent>> entry = oldAgents.pollFirstEntry();
             for (final Agent thisAgent : entry.getValue()) {
-                if (oldAgents.size() > 0) {
+                // check for collision with next, if there is a next and
+                // thisAgent was fully moved
+                if (oldAgents.size() > 0 && thisAgent.getDistanceOnLaneLeft() <= 0) {
                     final Entry<Double, Set<Agent>> nextEntry = oldAgents.firstEntry();
                     for (final Agent nextAgent : nextEntry.getValue()) {
                         final double distanceLeft = thisAgent.getPosition().distance(nextAgent.getPosition()) - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
