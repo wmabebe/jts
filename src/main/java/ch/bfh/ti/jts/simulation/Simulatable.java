@@ -39,6 +39,9 @@ public interface Simulatable {
      * @return the layer
      */
     default int getSimulationLayer() {
+        if (!KNOWN_CLASSES.containsKey(this.getClass())) {
+            throw new AssertionError("invalid layer", new IndexOutOfBoundsException(this.getClass() + " is not a known class"));
+        }
         return KNOWN_CLASSES.get(this.getClass());
     }
     

@@ -34,6 +34,9 @@ public interface Renderable {
      * @return the layer
      */
     default int getRenderLayer() {
+        if (!KNOWN_CLASSES.containsKey(this.getClass())) {
+            throw new AssertionError("invalid layer", new IndexOutOfBoundsException(this.getClass() + " is not a known class"));
+        }
         return KNOWN_CLASSES.get(getClass());
     }
     
