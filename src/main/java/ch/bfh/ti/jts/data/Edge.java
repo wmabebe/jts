@@ -86,7 +86,7 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
     public Map<Agent, Lane> getEdgeSwitchCandidates() {
         final Map<Agent, Lane> switchAgents = new ConcurrentHashMap<>();
         lanes.forEach(lane -> {
-            switchAgents.putAll(lane.getLaneLeaveCandidates());
+            switchAgents.putAll(lane.getEdgeLeaveCandidates());
         });
         return switchAgents;
     }
@@ -95,10 +95,11 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
     public void simulate(final double duration) {
         // do lane switching
         getLanes().forEach(lane -> {
-            lane.getLaneSwitchCandidates().forEach((agent, switchlane) -> {
+            lane.getLaneChangeCandidates().forEach((agent, changeLane) -> {
                 try {
-                    if (switchlane.isPresent()) {
-                        switchlane.get().addAgent(agent);
+                    if (changeLane.isPresent()) {
+                        agent.setLane(changeLane.get());
+                        changeLane.get().addAgent(agent);
                         lane.removeAgent(agent);
                     }
                 } catch (Exception e) {

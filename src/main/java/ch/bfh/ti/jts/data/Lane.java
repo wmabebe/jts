@@ -40,7 +40,7 @@ public class Lane extends Element implements Simulatable, Renderable {
     /**
      * Agents which have reached the end of the lane.
      */
-    final Set<Agent>                               laneLeaveCandidates;
+    final Set<Agent>                               edgeLeaveCandidates;
     
     public Lane(final String name, final Edge edge, final int index, final double speed, final double length, final PolyShape polyShape) {
         super(name);
@@ -58,7 +58,7 @@ public class Lane extends Element implements Simulatable, Renderable {
         this.polyShape = polyShape;
         lanes = new LinkedList<>();
         laneAgents = new TreeMap<>();
-        laneLeaveCandidates = new HashSet<>();
+        edgeLeaveCandidates = new HashSet<>();
     }
     
     public boolean comesFrom(final Junction junction) {
@@ -72,19 +72,18 @@ public class Lane extends Element implements Simulatable, Renderable {
      *            the agent to add
      */
     public void addAgent(final Agent agent) {
-        if (agent.isLaneLeaveCandidate()) {
-            laneLeaveCandidates.add(agent);
+        if (agent.isEdgeLeaveCandidate()) {
+            edgeLeaveCandidates.add(agent);
         } else {
-            Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePosition());
+            Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePositionOnLane());
             if (agentsAtPosition == null) {
                 // position not yet known.
                 agentsAtPosition = new HashSet<>();
-                laneAgents.put(agent.getRelativePosition(), agentsAtPosition);
+                laneAgents.put(agent.getRelativePositionOnLane(), agentsAtPosition);
             }
             agentsAtPosition.add(agent);
             
         }
-        agent.setLane(this);
     }
     
     /**
@@ -94,10 +93,10 @@ public class Lane extends Element implements Simulatable, Renderable {
      *            agent to remove
      */
     public void removeAgent(final Agent agent) {
-        if (agent.isLaneLeaveCandidate()) {
-            laneLeaveCandidates.remove(agent);
+        if (agent.isEdgeLeaveCandidate()) {
+            edgeLeaveCandidates.remove(agent);
         } else {
-            Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePosition());
+            Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePositionOnLane());
             if (agentsAtPosition != null) {
                 agentsAtPosition.remove(agent);
             }
@@ -112,7 +111,7 @@ public class Lane extends Element implements Simulatable, Renderable {
      * @return the next @{link Agent} on line, null if there is none.
      */
     public Set<Agent> nextAgentsOnLine(final Agent agent) {
-        Entry<Double, Set<Agent>> nextAgentsEntry = laneAgents.higherEntry(agent.getRelativePosition());
+        Entry<Double, Set<Agent>> nextAgentsEntry = laneAgents.higherEntry(agent.getRelativePositionOnLane());
         Set<Agent> nextAgents = new HashSet<>();
         if (nextAgentsEntry != null) {
             nextAgents = nextAgentsEntry.getValue();
@@ -120,48 +119,46 @@ public class Lane extends Element implements Simulatable, Renderable {
         return nextAgents;
     }
     
-    public Map<Agent, Optional<Lane>> getLaneSwitchCandidates() {
-        final Map<Agent, Optional<Lane>> switchAgents = new ConcurrentHashMap<>();
-        final Set<Agent> laneSwitchCandidates = new HashSet<>();
+    public Map<Agent, Optional<Lane>> getLaneChangeCandidates() {
+        final Map<Agent, Optional<Lane>> changeAgents = new ConcurrentHashMap<>();
+        final Set<Agent> laneChangeCandidates = new HashSet<>();
         // TODO: this as stream
         for (Set<Agent> agents : laneAgents.values()) {
             for (Agent agent : agents) {
-                if (agent.isLaneSwitchCandidate()) {
-                    laneSwitchCandidates.add(agent);
+                if (agent.isLaneChangeCandidate()) {
+                    laneChangeCandidates.add(agent);
                 }
                 
             }
             
         }
-        laneSwitchCandidates.forEach(agent -> {
+        laneChangeCandidates.forEach(agent -> {
             switch (agent.getDecision().getLaneChangeDirection()) {
                 case RIGHT :
-                    switchAgents.put(agent, getRightLane());
+                    changeAgents.put(agent, getRightLane());
                 break;
                 case LEFT :
-                    switchAgents.put(agent, getLeftLane());
+                    changeAgents.put(agent, getLeftLane());
                 break;
                 default :
                     throw new IllegalAccessError("lane change direction");
             }
         });
-        return switchAgents;
+        return changeAgents;
     }
     
-    public Map<Agent, Lane> getLaneLeaveCandidates() {
-        final Map<Agent, Lane> leaveAgents = new HashMap<>();
-        for (final Agent agent : laneLeaveCandidates) {
-            if (agent.getDistanceToDrive() > 0) {
-                final Lane nextJunctionLane = agent.getDecision().getNextJunctionLane();
-                if (nextJunctionLane != null && lanes.contains(nextJunctionLane)) {
-                    leaveAgents.put(agent, nextJunctionLane);
-                } else {
-                    // not a valid decision, stop agent.
-                    agent.collide();
-                }
+    public Map<Agent, Lane> getEdgeLeaveCandidates() {
+        final Map<Agent, Lane> edgeLeaveAgents = new HashMap<>();
+        for (final Agent agent : edgeLeaveCandidates) {
+            final Lane nextEdgeLane = agent.getDecision().getNextEdgeLane();
+            if (nextEdgeLane != null && lanes.contains(nextEdgeLane)) {
+                edgeLeaveAgents.put(agent, nextEdgeLane);
+            } else {
+                // not a valid decision, stop agent.
+                agent.collide();
             }
         }
-        return leaveAgents;
+        return edgeLeaveAgents;
     }
     
     public Edge getEdge() {

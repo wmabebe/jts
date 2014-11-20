@@ -1,8 +1,13 @@
 package ch.bfh.ti.jts.ai.agents;
 
 import ch.bfh.ti.jts.ai.Decision;
+import ch.bfh.ti.jts.data.Vehicle;
 
 public class IdleAgent extends RandomAgent {
+    
+    public IdleAgent(double positionOnLane, Vehicle vehicle, double velocity) {
+        super(positionOnLane, vehicle, velocity);
+    }
     
     private static final long serialVersionUID = 1L;
     

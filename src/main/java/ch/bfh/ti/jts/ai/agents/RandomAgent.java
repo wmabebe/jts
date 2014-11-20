@@ -9,6 +9,7 @@ import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Edge;
 import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
+import ch.bfh.ti.jts.data.Vehicle;
 
 /**
  * A agent which does random stuff.
@@ -18,6 +19,10 @@ import ch.bfh.ti.jts.data.Lane;
 public class RandomAgent extends Agent {
     
     private static final long serialVersionUID = 1L;
+    
+    public RandomAgent(double positionOnLane, Vehicle vehicle, double velocity) {
+        super(positionOnLane, vehicle, velocity);
+    }
     
     @Override
     public void think() {
@@ -30,7 +35,7 @@ public class RandomAgent extends Agent {
             final List<Lane> nextLanes = new LinkedList<Lane>(nextEdges.get(ThreadLocalRandom.current().nextInt(nextEdges.size())).getLanes());
             // select a random lane
             final Lane nextLane = nextLanes.get(ThreadLocalRandom.current().nextInt(nextLanes.size()));
-            getDecision().setNextJunctionLane(nextLane);
+            getDecision().setNextEdgeLane(nextLane);
         }
     }
 }

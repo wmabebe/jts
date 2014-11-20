@@ -70,19 +70,19 @@ public class Simulation {
             });
         }
         
-        if (doThink) {
-            // think
-            simulateNet.getThinkableStream().forEach(e -> {
-                e.think();
-            });
-        }
-        
         // simulate
         // delegate simulation to @{link Simulatable}s
         final Layers<Simulatable> simulatables = simulateNet.getSimulatable();
         for (final int layer : simulatables.getLayersIterator()) {
             simulatables.getLayerStream(layer).parallel().forEach(e -> {
                 e.simulate(timeDelta);
+            });
+        }
+        
+        if (doThink) {
+            // think
+            simulateNet.getThinkableStream().forEach(e -> {
+                e.think();
             });
         }
     }

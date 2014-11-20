@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import ch.bfh.ti.jts.utils.Helpers;
+
 public class PolyShape implements Serializable {
     
     private static List<Point2D> buildPoints(final String shapeString) {
@@ -96,10 +98,8 @@ public class PolyShape implements Serializable {
         return path;
     }
     
-    private void calculate(final double relative) {
-        if (relative < 0.0 || relative > 1.0) {
-            throw new IllegalArgumentException("relative is out of bounds");
-        }
+    private void calculate(double relative) {
+        relative = Helpers.clamp(relative, 0, 1.0);
         if (points.size() == 2) {
             final double x = getStartPoint().getX() + relative * (getEndPoint().getX() - getStartPoint().getX());
             final double y = getStartPoint().getY() + relative * (getEndPoint().getY() - getStartPoint().getY());

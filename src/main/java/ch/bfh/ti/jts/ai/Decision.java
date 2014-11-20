@@ -23,7 +23,7 @@ public class Decision implements Serializable {
     private static final long   serialVersionUID    = 1L;
     private double              acceleration        = 0.0;
     private LaneChangeDirection laneChangeDirection = LaneChangeDirection.NONE;
-    private Lane                nextJunctionLane    = null;
+    private Lane                nextEdgeLane        = null;
     
     public Decision() {
         laneChangeDirection = LaneChangeDirection.NONE;
@@ -31,30 +31,31 @@ public class Decision implements Serializable {
     
     @Override
     public String toString() {
-        return "Decision a: " + acceleration + " laneChangeDirection: " + laneChangeDirection + " nextJunctionLane: " + nextJunctionLane;
+        return "Decision a: " + acceleration + " laneChangeDirection: " + laneChangeDirection + " nextEdgeLane: " + nextEdgeLane;
     }
     
     public double getAcceleration() {
         return acceleration;
     }
     
-    public LaneChangeDirection getLaneChangeDirection() {
-        return laneChangeDirection;
-    }
-    
-    public Lane getNextJunctionLane() {
-        return nextJunctionLane;
-    }
-    
     public void setAcceleration(final double acceleration) {
         this.acceleration = acceleration;
+    }
+    
+    public LaneChangeDirection getLaneChangeDirection() {
+        return laneChangeDirection;
     }
     
     public void setLaneChangeDirection(final LaneChangeDirection laneChangeDirection) {
         this.laneChangeDirection = laneChangeDirection;
     }
     
-    public void setNextJunctionLane(final Lane nextJunctionLane) {
-        this.nextJunctionLane = nextJunctionLane;
+    public Lane getNextEdgeLane() {
+        return nextEdgeLane;
     }
+    
+    public void setNextEdgeLane(final Lane nextEdgeLane) {
+        this.nextEdgeLane = nextEdgeLane;
+    }
+    
 }

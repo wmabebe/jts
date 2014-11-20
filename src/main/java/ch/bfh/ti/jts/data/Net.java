@@ -15,7 +15,6 @@ import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.ai.agents.FullSpeedAgent;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
-import ch.bfh.ti.jts.utils.Helpers;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
 /**
@@ -133,23 +132,14 @@ public class Net extends Element implements Serializable, Simulatable {
         
         final List<Route> routes = getRoutes().stream().sequential().filter(x -> x.getDepartureTime() < getTimeTotal() * SPAWN_TIME_FACTOR).collect(Collectors.toList());
         for (final Route route : routes) {
-            final Agent agent = createAgent();
             final Lane lane = route.getRouteStart().getFirstLane();
-            agent.setVehicle(route.getVehicle());
-            final double relativePositionOnLane = route.getDeparturePos() / lane.getLength();
-            agent.setRelativePosition(Helpers.clamp(relativePositionOnLane, 0.0, 1.0));
-            agent.setVelocity(route.getDepartureSpeed());
+            Agent agent = new FullSpeedAgent(route.getDeparturePos(), route.getVehicle(), route.getDepartureSpeed());
             addElement(agent);
+            agent.setLane(lane);
             lane.addAgent(agent);
             getRoutes().remove(route);
-            Logger.getLogger(Net.class.getName()).info("Agent spawned at: " + lane + " pos:" + relativePositionOnLane);
+            Logger.getLogger(Net.class.getName()).info(agent + " spawned at: " + lane);
             
         }
-    }
-    
-    // TODO: create different types of agents here
-    private Agent createAgent() {
-        // return new RealisticAgent();
-        return new FullSpeedAgent();
     }
 }

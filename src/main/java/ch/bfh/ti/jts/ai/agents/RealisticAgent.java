@@ -1,9 +1,9 @@
 package ch.bfh.ti.jts.ai.agents;
 
 import java.util.Random;
-import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.data.Agent;
+import ch.bfh.ti.jts.data.Vehicle;
 import ch.bfh.ti.jts.utils.Helpers;
 
 /**
@@ -19,6 +19,10 @@ public class RealisticAgent extends Agent {
     private final double      niggleFactor     = 0.1;
     private final Random      rand             = new Random();
     
+    public RealisticAgent(double positionOnLane, Vehicle vehicle, double velocity) {
+        super(positionOnLane, vehicle, velocity);
+    }
+    
     @Override
     public void think() {
         
@@ -27,7 +31,7 @@ public class RealisticAgent extends Agent {
         
         // current properties of this agent
         double tVelocity = getVelocity();
-        double tAbsPosOnLane = getAbsPosOnLane();
+        double tAbsPosOnLane = getPositionOnLane();
         
         double minMaxVelocity = Double.MAX_VALUE;
         
@@ -80,10 +84,10 @@ public class RealisticAgent extends Agent {
         // where is other agent in the specified amount of time if he decelerate
         // the maximum?
         double pMinVelocity = o.getVelocity() + time * o.getVehicle().getMinAcceleration();
-        double oPos = o.getAbsPosOnLane() + pMinVelocity * time;
+        double oPos = o.getPositionOnLane() + pMinVelocity * time;
         
         // calculate maximum possible speed
-        return (oPos - t.getAbsPosOnLane()) / time;
+        return (oPos - t.getPositionOnLane()) / time;
     }
     
     private double getAccelerationToReachVelocity(double time, double currentVelocity, double goalVelocity) {
