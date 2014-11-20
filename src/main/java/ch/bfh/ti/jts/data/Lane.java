@@ -71,19 +71,25 @@ public class Lane extends Element implements Simulatable, Renderable {
      * @param agent
      *            the agent to add
      */
-    public void addAgent(final Agent agent) {
-        if (agent.isEdgeLeaveCandidate()) {
-            edgeLeaveCandidates.add(agent);
-        } else {
-            Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePositionOnLane());
-            if (agentsAtPosition == null) {
-                // position not yet known.
-                agentsAtPosition = new HashSet<>();
-                laneAgents.put(agent.getRelativePositionOnLane(), agentsAtPosition);
-            }
-            agentsAtPosition.add(agent);
-            
+    public void addLaneAgent(final Agent agent) {
+        if (agent == null) {
+            throw new IllegalArgumentException("agent");
         }
+        Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePositionOnLane());
+        if (agentsAtPosition == null) {
+            // position not yet known.
+            agentsAtPosition = new HashSet<>();
+            laneAgents.put(agent.getRelativePositionOnLane(), agentsAtPosition);
+        }
+        agentsAtPosition.add(agent);
+        
+    }
+    
+    public void addEdgeLeaveCandidate(final Agent agent) {
+        if (agent == null) {
+            throw new IllegalArgumentException("agent");
+        }
+        edgeLeaveCandidates.add(agent);
     }
     
     /**
@@ -92,15 +98,22 @@ public class Lane extends Element implements Simulatable, Renderable {
      * @param agent
      *            agent to remove
      */
-    public void removeAgent(final Agent agent) {
-        if (agent.isEdgeLeaveCandidate()) {
-            edgeLeaveCandidates.remove(agent);
-        } else {
-            Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePositionOnLane());
-            if (agentsAtPosition != null) {
-                agentsAtPosition.remove(agent);
-            }
+    public void removeLaneAgent(final Agent agent) {
+        if (agent == null) {
+            throw new IllegalArgumentException("agent");
         }
+        Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePositionOnLane());
+        if (agentsAtPosition != null) {
+            agentsAtPosition.remove(agent);
+        }
+        
+    }
+    
+    public void removeEdgeLeaveCandidate(final Agent agent) {
+        if (agent == null || !edgeLeaveCandidates.contains(agent)) {
+            throw new IllegalArgumentException("agent");
+        }
+        edgeLeaveCandidates.remove(agent);
     }
     
     /**
@@ -230,7 +243,11 @@ public class Lane extends Element implements Simulatable, Renderable {
                     }
                 }
                 // add this agent again
-                addAgent(thisAgent);
+                if (thisAgent.isEdgeLeaveCandidate()) {
+                    addEdgeLeaveCandidate(thisAgent);
+                } else {
+                    addLaneAgent(thisAgent);
+                }
             }
         }
     }

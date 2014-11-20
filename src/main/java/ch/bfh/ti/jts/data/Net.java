@@ -136,7 +136,7 @@ public class Net extends Element implements Serializable, Simulatable {
             Agent agent = new FullSpeedAgent(route.getDeparturePos(), route.getVehicle(), route.getDepartureSpeed());
             addElement(agent);
             agent.setLane(lane);
-            lane.addAgent(agent);
+            lane.addLaneAgent(agent);
             getRoutes().remove(route);
             Logger.getLogger(Net.class.getName()).info(agent + " spawned at: " + lane);
             

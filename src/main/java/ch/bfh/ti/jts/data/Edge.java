@@ -99,8 +99,8 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
                 try {
                     if (changeLane.isPresent()) {
                         agent.setLane(changeLane.get());
-                        changeLane.get().addAgent(agent);
-                        lane.removeAgent(agent);
+                        changeLane.get().addLaneAgent(agent);
+                        lane.removeLaneAgent(agent);
                     }
                 } catch (Exception e) {
                     Logger.getLogger(Edge.class.getName()).info("Agent cannot swith lane");

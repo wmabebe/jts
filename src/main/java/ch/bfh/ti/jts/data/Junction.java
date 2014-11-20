@@ -85,9 +85,9 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
         // move incoming agents over junction
         edges.stream().filter(edge -> edge.goesTo(this)).forEach(edge -> {
             edge.getEdgeSwitchCandidates().forEach((agent, nextEdgeLane) -> {
-                agent.getLane().removeAgent(agent);
+                agent.getLane().removeEdgeLeaveCandidate(agent);
                 agent.setNextEdgeLane(nextEdgeLane);
-                nextEdgeLane.addAgent(agent);
+                nextEdgeLane.addLaneAgent(agent);
             });
         });
         
