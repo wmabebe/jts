@@ -118,20 +118,67 @@ winki
 ### Calendar week 46
 
 Enteee
-* Draw simulation decoupling
-* Draw fake laneswitch
+* Draw simulation decoupling [done]
+* Bugfix lane set agent override [done]
 
 winki
 * Simple map for developing agent [done]
 * Fix index out of bounds bug in polyshape class [done]
 * Realistic agent [progess]
 
+### Calendar week 47
+
+Enteee
+* Draw fake laneswitch
+
+winki
+* Realistic agent [progess]
+
+### Calendar week 48
+
+Enteee
+
+winki
+
+### Calendar week 49
+
+Enteee
+
+winki
+
+### Calendar week 50
+
+Enteee
+
+winki
+
+### Calendar week 51
+
+Enteee
+
+winki
+
+## 
+
+## Open issues
+
+* Bugfixes
+  * Transcendent agents when collision happend
+* Agent handling on junctions
+* Area restricted tick method
+* Constant traffic flow 
+* Console can receive parameters from clickable GUI
+* Console commands:
+  * agent removing
+  * restart simulation
+* Weather / daylight
+* Write project documentation
+
 ## Resources
 
 * [Project outline][projoutl]
 * [Simulation of Urban MObility (SUMO), old website][sumoweb]
 * [Simulation of Urban MObility (SUMO), wiki][sumowiki]
-
 
 ## Licence
 

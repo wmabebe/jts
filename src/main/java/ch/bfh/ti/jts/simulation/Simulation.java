@@ -19,19 +19,25 @@ public class Simulation {
      * Factor by which the simulation should take place. 1 means real time
      * speed.
      */
-    private final static double  TIME_FACTOR = 1;
+    private final static double  TIME_FACTOR              = 1;
+    
+    /**
+     * The duration of one simulation step in miliseconds. INFO: static here
+     * because agent is missing a reference to the simulation object.
+     */
+    public final static double   SIMULATION_STEP_DURATION = 0.25;
     
     /**
      * Commands the simulation should execute.
      */
-    private final Queue<Command> commands    = new ConcurrentLinkedQueue<>();
+    private final Queue<Command> commands                 = new ConcurrentLinkedQueue<>();
     
     private Console              console;
     
     /**
      * If the simulation should call the think method of each agent in every
      * step. If false, the simulation is "dumb" and does only the basic physics
-     * (for example the gui thred).
+     * (for example the gui thread).
      */
     private final boolean        doThink;
     

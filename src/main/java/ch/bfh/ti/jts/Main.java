@@ -33,8 +33,7 @@ public class Main {
         
         // start app
         final App app = new App();
-        app.loadNet("map1");
-        app.setSimulationStepDuration(3000);
+        app.loadNet("round");
         app.run();
     }
 }

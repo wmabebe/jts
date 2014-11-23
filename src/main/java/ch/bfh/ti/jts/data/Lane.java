@@ -61,8 +61,38 @@ public class Lane extends Element implements Simulatable, Renderable {
         edgeLeaveCandidates = new HashSet<>();
     }
     
+    /**
+     * Gets a flat collection of all agents on this lane in ascending order.
+     * 
+     * @return all agents on the lane
+     */
+    public Collection<Agent> getAgentsInOrder() {
+        Collection<Agent> list = new LinkedList<>();
+        for (Set<Agent> agents : laneAgents.values()) {
+            for (Agent agent : agents) {
+                list.add(agent);
+            }
+        }
+        return list;
+    }
+    
     public boolean comesFrom(final Junction junction) {
         return getEdge().getStart() == junction;
+    }
+    
+    /**
+     * Gets the relative position on this lane from an absolute position in
+     * meters.
+     * 
+     * @param absolutePosition
+     *            absolute position in meters on this lane
+     * @return relative position
+     */
+    public double getRelativePosition(double absolutePosition) {
+        if (absolutePosition < 0 || absolutePosition > getLength()) {
+            throw new IllegalArgumentException("absolutePosition out of bounds");
+        }
+        return absolutePosition / getLength();
     }
     
     /**
@@ -119,17 +149,37 @@ public class Lane extends Element implements Simulatable, Renderable {
     /**
      * Returns the next agents on line.
      * 
-     * @param agent
+     * @param relativePosition
      *            the relative position on this lane
-     * @return the next @{link Agent} on line, null if there is none.
+     * @return the next @{link Agent} on line, empty set if there is none.
      */
-    public Set<Agent> nextAgentsOnLine(final Agent agent) {
-        Entry<Double, Set<Agent>> nextAgentsEntry = laneAgents.higherEntry(agent.getRelativePositionOnLane());
+    public Set<Agent> getNextAgentsOnLine(final double relativePosition) {
+        if (relativePosition < 0 || relativePosition > 1.0) {
+            throw new IllegalArgumentException("relative position invalid");
+        }
+        Entry<Double, Set<Agent>> nextAgentsEntry = laneAgents.higherEntry(relativePosition);
         Set<Agent> nextAgents = new HashSet<>();
         if (nextAgentsEntry != null) {
             nextAgents = nextAgentsEntry.getValue();
         }
         return nextAgents;
+    }
+    
+    /**
+     * Returns the next agents on line in front of a agent on the same lane.
+     * 
+     * @param agent
+     *            an agent on the same lane
+     * @return the next @{link Agent} on line, empty set if there is none.
+     */
+    public Set<Agent> getNextAgentsOnLine(final Agent agent) {
+        if (agent == null) {
+            throw new IllegalArgumentException("agent is null");
+        }
+        if (agent.getLane() != this) {
+            throw new IllegalArgumentException("agent is not on this lane");
+        }
+        return getNextAgentsOnLine(agent.getPositionOnLane());
     }
     
     public Map<Agent, Optional<Lane>> getLaneChangeCandidates() {
@@ -190,16 +240,16 @@ public class Lane extends Element implements Simulatable, Renderable {
         return getEdge().getLanes().stream().filter(x -> x.index == index + 1).findAny();
     }
     
+    public Optional<Lane> getRightLane() {
+        return getEdge().getLanes().stream().filter(x -> x.index == index - 1).findAny();
+    }
+    
     public double getLength() {
         return length;
     }
     
     public PolyShape getPolyShape() {
         return polyShape;
-    }
-    
-    public Optional<Lane> getRightLane() {
-        return getEdge().getLanes().stream().filter(x -> x.index == index - 1).findAny();
     }
     
     public double getSpeed() {

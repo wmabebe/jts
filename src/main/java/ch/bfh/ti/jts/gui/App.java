@@ -1,6 +1,8 @@
 package ch.bfh.ti.jts.gui;
 
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.console.JtsConsole;
@@ -20,11 +22,6 @@ public class App implements Runnable {
     private Window              window;
     private Simulation          simulation;
     private Console             console;
-    private int                 simulationStepDuration;
-    
-    public App() {
-        this.simulationStepDuration = 1000; // one second is default
-    }
     
     private void end() {
         // free resources or clean up stuff...
@@ -62,16 +59,6 @@ public class App implements Runnable {
         net.addRoutes(routes);
     }
     
-    /**
-     * Set the duration of one simulation step in miliseconds.
-     * 
-     * @param simulationStepDuration
-     *            duration in miliseconds
-     */
-    public void setSimulationStepDuration(int simulationStepDuration) {
-        this.simulationStepDuration = simulationStepDuration;
-    }
-    
     @Override
     public void run() {
         init();
@@ -80,8 +67,9 @@ public class App implements Runnable {
             window.setNet(net);
             // Sleep some time
             try {
-                Thread.sleep(simulationStepDuration);
+                Thread.sleep((int) (Simulation.SIMULATION_STEP_DURATION * 1000));
             } catch (InterruptedException e) {
+                Logger.getLogger(App.class.getName()).log(Level.WARNING, "Thread interrupted.", e);
             }
         }
         end();
