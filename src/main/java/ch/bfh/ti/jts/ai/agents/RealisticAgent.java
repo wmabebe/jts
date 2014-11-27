@@ -54,11 +54,11 @@ public class RealisticAgent extends RandomAgent {
      */
     private final Random      rand;
     
-    public RealisticAgent(double positionOnLane, Vehicle vehicle, double velocity) {
-        super(positionOnLane, vehicle, velocity);
+    public RealisticAgent() {
+        super();
         this.rand = new Random((long) this.getId());
     }
-    
+        
     @Override
     public void think() {
         super.think();

@@ -141,7 +141,10 @@ Enteee
 winki
 * Bugfix in lane
 * Lane switching logic of realisitc agent [done]
-* Implementation of traffic flows
+* Implementation of traffic flows [done]
+* Agent type can be configured in the routes xml file [done]
+* Despawning of agents when spawn info of type "Flow" [done]
+* Added restart command to console [done]
 
 ### Calendar week 49
 
@@ -169,13 +172,13 @@ winki
   * Transcendent agents when collision happend
 * Agent handling on junctions
 * Area restricted tick method
-* Constant traffic flow 
 * Console can receive parameters from clickable GUI
 * Console commands:
   * agent removing
   * restart simulation
 * Weather / daylight
 * Write project documentation
+* RealisitcAgent can use GPS
 
 ## Resources
 

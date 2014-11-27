@@ -1,60 +1,26 @@
 package ch.bfh.ti.jts.data;
 
-import java.io.Serializable;
-
-public class Route implements Serializable {
+public class Route extends SpawnInfo {
     
     private static final long serialVersionUID = 1L;
-    private final Vehicle     vehicle;
-    private final Edge        routeStart;
-    private final Edge        routeEnd;
-    private final double      departureTime;
-    private final double      departurePos;
-    private final double      departureSpeed;
-    private final double      arrivalPos;
-    private final double      arrivalSpeed;
     
-    public Route(final Vehicle vehicle, final Edge routeStart, final Edge routeEnd, final double departureTime, final double departurePos, final double departureSpeed, final double arrivalPos,
-            final double arrivalSpeed) {
-        this.vehicle = vehicle;
-        this.routeStart = routeStart;
-        this.routeEnd = routeEnd;
-        this.departureTime = departureTime;
-        this.departurePos = departurePos;
-        this.departureSpeed = departureSpeed;
-        this.arrivalPos = arrivalPos;
-        this.arrivalSpeed = arrivalSpeed;
-    }
-    
-    public double getArrivalPos() {
-        return arrivalPos;
-    }
-    
-    public double getArrivalSpeed() {
-        return arrivalSpeed;
-    }
-    
-    public double getDeparturePos() {
-        return departurePos;
-    }
-    
-    public double getDepartureSpeed() {
-        return departureSpeed;
-    }
-    
-    public double getDepartureTime() {
-        return departureTime;
-    }
-    
-    public Edge getRouteEnd() {
-        return routeEnd;
+    public Route(Vehicle vehicle, Edge routeStart, Edge routeEnd, double departureTime, double departurePos, double departureSpeed, double arrivalPos, double arrivalSpeed) {
+        super(vehicle, routeStart, routeEnd, departureTime, departurePos, departureSpeed, arrivalPos, arrivalSpeed);
     }
     
     public Edge getRouteStart() {
-        return routeStart;
+        SpawnLocation start = getStart();
+        if (start instanceof Edge) {
+            return (Edge) start;
+        }
+        return null;
     }
     
-    public Vehicle getVehicle() {
-        return vehicle;
+    public Edge getRouteEnd() {
+        SpawnLocation end = getEnd();
+        if (end instanceof Edge) {
+            return (Edge) end;
+        }
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import ch.bfh.ti.jts.console.commands.Command;
+import ch.bfh.ti.jts.console.commands.RestartCommand;
 import ch.bfh.ti.jts.console.commands.SpawnCommand;
 import ch.bfh.ti.jts.console.commands.TimeCommand;
 
@@ -31,6 +32,7 @@ public class JtsConsole extends BasicConsole {
         commands.clear();
         commands.add(new TimeCommand());
         commands.add(new SpawnCommand());
+        commands.add(new RestartCommand());
         
         commands.forEach(command -> {
             final String name = command.getName();

@@ -7,10 +7,10 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
+import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
 import ch.bfh.ti.jts.ai.Thinkable;
-import ch.bfh.ti.jts.gui.App;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
@@ -41,12 +41,26 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      * Vehicle of this agent
      */
     private Vehicle            vehicle;
+    /**
+     * Optional spawning information of this agent. Can be null.
+     */
+    private SpawnInfo          spawnInfo;
     
-    public Agent(final double positionOnLane, final Vehicle vehicle, final double velocity) {
+    private boolean            isRemoveCandidate      = false;
+    
+    public Agent() {
         super("Agent");
+    }
+    
+    public void init(final double positionOnLane, final Vehicle vehicle, final double velocity) {
+        init(positionOnLane, vehicle, velocity, null);
+    }
+    
+    public void init(final double positionOnLane, final Vehicle vehicle, final double velocity, SpawnInfo spawnInfo) {
         setPositionOnLane(positionOnLane);
         setVehicle(vehicle);
         setVelocity(velocity);
+        setSpawnInfo(spawnInfo);
     }
     
     @Override
@@ -76,6 +90,16 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     
     public Lane getLane() {
         return lane;
+    }
+    
+    public void remove() {
+        isRemoveCandidate = true;
+        getLane().removeEdgeLeaveCandidate(this);
+        lane = null;
+    }
+    
+    public boolean isRemoveCandidate() {
+        return isRemoveCandidate;
     }
     
     /**
@@ -235,5 +259,13 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         setVelocity(getVelocity() + getAcceleration() * duration);
         // update position
         setPositionOnLane(getPositionOnLane() + getVelocity() * duration);
+    }
+    
+    private void setSpawnInfo(SpawnInfo spawnInfo) {
+        this.spawnInfo = spawnInfo;
+    }
+    
+    public SpawnInfo getSpawnInfo() {
+        return spawnInfo;
     }
 }

@@ -9,7 +9,6 @@ import ch.bfh.ti.jts.ai.agents.RealisticAgent;
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
-import ch.bfh.ti.jts.gui.App;
 import ch.bfh.ti.jts.gui.Window;
 import ch.bfh.ti.jts.importer.NetImporter;
 

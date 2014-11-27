@@ -13,11 +13,13 @@ import ch.bfh.ti.jts.data.Net;
 
 public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdge<E, V>> {
     
+    @SuppressWarnings("unused")
     private final Net                                                 net;
     private final List<V>                                             vertices = new LinkedList<>();
     private final List<E>                                             edges    = new LinkedList<>();
     private final ConcurrentHashMap<V, ConcurrentHashMap<V, List<V>>> routes   = new ConcurrentHashMap<>();
     
+    @SuppressWarnings("unchecked")
     public GPS(final Net net) {
         this.net = net;
         // extract all edges and vertices

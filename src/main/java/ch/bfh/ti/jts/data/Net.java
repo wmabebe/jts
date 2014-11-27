@@ -1,6 +1,7 @@
 package ch.bfh.ti.jts.data;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -12,8 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ch.bfh.ti.jts.ai.Thinkable;
-import ch.bfh.ti.jts.ai.agents.FullSpeedAgent;
-import ch.bfh.ti.jts.ai.agents.RealisticAgent;
+import ch.bfh.ti.jts.ai.agents.IdleAgent;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
@@ -26,25 +26,25 @@ import ch.bfh.ti.jts.utils.layers.Layers;
  */
 public class Net extends Element implements Serializable, Simulatable {
     
-    private static final long          serialVersionUID  = 1L;
+    private static final long              serialVersionUID  = 1L;
     /**
      * Factor by which the spawning should take place. 1 means real time speed.
      * 1440 = 1 day in one minute
      */
-    private final double               SPAWN_TIME_FACTOR = 1440;
-    private final Set<Element>         elements          = new HashSet<>();
-    private final Layers<Renderable>   renderables       = new Layers<>();
-    private final Set<Thinkable>       thinkables        = new HashSet<>();
-    private final Layers<Simulatable>  simulatables      = new Layers<>();
-    private final BlockingQueue<Route> routes            = new LinkedBlockingQueue<>();
+    private final double                   SPAWN_TIME_FACTOR = 1440;
+    private final Set<Element>             elements          = new HashSet<>();
+    private final Layers<Renderable>       renderables       = new Layers<>();
+    private final Set<Thinkable>           thinkables        = new HashSet<>();
+    private final Layers<Simulatable>      simulatables      = new Layers<>();
+    private final BlockingQueue<SpawnInfo> routes            = new LinkedBlockingQueue<>();
     /**
      * Absolute time at which the simulation started [s].
      */
-    private final double               startTime;
+    private final double                   startTime;
     /**
      * Absolute time at which the the latest simulation tick took place [s].
      */
-    private double                     lastTick;
+    private double                         lastTick;
     
     public Net() {
         super("Net");
@@ -72,7 +72,7 @@ public class Net extends Element implements Serializable, Simulatable {
         }
     }
     
-    public void addRoutes(final Collection<Route> routes) {
+    public void addRoutes(final Collection<SpawnInfo> routes) {
         this.routes.addAll(routes);
     }
     
@@ -92,7 +92,7 @@ public class Net extends Element implements Serializable, Simulatable {
         return renderables;
     }
     
-    public Collection<Route> getRoutes() {
+    public Collection<SpawnInfo> getRoutes() {
         return routes;
     }
     
@@ -127,22 +127,101 @@ public class Net extends Element implements Serializable, Simulatable {
     
     @Override
     public void simulate(final double duration) {
-        spawn();
+        doSpawning();
+        removeDespawnedAgents();
     }
     
-    private void spawn() {
+    private void doSpawning() {
         
-        final List<Route> routes = getRoutes().stream().sequential().filter(x -> x.getDepartureTime() < getTimeTotal() * SPAWN_TIME_FACTOR).collect(Collectors.toList());
+        final List<Route> routes = getRoutes().stream().sequential().filter(x -> x instanceof Route).filter(x -> x.getDepartureTime() < getTimeTotal() * SPAWN_TIME_FACTOR).map(x -> (Route) x)
+                .collect(Collectors.toList());
         for (final Route route : routes) {
-            final Lane lane = route.getRouteStart().getFirstLane();
-            double posOnLane = Helpers.clamp(route.getDeparturePos(), 0.0, lane.getLength());
-            Agent agent = new RealisticAgent(posOnLane, route.getVehicle(), route.getDepartureSpeed());
-            addElement(agent);
-            agent.setLane(lane);
-            lane.addLaneAgent(agent);
-            getRoutes().remove(route);
-            Logger.getLogger(Net.class.getName()).info(agent + " spawned at: " + lane);
             
+            // create agent
+            Agent agent = createAgent(route.getVehicle().getAgent());
+            spawn(route, agent);
+            
+            // remove route (one one spawn per route)
+            getRoutes().remove(route);
         }
+        
+        final List<Flow> flows = getRoutes().stream().sequential().filter(x -> x instanceof Flow).filter(x -> x.getDepartureTime() < getTimeTotal() * SPAWN_TIME_FACTOR).map(x -> (Flow) x)
+                .collect(Collectors.toList());
+        for (final Flow flow : flows) {
+            if (flow.isSpawn(getTimeTotal())) {
+                
+                // create agent
+                Agent agent = createAgent(flow.getVehicle().getAgent());
+                spawn(flow, agent);
+                
+                // don't remove flow (infinite spawning)
+            }
+        }
+    }
+    
+    private void spawn(SpawnInfo spawnInfo, Agent agent) {
+        assert agent != null;
+        
+        SpawnLocation spawnLocation = spawnInfo.getStart();
+        assert spawnLocation != null;
+        
+        Lane lane = spawnLocation.getSpawnLane();
+        if (lane == null)
+            throw new RuntimeException("lane is null");
+        
+        double posOnLane = Helpers.clamp(spawnInfo.getDeparturePos(), 0.0, lane.getLength());
+        agent.init(posOnLane, spawnInfo.getVehicle(), spawnInfo.getDepartureSpeed(), spawnInfo);
+        
+        addElement(agent);
+        
+        agent.setLane(lane);
+        lane.addLaneAgent(agent);
+        
+        Logger.getLogger(Net.class.getName()).info(agent + " spawned at: " + lane);
+    }
+    
+    private Agent createAgent(String name) {
+        if (name != null) {
+            if (!name.endsWith("Agent")) {
+                // add suffix
+                name = name.concat("Agent");
+            }
+            try {
+                // append namespace
+                name = String.format("ch.bfh.ti.jts.ai.agents.%s", name);
+                Class<?> clazz = Class.forName(name);
+                Constructor<?> ctor = clazz.getConstructor();
+                Object object = ctor.newInstance();
+                
+                Logger.getLogger(Net.class.getName()).info("Create agent: " + object.getClass());
+                
+                return (Agent) object;
+            } catch (Exception e) {
+                Logger.getLogger(Net.class.getName()).warning("Creating agent failed: " + name);
+            }
+        }
+        // default agent
+        Logger.getLogger(Net.class.getName()).info("Create default agent: " + IdleAgent.class);
+        return new IdleAgent();
+    }
+    
+    private void removeDespawnedAgents() {        
+        // remove agents...
+        elements.removeIf(x -> {
+            if (x != null && x instanceof Agent) {
+                Agent a = (Agent) x;
+                return a.isRemoveCandidate();
+            }
+            return false;
+        });
+        thinkables.removeIf(x -> {
+            if (x != null && x instanceof Agent) {
+                Agent a = (Agent) x;
+                return a.isRemoveCandidate();
+            }
+            return false;
+        });
+        renderables.removeAgents();
+        simulatables.removeAgents();
     }
 }

@@ -20,7 +20,7 @@ import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 import ch.bfh.ti.jts.simulation.Simulatable;
 
-public class Lane extends Element implements Simulatable, Renderable {
+public class Lane extends Element implements SpawnLocation, Simulatable, Renderable {
     
     private static final long                      serialVersionUID = 1L;
     private final Edge                             edge;
@@ -111,8 +111,7 @@ public class Lane extends Element implements Simulatable, Renderable {
             agentsAtPosition = new HashSet<>();
             laneAgents.put(agent.getRelativePositionOnLane(), agentsAtPosition);
         }
-        agentsAtPosition.add(agent);
-        
+        agentsAtPosition.add(agent);        
     }
     
     public void addEdgeLeaveCandidate(final Agent agent) {
@@ -300,5 +299,10 @@ public class Lane extends Element implements Simulatable, Renderable {
                 }
             }
         }
+    }
+
+    @Override
+    public Lane getSpawnLane() {
+        return this;
     }
 }

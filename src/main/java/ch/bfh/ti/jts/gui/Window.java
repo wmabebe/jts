@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.simulation.Simulation;

@@ -14,7 +14,7 @@ import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.graph.DirectedGraphVertex;
 
-public class Junction extends Element implements DirectedGraphVertex<Junction, Edge>, Renderable, Simulatable {
+public class Junction extends Element implements SpawnLocation, DirectedGraphVertex<Junction, Edge>, Renderable, Simulatable {
     
     private static final long      serialVersionUID = 1L;
     private final double           x;
@@ -85,11 +85,36 @@ public class Junction extends Element implements DirectedGraphVertex<Junction, E
         // move incoming agents over junction
         edges.stream().filter(edge -> edge.goesTo(this)).forEach(edge -> {
             edge.getEdgeSwitchCandidates().forEach((agent, nextEdgeLane) -> {
+                
+                // despawn agents
+                SpawnInfo spawnInfo = agent.getSpawnInfo();
+                if (spawnInfo != null && spawnInfo instanceof Flow) {
+                    SpawnLocation end = spawnInfo.getEnd();
+                    
+                    if (this.equals(end)){
+                        // remove agent
+                        agent.remove();
+                        return;
+                    }
+                }
+                                              
                 agent.getLane().removeEdgeLeaveCandidate(agent);
                 agent.setNextEdgeLane(nextEdgeLane);
                 nextEdgeLane.addLaneAgent(agent);
             });
         });
         
+    }
+
+    @Override
+    public Lane getSpawnLane() {
+        Collection<Edge> edges = getOutgoingEdges();
+        if (edges.size() > 0){
+            Edge edge = edges.stream().findAny().orElse(null);
+            if (edge != null){
+                return edge.getFirstLane();
+            }
+        }
+        return null;
     }
 }

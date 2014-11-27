@@ -40,19 +40,24 @@ public class Vehicle implements Serializable {
      * Width of the vehicle [m]
      */
     private final double       width            = 1.7;
+    /**
+     * String representing the agent class (without suffix "Agent").
+     */
+    private final String       agent;
     
     private final static Shape SHAPE            = buildShape();
     
     public Vehicle() {
-        this(-5, 5, 0, 33.3, 3);
+        this(-5, 5, 0, 33.3, 3, null);
     }
     
-    public Vehicle(final double minAcceleration, final double maxAcceleration, final double minVelocity, final double maxVelocity, final double length) {
+    public Vehicle(final double minAcceleration, final double maxAcceleration, final double minVelocity, final double maxVelocity, final double length, final String agent) {
         this.minAcceleration = minAcceleration;
         this.maxAcceleration = maxAcceleration;
         this.minVelocity = minVelocity;
         this.maxVelocity = maxVelocity;
         this.length = length;
+        this.agent = agent;
     }
     
     public double getLength() {
@@ -81,5 +86,9 @@ public class Vehicle implements Serializable {
     
     public double getWidth() {
         return width;
+    }
+        
+    public String getAgent() {
+        return agent;
     }
 }
