@@ -124,7 +124,7 @@ Enteee
 winki
 * Simple map for developing agent [done]
 * Fix index out of bounds bug in polyshape class [done]
-* Realistic agent [progess]
+* Realistic agent [done]
 
 ### Calendar week 47
 
@@ -132,13 +132,16 @@ Enteee
 * Draw fake laneswitch
 
 winki
-* Realistic agent [progess]
+* Improvement of realistic agent [done]
 
 ### Calendar week 48
 
 Enteee
 
 winki
+* Bugfix in lane
+* Lane switching logic of realisitc agent [done]
+* Implementation of traffic flows
 
 ### Calendar week 49
 

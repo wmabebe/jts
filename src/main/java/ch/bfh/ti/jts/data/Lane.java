@@ -155,7 +155,7 @@ public class Lane extends Element implements Simulatable, Renderable {
      */
     public Set<Agent> getNextAgentsOnLine(final double relativePosition) {
         if (relativePosition < 0 || relativePosition > 1.0) {
-            throw new IllegalArgumentException("relative position invalid");
+            throw new IllegalArgumentException("relative position invalid: " + relativePosition);
         }
         Entry<Double, Set<Agent>> nextAgentsEntry = laneAgents.higherEntry(relativePosition);
         Set<Agent> nextAgents = new HashSet<>();
@@ -179,7 +179,7 @@ public class Lane extends Element implements Simulatable, Renderable {
         if (agent.getLane() != this) {
             throw new IllegalArgumentException("agent is not on this lane");
         }
-        return getNextAgentsOnLine(agent.getPositionOnLane());
+        return getNextAgentsOnLine(agent.getRelativePositionOnLane());
     }
     
     public Map<Agent, Optional<Lane>> getLaneChangeCandidates() {

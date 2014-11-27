@@ -13,8 +13,10 @@ import java.util.stream.Stream;
 
 import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.ai.agents.FullSpeedAgent;
+import ch.bfh.ti.jts.ai.agents.RealisticAgent;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
+import ch.bfh.ti.jts.utils.Helpers;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
 /**
@@ -133,7 +135,8 @@ public class Net extends Element implements Serializable, Simulatable {
         final List<Route> routes = getRoutes().stream().sequential().filter(x -> x.getDepartureTime() < getTimeTotal() * SPAWN_TIME_FACTOR).collect(Collectors.toList());
         for (final Route route : routes) {
             final Lane lane = route.getRouteStart().getFirstLane();
-            Agent agent = new FullSpeedAgent(route.getDeparturePos(), route.getVehicle(), route.getDepartureSpeed());
+            double posOnLane = Helpers.clamp(route.getDeparturePos(), 0.0, lane.getLength());
+            Agent agent = new RealisticAgent(posOnLane, route.getVehicle(), route.getDepartureSpeed());
             addElement(agent);
             agent.setLane(lane);
             lane.addLaneAgent(agent);

@@ -2,6 +2,7 @@ package ch.bfh.ti.jts.data;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -9,6 +10,7 @@ import java.awt.geom.Point2D;
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
 import ch.bfh.ti.jts.ai.Thinkable;
+import ch.bfh.ti.jts.gui.App;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
@@ -216,6 +218,12 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         g.setColor(getColor());
         g.translate(x, y);
         g.fill(at.createTransformedShape(vehicle.getShape()));
+        if (App.DEBUG) {
+            g.setFont(new Font("sans-serif", Font.PLAIN, 4));
+            g.scale(1, -1);
+            g.drawString("Agent " + getId(), 5, 1);
+            g.scale(1, -1);
+        }
         g.translate(-x, -y);
     }
     

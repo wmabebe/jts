@@ -20,7 +20,7 @@ public class Main {
         Logger.getLogger(Main.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(Window.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(Agent.class.getName()).setLevel(Level.OFF);
-        Logger.getLogger(Lane.class.getName()).setLevel(Level.ALL);
+        Logger.getLogger(Lane.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(Net.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(NetImporter.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(RealisticAgent.class.getName()).setLevel(Level.ALL);
