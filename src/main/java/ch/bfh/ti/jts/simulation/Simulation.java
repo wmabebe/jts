@@ -25,7 +25,7 @@ public class Simulation {
      * The duration of one simulation step in miliseconds. INFO: static here
      * because agent is missing a reference to the simulation object.
      */
-    public final static double   SIMULATION_STEP_DURATION = 0.25;
+    public final static double   SIMULATION_STEP_DURATION = 3;
     
     /**
      * Commands the simulation should execute.

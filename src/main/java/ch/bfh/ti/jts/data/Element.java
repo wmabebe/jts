@@ -11,6 +11,36 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class Element implements Serializable {
     
+    /**
+     * Represents an element at a specific time;
+     * 
+     * @author ente
+     */
+    public static class ElementInTime implements Comparable<ElementInTime> {
+        
+        private final double  time;
+        private final Element element;
+        
+        public ElementInTime(final double time, final Element element) {
+            this.time = time;
+            this.element = element;
+        }
+        
+        public double getTime() {
+            return time;
+        }
+        
+        public Element getElement() {
+            return element;
+        }
+        
+        @Override
+        public int compareTo(ElementInTime o) {
+            return (new Double(time)).compareTo(o.getTime());
+        }
+        
+    }
+    
     private static final long          serialVersionUID = 1L;
     private final String               name;
     private static final AtomicInteger NEXT_ID          = new AtomicInteger(0);

@@ -3,6 +3,7 @@ package ch.bfh.ti.jts.gui;
 import java.awt.Graphics2D;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NavigableMap;
 
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Edge;
@@ -46,5 +47,18 @@ public interface Renderable {
      * @param g
      *            the object to render with.
      */
-    void render(Graphics2D g);
+    void render(final Graphics2D g);
+    
+    /**
+     * Render the implementing object.
+     *
+     * @param g
+     *            the object to render with.
+     * @param simulationHistory
+     *            the history of the simulation. Key:= relative distance in time
+     *            from current newest @{link Net} [s]. Value:=@{link Net}
+     */
+    default void render(final Graphics2D g, NavigableMap<Double, Net> simulationHistory) {
+        render(g);
+    }
 }

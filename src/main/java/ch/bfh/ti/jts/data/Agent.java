@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
 
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
@@ -15,26 +17,30 @@ import ch.bfh.ti.jts.utils.Helpers;
 
 public abstract class Agent extends Element implements Thinkable, Simulatable, Renderable {
     
-    private static final long  serialVersionUID       = 1L;
+    private static final long  serialVersionUID               = 1L;
     /**
      * The hue of the agent when driving with maximum velocity. Slower is in the
      * range [0 , AGENT_MAX_VELOCITY_COLOR]. 0.33 : Green
      */
-    public final static double AGENT_MAX_VELOCITY_HUE = 0.33;
-    private final Decision     decision               = new Decision();
+    public final static double AGENT_MAX_VELOCITY_HUE         = 0.33;
+    /**
+     * Duration [s] of change line animation.
+     */
+    public final static double CHANGE_LINE_ANIMATION_DURATION = 1;
+    private final Decision     decision                       = new Decision();
     private Lane               lane;
     /**
      * The velocity of an agent in m/s
      */
-    private double             velocity               = 0;
+    private double             velocity                       = 0;
     /**
      * The acceleration of a agent in m/s^2
      */
-    private double             acceleration           = 0;
+    private double             acceleration                   = 0;
     /**
      * Distance to drive in m
      */
-    private double             positionOnLane         = 0;
+    private double             positionOnLane                 = 0;
     /**
      * Vehicle of this agent
      */
@@ -217,6 +223,35 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         g.translate(x, y);
         g.fill(at.createTransformedShape(vehicle.getShape()));
         g.translate(-x, -y);
+    }
+    
+    @Override
+    public void render(Graphics2D g, NavigableMap<Double, Net> simulationHistory) {
+        Entry<Double, Net> changeLaneEntry = simulationHistory.ceilingEntry(CHANGE_LINE_ANIMATION_DURATION);
+        double changeLaneAgentAge = 0.0;
+        Agent newestChangeLaneAgent;
+        simulationHistory.headMap(CHANGE_LINE_ANIMATION_DURATION).values().stream().map(oldNet -> {
+            return new Element.ElementInTime(oldNet.getTimeTotal(), oldNet.getElement(getId()));
+            
+        }).filter(oldAgentInTime -> {
+            final Agent oldAgent = (Agent) oldAgentInTime.getElement();
+            // lane changed on same edge?
+                // @formatter:off
+                return (    (
+                        // is on lane left
+                        getLane().getLeftLane().isPresent() 
+                        && oldAgent.getLane() == getLane().getLeftLane().get()
+                    ) || (
+                        // or on lane right
+                        getLane().getRightLane().isPresent()
+                        && oldAgent.getLane() == getLane().getRightLane().get()
+                    )
+                );
+            // @formatter:on
+            }).sorted();
+        // TODO: finish
+        
+        Renderable.super.render(g, simulationHistory);
     }
     
     @Override
