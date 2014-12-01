@@ -20,7 +20,7 @@ import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 import ch.bfh.ti.jts.simulation.Simulatable;
 
-public class Lane extends Element implements Simulatable, Renderable {
+public class Lane extends Element implements SpawnLocation, Simulatable, Renderable {
     
     private static final long                      serialVersionUID = 1L;
     private final Edge                             edge;
@@ -111,8 +111,7 @@ public class Lane extends Element implements Simulatable, Renderable {
             agentsAtPosition = new HashSet<>();
             laneAgents.put(agent.getRelativePositionOnLane(), agentsAtPosition);
         }
-        agentsAtPosition.add(agent);
-        
+        agentsAtPosition.add(agent);        
     }
     
     public void addEdgeLeaveCandidate(final Agent agent) {
@@ -155,7 +154,7 @@ public class Lane extends Element implements Simulatable, Renderable {
      */
     public Set<Agent> getNextAgentsOnLine(final double relativePosition) {
         if (relativePosition < 0 || relativePosition > 1.0) {
-            throw new IllegalArgumentException("relative position invalid");
+            throw new IllegalArgumentException("relative position invalid: " + relativePosition);
         }
         Entry<Double, Set<Agent>> nextAgentsEntry = laneAgents.higherEntry(relativePosition);
         Set<Agent> nextAgents = new HashSet<>();
@@ -179,7 +178,7 @@ public class Lane extends Element implements Simulatable, Renderable {
         if (agent.getLane() != this) {
             throw new IllegalArgumentException("agent is not on this lane");
         }
-        return getNextAgentsOnLine(agent.getPositionOnLane());
+        return getNextAgentsOnLine(agent.getRelativePositionOnLane());
     }
     
     public Map<Agent, Optional<Lane>> getLaneChangeCandidates() {
@@ -300,5 +299,10 @@ public class Lane extends Element implements Simulatable, Renderable {
                 }
             }
         }
+    }
+
+    @Override
+    public Lane getSpawnLane() {
+        return this;
     }
 }

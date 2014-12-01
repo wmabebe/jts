@@ -2,12 +2,14 @@ package ch.bfh.ti.jts.data;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 
+import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
 import ch.bfh.ti.jts.ai.Thinkable;
@@ -45,12 +47,26 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      * Vehicle of this agent
      */
     private Vehicle            vehicle;
+    /**
+     * Optional spawning information of this agent. Can be null.
+     */
+    private SpawnInfo          spawnInfo;
     
-    public Agent(final double positionOnLane, final Vehicle vehicle, final double velocity) {
+    private boolean            isRemoveCandidate      = false;
+    
+    public Agent() {
         super("Agent");
+    }
+    
+    public void init(final double positionOnLane, final Vehicle vehicle, final double velocity) {
+        init(positionOnLane, vehicle, velocity, null);
+    }
+    
+    public void init(final double positionOnLane, final Vehicle vehicle, final double velocity, SpawnInfo spawnInfo) {
         setPositionOnLane(positionOnLane);
         setVehicle(vehicle);
         setVelocity(velocity);
+        setSpawnInfo(spawnInfo);
     }
     
     @Override
@@ -80,6 +96,16 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     
     public Lane getLane() {
         return lane;
+    }
+    
+    public void remove() {
+        isRemoveCandidate = true;
+        getLane().removeEdgeLeaveCandidate(this);
+        lane = null;
+    }
+    
+    public boolean isRemoveCandidate() {
+        return isRemoveCandidate;
     }
     
     /**
@@ -222,6 +248,12 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         g.setColor(getColor());
         g.translate(x, y);
         g.fill(at.createTransformedShape(vehicle.getShape()));
+        if (App.DEBUG) {
+            g.setFont(new Font("sans-serif", Font.PLAIN, 4));
+            g.scale(1, -1);
+            g.drawString("Agent " + getId(), 5, 1);
+            g.scale(1, -1);
+        }
         g.translate(-x, -y);
     }
     
@@ -262,5 +294,13 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         setVelocity(getVelocity() + getAcceleration() * duration);
         // update position
         setPositionOnLane(getPositionOnLane() + getVelocity() * duration);
+    }
+    
+    private void setSpawnInfo(SpawnInfo spawnInfo) {
+        this.spawnInfo = spawnInfo;
+    }
+    
+    public SpawnInfo getSpawnInfo() {
+        return spawnInfo;
     }
 }

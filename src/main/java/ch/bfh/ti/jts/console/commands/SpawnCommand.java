@@ -10,6 +10,7 @@ import ch.bfh.ti.jts.data.Edge;
 import ch.bfh.ti.jts.data.Element;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.Route;
+import ch.bfh.ti.jts.data.SpawnInfo;
 import ch.bfh.ti.jts.data.Vehicle;
 
 import com.beust.jcommander.Parameter;
@@ -27,7 +28,7 @@ public class SpawnCommand implements Command {
         final List<Element> edges = net.getElementStream(Edge.class).collect(Collectors.toList());
         
         // generate routes
-        final Collection<Route> routes = new LinkedList<>();
+        final Collection<SpawnInfo> routes = new LinkedList<>();
         for (int i = 0; i < number; i++) {
             
             final Vehicle vehicle = new Vehicle();
@@ -39,7 +40,7 @@ public class SpawnCommand implements Command {
             final double departureTime = net.getTimeTotal();
             final double speed = vehicle.getMaxVelocity();
             
-            final Route route = new Route(vehicle, routeStart, routeEnd, departureTime, position, speed, 0.0, 0.0);
+            final SpawnInfo route = new Route(vehicle, routeStart, routeEnd, departureTime, position, speed, 0.0, 0.0);
             routes.add(route);
         }
         net.addRoutes(routes);
@@ -55,6 +56,5 @@ public class SpawnCommand implements Command {
     @Override
     public Class<?> getTargetType() {
         return Net.class;
-    }
-    
+    }    
 }

@@ -9,6 +9,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import ch.bfh.ti.jts.data.Agent;
+
 /**
  * A data structure which holds its elements in layers.
  *
@@ -46,4 +48,17 @@ public class Layers<T> implements Serializable {
         }
         return layers.get(layer).stream();
     }
+    
+    public void removeAgents() {
+        // TODO: use global constant?
+        final int agentLayer = 4;
+        
+        layers.get(agentLayer).removeIf(x -> {
+            if (x != null && x instanceof Agent) {
+                Agent a = (Agent) x;
+                return a.isRemoveCandidate();
+            }
+            return false;
+        });        
+    }    
 }

@@ -3,8 +3,10 @@ package ch.bfh.ti.jts.simulation;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.console.commands.Command;
+import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
@@ -41,8 +43,11 @@ public class Simulation {
      */
     private final boolean        doThink;
     
-    public Simulation() {
+    private App                  app;
+    
+    public Simulation(App app) {
         this(true);
+        this.app = app;
     }
     
     public Simulation(boolean doThink) {
@@ -67,14 +72,9 @@ public class Simulation {
     public void tick(final Net simulateNet) {
         // Time that has passed since the last simulation step [s].
         double timeDelta = simulateNet.tick() * TIME_FACTOR;
-        // execute all commands
-        while (commands.size() > 0) {
-            final Command command = commands.poll();
-            final Class<?> targetType = command.getTargetType();
-            simulateNet.getElementStream(targetType).forEach(element -> {
-                getConsole().write(command.execute(element));
-            });
-        }
+        
+        // execute all queued commands
+        executeCommands(simulateNet);
         
         // simulate
         // delegate simulation to @{link Simulatable}s
@@ -88,8 +88,36 @@ public class Simulation {
         if (doThink) {
             // think
             simulateNet.getThinkableStream().forEach(e -> {
-                e.think();
-            });
+                assert e != null;
+                if (e instanceof Agent) {
+                    Agent a = (Agent) e;
+                    if (a.isRemoveCandidate()) {
+                        // don't call think on this removed agent
+                    return;
+                }
+            }
+            e.think();
+        }   );
         }
+    }
+    
+    private void executeCommands(final Net simulateNet) {
+        while (commands.size() > 0) {
+            final Command command = commands.poll();
+            final Class<?> targetType = command.getTargetType();
+            if (targetType == Simulation.class) {
+                // command on simulation itself
+                getConsole().write(command.execute(this));
+            } else {
+                // command on simulation element
+                simulateNet.getElementStream(targetType).forEach(element -> {
+                    getConsole().write(command.execute(element));
+                });
+            }
+        }
+    }
+    
+    public void restart() {
+        app.restart();
     }
 }

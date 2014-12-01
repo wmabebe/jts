@@ -13,7 +13,7 @@ import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
 import ch.bfh.ti.jts.utils.graph.DirectedGraphEdge;
 
-public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, Simulatable, Renderable {
+public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Edge, Junction>, Simulatable, Renderable {
     
     private static final long      serialVersionUID = 1L;
     private final Junction         start;
@@ -98,14 +98,23 @@ public class Edge extends Element implements DirectedGraphEdge<Edge, Junction>, 
             lane.getLaneChangeCandidates().forEach((agent, changeLane) -> {
                 try {
                     if (changeLane.isPresent()) {
-                        agent.setLane(changeLane.get());
-                        changeLane.get().addLaneAgent(agent);
-                        lane.removeLaneAgent(agent);
-                    }
-                } catch (Exception e) {
-                    Logger.getLogger(Edge.class.getName()).info("Agent cannot swith lane");
+                        // lane switch
+                    agent.setLane(changeLane.get());
+                    changeLane.get().addLaneAgent(agent);
+                    lane.removeLaneAgent(agent);
+                } else {
+                    // despawn
+                    agent.remove();
                 }
-            });
+            } catch (Exception e) {
+                Logger.getLogger(Edge.class.getName()).info("Agent cannot swith lane");
+            }
+        }   );
         });
+    }
+    
+    @Override
+    public Lane getSpawnLane() {
+        return getFirstLane();
     }
 }

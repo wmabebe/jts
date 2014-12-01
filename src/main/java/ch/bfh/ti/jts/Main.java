@@ -9,7 +9,6 @@ import ch.bfh.ti.jts.ai.agents.RealisticAgent;
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
-import ch.bfh.ti.jts.gui.App;
 import ch.bfh.ti.jts.gui.Window;
 import ch.bfh.ti.jts.importer.NetImporter;
 
@@ -20,7 +19,7 @@ public class Main {
         Logger.getLogger(Main.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(Window.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(Agent.class.getName()).setLevel(Level.OFF);
-        Logger.getLogger(Lane.class.getName()).setLevel(Level.ALL);
+        Logger.getLogger(Lane.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(Net.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(NetImporter.class.getName()).setLevel(Level.OFF);
         Logger.getLogger(RealisticAgent.class.getName()).setLevel(Level.ALL);
