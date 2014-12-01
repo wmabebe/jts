@@ -13,7 +13,7 @@ import ch.bfh.ti.jts.gui.Window;
 import ch.bfh.ti.jts.importer.NetImporter;
 
 public class Main {
-    
+
     public static void main(final String[] args) {
         // configure loggers
         Logger.getLogger(Main.class.getName()).setLevel(Level.OFF);
@@ -29,7 +29,7 @@ public class Main {
         } catch (final Exception e) {
             Logger.getLogger(Main.class.getName()).log(Level.WARNING, "failed to set look and feel", e);
         }
-        
+
         // start app
         final App app = new App();
         app.loadNet("round");

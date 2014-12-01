@@ -14,13 +14,13 @@ import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 
 public class GPSTest {
-    
+
     private final Shape     s     = new Line2D.Double(0, 0, 1, 1);
     private final PolyShape p     = new PolyShape("0.0,0.0 1.0,1.0");
     private final Net       net[] = new Net[10];
     private final Junction  j[]   = new Junction[100];
     private final Edge      e[]   = new Edge[100];
-    
+
     @Before
     public void setUp() throws Exception {
         // @formatter:off
@@ -30,7 +30,7 @@ public class GPSTest {
          *(e2) ---(e3)--\  (e4)
          *  v             v |
          *  j2-----(e5)---> j3
-         *  
+         *
          */
         // @formatter:on
         net[0] = new Net();
@@ -70,7 +70,7 @@ public class GPSTest {
          *       j6
          *
          *  j7 <-(e9,e10)-> j8
-         *       
+         *
          * Whereas :
          *  e6.priority = 1
          *  e7.priority = 3
@@ -104,13 +104,7 @@ public class GPSTest {
         net[1].addElement(e[9]);
         net[1].addElement(e[10]);
     }
-    
-    @Test
-    public final void testGPS() {
-        new GPS<>(net[0]);
-        new GPS<>(net[1]);
-    }
-    
+
     @Test
     public final void testGetNextEdge() {
         // NET 0
@@ -168,5 +162,11 @@ public class GPSTest {
         Assert.assertEquals(e[10], gps1.getNextEdge(j[8], j[7]).get());
         Assert.assertFalse(gps1.getNextEdge(j[8], j[8]).isPresent());
     }
-    
+
+    @Test
+    public final void testGPS() {
+        new GPS<>(net[0]);
+        new GPS<>(net[1]);
+    }
+
 }

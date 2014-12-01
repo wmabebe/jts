@@ -36,26 +36,26 @@ import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
 public class Window {
-    
+
     private class FrameComponentAdapter extends ComponentAdapter {
-        
+
         @Override
         public void componentResized(final ComponentEvent componentEvent) {
             windoww = renderPanel.getWidth();
             windowh = renderPanel.getHeight();
         }
     }
-    
+
     private class RenderPanel extends JPanel {
-        
+
         private static final long serialVersionUID = 1L;
-        
+
         @Override
         public void paintComponent(final Graphics g) {
             final Graphics2D g2d = (Graphics2D) g;
             // simulate parts of the net
-            Net saveCopyNet = netSaveCopy.get();
-            ConcurrentSkipListMap<Double, Net> newSimulationHistory = new ConcurrentSkipListMap<>();
+            final Net saveCopyNet = netSaveCopy.get();
+            final ConcurrentSkipListMap<Double, Net> newSimulationHistory = new ConcurrentSkipListMap<>();
             // remove old nets from history
             simulationHistory.entrySet().parallelStream().forEach(entry -> {
                 final Net net = entry.getValue();
@@ -109,10 +109,10 @@ public class Window {
                 // render console
                 g2d.setTransform(tConsole);
                 console.render(g2d);
-                
+
                 // Let the OS have a little time...
                 Thread.yield();
-                
+
                 // repaint after every step
                 frame.repaint();
             } finally {
@@ -122,12 +122,35 @@ public class Window {
             }
         }
     }
-    
+
+    private class RenderPanelKeyAdapter extends KeyAdapter {
+
+        @Override
+        public void keyPressed(final KeyEvent keyEvent) {
+            final int keyCode = keyEvent.getKeyCode();
+            keys.add(keyCode);
+        }
+
+        @Override
+        public void keyReleased(final KeyEvent keyEvent) {
+            final int keyCode = keyEvent.getKeyCode();
+            keys.remove(keyCode);
+        }
+
+        @Override
+        public void keyTyped(final KeyEvent keyEvent) {
+            // keyCode is undefinet in this event
+            // so we use the character instead
+            console.keyTyped(keyEvent.getKeyChar());
+        }
+
+    }
+
     private class RenderPanelMouseAdapter extends MouseAdapter {
-        
+
         private boolean isDown            = false;
         private Point   mousePressedPoint = new Point();
-        
+
         @Override
         public void mouseDragged(final MouseEvent mouseEvent) {
             if (isDown) {
@@ -137,20 +160,20 @@ public class Window {
                 mousePressedPoint = mouseEvent.getPoint();
             }
         }
-        
+
         @Override
         public void mousePressed(final MouseEvent mouseEvent) {
             mousePressedPoint = mouseEvent.getPoint();
             isDown = true;
         }
-        
+
         @Override
         public void mouseReleased(final MouseEvent mouseEvent) {
             isDown = false;
         }
-        
+
         @Override
-        public void mouseWheelMoved(MouseWheelEvent mouseEvent) {
+        public void mouseWheelMoved(final MouseWheelEvent mouseEvent) {
             final Point mousePoint = mouseEvent.getPoint();
             // set zoom center relative to no zoom
             final int rotation = mouseEvent.getWheelRotation();
@@ -174,35 +197,12 @@ public class Window {
             }
         }
     }
-    
-    private class RenderPanelKeyAdapter extends KeyAdapter {
-        
-        @Override
-        public void keyPressed(final KeyEvent keyEvent) {
-            final int keyCode = keyEvent.getKeyCode();
-            keys.add(keyCode);
-        }
-        
-        @Override
-        public void keyReleased(final KeyEvent keyEvent) {
-            final int keyCode = keyEvent.getKeyCode();
-            keys.remove(keyCode);
-        }
-        
-        @Override
-        public void keyTyped(final KeyEvent keyEvent) {
-            // keyCode is undefinet in this event
-            // so we use the character instead
-            console.keyTyped(keyEvent.getKeyChar());
-        }
-        
-    }
-    
+
     /**
      * Keep the last {@link Net} for this amount of time in [s];
      */
     private static final double                SIMULATION_HISTORY_KEEP_WINDOW = 10;
-    
+
     /**
      * Zoom delta. Determines how much to change the zoom when scrolling. Also
      * sets the minimum zoom
@@ -230,7 +230,7 @@ public class Window {
     private ConcurrentSkipListMap<Double, Net> simulationHistory              = new ConcurrentSkipListMap<>();
     private final Simulation                   windowSimulation;
     private final Console                      console;
-    
+
     public Window(final Net net, final Console console) {
         if (net == null) {
             throw new IllegalArgumentException("net is null");
@@ -256,15 +256,15 @@ public class Window {
         renderPanel.addMouseWheelListener(renderPanelMouseAdaptor);
         frame.setContentPane(renderPanel);
     }
-    
+
     public void setNet(final Net net) {
         netSaveCopy.set(DeepCopy.copy(net));
-        Net netCopy = DeepCopy.copy(net);
+        final Net netCopy = DeepCopy.copy(net);
         simulationHistory.put(0.0, netCopy);
     }
-    
+
     public void setVisible(final boolean visible) {
         frame.setVisible(visible);
     }
-    
+
 }

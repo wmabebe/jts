@@ -1,7 +1,7 @@
 package ch.bfh.ti.jts.utils;
 
 public class Helpers {
-    
+
     /**
      * Make sure a value is in between the specified bounds.
      *
@@ -21,7 +21,7 @@ public class Helpers {
         }
         return value;
     }
-    
+
     /**
      * @see Helpers#clamp(double, double, double)
      */

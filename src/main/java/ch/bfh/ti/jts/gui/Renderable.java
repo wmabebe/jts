@@ -12,35 +12,35 @@ import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
 
 public interface Renderable {
-    
+
     /**
      * Known classes to layer mappings
      */
     static Map<Class<?>, Integer> KNOWN_CLASSES = new HashMap<Class<?>, Integer>() {
-                                                    
-                                                    private static final long serialVersionUID = 1L;
-                                                    
-                                                    {
-                                                        put(Agent.class, 4);
-                                                        put(Lane.class, 3);
-                                                        put(Edge.class, 2);
-                                                        put(Junction.class, 1);
-                                                        put(Net.class, 0);
-                                                    }
-                                                };
-    
+
+        private static final long serialVersionUID = 1L;
+
+        {
+            put(Agent.class, 4);
+            put(Lane.class, 3);
+            put(Edge.class, 2);
+            put(Junction.class, 1);
+            put(Net.class, 0);
+        }
+    };
+
     /**
      * The rendering layer of the object. 0: Background 1: First layer
      *
      * @return the layer
      */
     default int getRenderLayer() {
-        if (!KNOWN_CLASSES.containsKey(this.getClass())) {
-            throw new AssertionError("invalid layer", new IndexOutOfBoundsException(this.getClass() + " is not a known class"));
+        if (!KNOWN_CLASSES.containsKey(getClass())) {
+            throw new AssertionError("invalid layer", new IndexOutOfBoundsException(getClass() + " is not a known class"));
         }
         return KNOWN_CLASSES.get(getClass());
     }
-    
+
     /**
      * Render the implementing object.
      *
@@ -48,7 +48,7 @@ public interface Renderable {
      *            the object to render with.
      */
     void render(final Graphics2D g);
-    
+
     /**
      * Render the implementing object.
      *
@@ -58,7 +58,7 @@ public interface Renderable {
      *            the history of the simulation. Key:= relative distance in time
      *            from current newest @{link Net} [s]. Value:=@{link Net}
      */
-    default void render(final Graphics2D g, NavigableMap<Double, Net> simulationHistory) {
+    default void render(final Graphics2D g, final NavigableMap<Double, Net> simulationHistory) {
         render(g);
     }
 }

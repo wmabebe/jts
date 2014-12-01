@@ -21,7 +21,7 @@ import ch.bfh.ti.jts.gui.data.PolyShape;
 import ch.bfh.ti.jts.simulation.Simulatable;
 
 public class Lane extends Element implements SpawnLocation, Simulatable, Renderable {
-    
+
     private static final long                      serialVersionUID = 1L;
     private final Edge                             edge;
     private final int                              index;
@@ -36,12 +36,12 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
      * Agents on line. Key: RelativePosition, Value: List of @{link Agent}s
      */
     private final NavigableMap<Double, Set<Agent>> laneAgents;
-    
+
     /**
      * Agents which have reached the end of the lane.
      */
     final Set<Agent>                               edgeLeaveCandidates;
-    
+
     public Lane(final String name, final Edge edge, final int index, final double speed, final double length, final PolyShape polyShape) {
         super(name);
         if (edge == null) {
@@ -60,44 +60,17 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         laneAgents = new TreeMap<>();
         edgeLeaveCandidates = new HashSet<>();
     }
-    
-    /**
-     * Gets a flat collection of all agents on this lane in ascending order.
-     * 
-     * @return all agents on the lane
-     */
-    public Collection<Agent> getAgentsInOrder() {
-        Collection<Agent> list = new LinkedList<>();
-        for (Set<Agent> agents : laneAgents.values()) {
-            for (Agent agent : agents) {
-                list.add(agent);
-            }
+
+    public void addEdgeLeaveCandidate(final Agent agent) {
+        if (agent == null) {
+            throw new IllegalArgumentException("agent");
         }
-        return list;
+        edgeLeaveCandidates.add(agent);
     }
-    
-    public boolean comesFrom(final Junction junction) {
-        return getEdge().getStart() == junction;
-    }
-    
-    /**
-     * Gets the relative position on this lane from an absolute position in
-     * meters.
-     * 
-     * @param absolutePosition
-     *            absolute position in meters on this lane
-     * @return relative position
-     */
-    public double getRelativePosition(double absolutePosition) {
-        if (absolutePosition < 0 || absolutePosition > getLength()) {
-            throw new IllegalArgumentException("absolutePosition out of bounds");
-        }
-        return absolutePosition / getLength();
-    }
-    
+
     /**
      * Add a agent to the list of agents on this list.
-     * 
+     *
      * @param agent
      *            the agent to add
      */
@@ -111,104 +84,32 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
             agentsAtPosition = new HashSet<>();
             laneAgents.put(agent.getRelativePositionOnLane(), agentsAtPosition);
         }
-        agentsAtPosition.add(agent);        
+        agentsAtPosition.add(agent);
     }
-    
-    public void addEdgeLeaveCandidate(final Agent agent) {
-        if (agent == null) {
-            throw new IllegalArgumentException("agent");
-        }
-        edgeLeaveCandidates.add(agent);
+
+    public boolean comesFrom(final Junction junction) {
+        return getEdge().getStart() == junction;
     }
-    
+
     /**
-     * Remove agent from this lane
-     * 
-     * @param agent
-     *            agent to remove
+     * Gets a flat collection of all agents on this lane in ascending order.
+     *
+     * @return all agents on the lane
      */
-    public void removeLaneAgent(final Agent agent) {
-        if (agent == null) {
-            throw new IllegalArgumentException("agent");
-        }
-        Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePositionOnLane());
-        if (agentsAtPosition != null) {
-            agentsAtPosition.remove(agent);
-        }
-        
-    }
-    
-    public void removeEdgeLeaveCandidate(final Agent agent) {
-        if (agent == null || !edgeLeaveCandidates.contains(agent)) {
-            throw new IllegalArgumentException("agent");
-        }
-        edgeLeaveCandidates.remove(agent);
-    }
-    
-    /**
-     * Returns the next agents on line.
-     * 
-     * @param relativePosition
-     *            the relative position on this lane
-     * @return the next @{link Agent} on line, empty set if there is none.
-     */
-    public Set<Agent> getNextAgentsOnLine(final double relativePosition) {
-        if (relativePosition < 0 || relativePosition > 1.0) {
-            throw new IllegalArgumentException("relative position invalid: " + relativePosition);
-        }
-        Entry<Double, Set<Agent>> nextAgentsEntry = laneAgents.higherEntry(relativePosition);
-        Set<Agent> nextAgents = new HashSet<>();
-        if (nextAgentsEntry != null) {
-            nextAgents = nextAgentsEntry.getValue();
-        }
-        return nextAgents;
-    }
-    
-    /**
-     * Returns the next agents on line in front of a agent on the same lane.
-     * 
-     * @param agent
-     *            an agent on the same lane
-     * @return the next @{link Agent} on line, empty set if there is none.
-     */
-    public Set<Agent> getNextAgentsOnLine(final Agent agent) {
-        if (agent == null) {
-            throw new IllegalArgumentException("agent is null");
-        }
-        if (agent.getLane() != this) {
-            throw new IllegalArgumentException("agent is not on this lane");
-        }
-        return getNextAgentsOnLine(agent.getRelativePositionOnLane());
-    }
-    
-    public Map<Agent, Optional<Lane>> getLaneChangeCandidates() {
-        final Map<Agent, Optional<Lane>> changeAgents = new ConcurrentHashMap<>();
-        final Set<Agent> laneChangeCandidates = new HashSet<>();
-        // TODO: this as stream
-        for (Set<Agent> agents : laneAgents.values()) {
-            for (Agent agent : agents) {
-                if (agent.isLaneChangeCandidate()) {
-                    laneChangeCandidates.add(agent);
-                }
-                
+    public Collection<Agent> getAgentsInOrder() {
+        final Collection<Agent> list = new LinkedList<>();
+        for (final Set<Agent> agents : laneAgents.values()) {
+            for (final Agent agent : agents) {
+                list.add(agent);
             }
-            
         }
-        laneChangeCandidates.forEach(agent -> {
-            switch (agent.getDecision().getLaneChangeDirection()) {
-                case RIGHT :
-                    changeAgents.put(agent, getRightLane());
-                break;
-                case LEFT :
-                    changeAgents.put(agent, getLeftLane());
-                break;
-                default :
-                    throw new IllegalAccessError("lane change direction");
-            }
-        });
-        return changeAgents;
+        return list;
     }
-    
+
+    public Edge getEdge() {
+        return edge;
+    }
+
     public Map<Agent, Lane> getEdgeLeaveCandidates() {
         final Map<Agent, Lane> edgeLeaveAgents = new HashMap<>();
         for (final Agent agent : edgeLeaveCandidates) {
@@ -222,43 +123,147 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         }
         return edgeLeaveAgents;
     }
-    
-    public Edge getEdge() {
-        return edge;
-    }
-    
+
     public int getIndex() {
         return index;
     }
-    
+
+    public Map<Agent, Optional<Lane>> getLaneChangeCandidates() {
+        final Map<Agent, Optional<Lane>> changeAgents = new ConcurrentHashMap<>();
+        final Set<Agent> laneChangeCandidates = new HashSet<>();
+        // TODO: this as stream
+        for (final Set<Agent> agents : laneAgents.values()) {
+            for (final Agent agent : agents) {
+                if (agent.isLaneChangeCandidate()) {
+                    laneChangeCandidates.add(agent);
+                }
+
+            }
+
+        }
+        laneChangeCandidates.forEach(agent -> {
+            switch (agent.getDecision().getLaneChangeDirection()) {
+                case RIGHT :
+                    changeAgents.put(agent, getRightLane());
+                    break;
+                case LEFT :
+                    changeAgents.put(agent, getLeftLane());
+                    break;
+                default :
+                    throw new IllegalAccessError("lane change direction");
+            }
+        });
+        return changeAgents;
+    }
+
     public Collection<Lane> getLanes() {
         return lanes;
     }
-    
+
     public Optional<Lane> getLeftLane() {
         return getEdge().getLanes().stream().filter(x -> x.index == index + 1).findAny();
     }
-    
-    public Optional<Lane> getRightLane() {
-        return getEdge().getLanes().stream().filter(x -> x.index == index - 1).findAny();
-    }
-    
+
     public double getLength() {
         return length;
     }
-    
+
+    /**
+     * Returns the next agents on line in front of a agent on the same lane.
+     *
+     * @param agent
+     *            an agent on the same lane
+     * @return the next @{link Agent} on line, empty set if there is none.
+     */
+    public Set<Agent> getNextAgentsOnLine(final Agent agent) {
+        if (agent == null) {
+            throw new IllegalArgumentException("agent is null");
+        }
+        if (agent.getLane() != this) {
+            throw new IllegalArgumentException("agent is not on this lane");
+        }
+        return getNextAgentsOnLine(agent.getRelativePositionOnLane());
+    }
+
+    /**
+     * Returns the next agents on line.
+     *
+     * @param relativePosition
+     *            the relative position on this lane
+     * @return the next @{link Agent} on line, empty set if there is none.
+     */
+    public Set<Agent> getNextAgentsOnLine(final double relativePosition) {
+        if (relativePosition < 0 || relativePosition > 1.0) {
+            throw new IllegalArgumentException("relative position invalid: " + relativePosition);
+        }
+        final Entry<Double, Set<Agent>> nextAgentsEntry = laneAgents.higherEntry(relativePosition);
+        Set<Agent> nextAgents = new HashSet<>();
+        if (nextAgentsEntry != null) {
+            nextAgents = nextAgentsEntry.getValue();
+        }
+        return nextAgents;
+    }
+
     public PolyShape getPolyShape() {
         return polyShape;
     }
-    
+
+    /**
+     * Gets the relative position on this lane from an absolute position in
+     * meters.
+     *
+     * @param absolutePosition
+     *            absolute position in meters on this lane
+     * @return relative position
+     */
+    public double getRelativePosition(final double absolutePosition) {
+        if (absolutePosition < 0 || absolutePosition > getLength()) {
+            throw new IllegalArgumentException("absolutePosition out of bounds");
+        }
+        return absolutePosition / getLength();
+    }
+
+    public Optional<Lane> getRightLane() {
+        return getEdge().getLanes().stream().filter(x -> x.index == index - 1).findAny();
+    }
+
+    @Override
+    public Lane getSpawnLane() {
+        return this;
+    }
+
     public double getSpeed() {
         return speed;
     }
-    
+
     public boolean goesTo(final Junction junction) {
         return getEdge().getEnd() == junction;
     }
-    
+
+    public void removeEdgeLeaveCandidate(final Agent agent) {
+        if (agent == null || !edgeLeaveCandidates.contains(agent)) {
+            throw new IllegalArgumentException("agent");
+        }
+        edgeLeaveCandidates.remove(agent);
+    }
+
+    /**
+     * Remove agent from this lane
+     *
+     * @param agent
+     *            agent to remove
+     */
+    public void removeLaneAgent(final Agent agent) {
+        if (agent == null) {
+            throw new IllegalArgumentException("agent");
+        }
+        final Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePositionOnLane());
+        if (agentsAtPosition != null) {
+            agentsAtPosition.remove(agent);
+        }
+
+    }
+
     @Override
     public void render(final Graphics2D g) {
         g.setStroke(new BasicStroke(4));
@@ -268,7 +273,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         g.setColor(Color.BLACK);
         g.draw(polyShape.getShape());
     }
-    
+
     @Override
     public void simulate(final double duration) {
         final NavigableMap<Double, Set<Agent>> oldAgents = new TreeMap<>(laneAgents);
@@ -299,10 +304,5 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
                 }
             }
         }
-    }
-
-    @Override
-    public Lane getSpawnLane() {
-        return this;
     }
 }

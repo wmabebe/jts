@@ -12,16 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import ch.bfh.ti.jts.data.Net;
 
 public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdge<E, V>> {
-    
-    @SuppressWarnings("unused")
-    private final Net                                                 net;
+
     private final List<V>                                             vertices = new LinkedList<>();
     private final List<E>                                             edges    = new LinkedList<>();
     private final ConcurrentHashMap<V, ConcurrentHashMap<V, List<V>>> routes   = new ConcurrentHashMap<>();
-    
+
     @SuppressWarnings("unchecked")
     public GPS(final Net net) {
-        this.net = net;
         // extract all edges and vertices
         net.getElementStream().forEach(x -> {
             if (DirectedGraphVertex.class.isInstance(x)) {
@@ -46,16 +43,7 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
             routes.put(start, destinations);
         });
     }
-    
-    public Optional<E> getNextEdge(V from, V to) {
-        Optional<E> edgeBetween = Optional.empty();
-        final List<V> path = routes.get(from).get(to);
-        if (path.size() > 0) {
-            edgeBetween = from.getEdgeBetween(path.get(0));
-        }
-        return edgeBetween;
-    }
-    
+
     /**
      * Dijekstra algorithm. TODO: implement faster with priority queue
      *
@@ -93,8 +81,8 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
             q.remove(u);
             // update all reachable vertices
             u.getReachableVertices().stream().filter(v -> q.contains(v)).forEach(v -> {
-                double vDist = dist.get(v);
-                Optional<E> edgeBetween = u.getEdgeBetween(v);
+                final double vDist = dist.get(v);
+                final Optional<E> edgeBetween = u.getEdgeBetween(v);
                 double alt = uDistance;
                 if (edgeBetween.isPresent()) {
                     alt += edgeBetween.get().getWeight();
@@ -107,5 +95,14 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
         }
         return previous;
     }
-    
+
+    public Optional<E> getNextEdge(final V from, final V to) {
+        Optional<E> edgeBetween = Optional.empty();
+        final List<V> path = routes.get(from).get(to);
+        if (path.size() > 0) {
+            edgeBetween = from.getEdgeBetween(path.get(0));
+        }
+        return edgeBetween;
+    }
+
 }

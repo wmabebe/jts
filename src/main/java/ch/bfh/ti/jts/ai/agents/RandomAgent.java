@@ -16,13 +16,13 @@ import ch.bfh.ti.jts.data.Lane;
  * @author ente
  */
 public class RandomAgent extends Agent {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     public RandomAgent() {
         super();
     }
-    
+
     @Override
     public void think() {
         getDecision().setAcceleration(ThreadLocalRandom.current().nextDouble() * (getVehicle().getMaxAcceleration() - getVehicle().getMinAcceleration()) + getVehicle().getMinAcceleration());

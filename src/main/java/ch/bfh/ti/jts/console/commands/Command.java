@@ -6,7 +6,7 @@ package ch.bfh.ti.jts.console.commands;
  * @author Mathias
  */
 public interface Command {
-    
+
     /**
      * Executes the command.
      *
@@ -15,19 +15,19 @@ public interface Command {
      * @return console output
      */
     String execute(Object executor);
-    
+
     /**
      * Gets the name of the command.
      *
      * @return name of the command
      */
     String getName();
-    
+
     /**
      * The type of classes for which this command is intended
      *
      * @return
      */
     Class<?> getTargetType();
-    
+
 }

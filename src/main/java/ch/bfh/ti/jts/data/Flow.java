@@ -1,41 +1,41 @@
 package ch.bfh.ti.jts.data;
 
 public class Flow extends SpawnInfo {
-    
+
     private static final long serialVersionUID = 1L;
-    
-    private double            frequency;
+
+    private final double      frequency;
     private int               count;
-    
-    public Flow(Vehicle vehicle, Junction start, Junction end, double departureSpeed, double arrivalSpeed, double frequency) {
+
+    public Flow(final Vehicle vehicle, final Junction start, final Junction end, final double departureSpeed, final double arrivalSpeed, final double frequency) {
         super(vehicle, start, end, 0.0, 0.0, departureSpeed, 0.0, arrivalSpeed);
         this.frequency = frequency;
     }
-    
-    public Junction getRouteStart() {
-        SpawnLocation start = getStart();
-        if (start instanceof Junction) {
-            return (Junction) start;
-        }
-        return null;
+
+    public double getFrequency() {
+        return frequency;
     }
-    
+
     public Junction getRouteEnd() {
-        SpawnLocation end = getEnd();
+        final SpawnLocation end = getEnd();
         if (end instanceof Junction) {
             return (Junction) end;
         }
         return null;
     }
-    
-    public double getFrequency() {
-        return frequency;
+
+    public Junction getRouteStart() {
+        final SpawnLocation start = getStart();
+        if (start instanceof Junction) {
+            return (Junction) start;
+        }
+        return null;
     }
-    
-    public boolean isSpawn(double time) {
+
+    public boolean isSpawn(final double time) {
         assert time >= 0;
-        
-        if ((double) count / time < frequency) {
+
+        if (count / time < frequency) {
             count++;
             return true;
         }

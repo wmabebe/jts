@@ -18,11 +18,11 @@ import ch.bfh.ti.jts.data.SpawnInfo;
 import ch.bfh.ti.jts.data.Vehicle;
 
 public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
-    
+
     private final Map<String, Vehicle> vehicles = new LinkedHashMap<String, Vehicle>();
     private Net                        net;
     private Collection<SpawnInfo>      routes;
-    
+
     @Override
     protected Collection<SpawnInfo> extractData(final Document document) {
         routes = new LinkedList<SpawnInfo>();
@@ -37,11 +37,33 @@ public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
             } else if (node.getNodeName().equals("flow")) {
                 extractFlow(node);
             }
-            
+
         }
         return routes;
     }
-    
+
+    private void extractFlow(final Node node) {
+        if (node == null) {
+            throw new IllegalArgumentException("node is null");
+        }
+        final String type = getAttribute(node, "type", String.class);
+        final double departureSpeed = getAttribute(node, "departSpeed", Double.class);
+        final double arrivalSpeed = getAttribute(node, "arrivalSpeed", Double.class);
+        final double frequency = getAttribute(node, "frequency", Double.class);
+        final Vehicle vehicle = vehicles.get(type);
+        final String routeEdges = extractRouteJunctions(node);
+        final String[] edges = routeEdges.split(" ");
+        if (edges.length < 2) {
+            throw new IllegalArgumentException("illegal format of attribute edges in node route");
+        }
+        final String edgeIdStart = edges[0];
+        final String edgeIdEnd = edges[edges.length - 1];
+        final Junction routeStart = (Junction) net.getElementStream(Junction.class).filter(x -> x.getName().equals(edgeIdStart)).findFirst().orElse(null);
+        final Junction routeEnd = (Junction) net.getElementStream(Junction.class).filter(x -> x.getName().equals(edgeIdEnd)).findFirst().orElse(null);
+        final SpawnInfo route = new Flow(vehicle, routeStart, routeEnd, departureSpeed, arrivalSpeed, frequency);
+        routes.add(route);
+    }
+
     private String extractRouteEdges(final Node node) {
         if (node == null) {
             throw new IllegalArgumentException("node is null");
@@ -56,7 +78,7 @@ public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
         }
         return routeEdges;
     }
-    
+
     private String extractRouteJunctions(final Node node) {
         if (node == null) {
             throw new IllegalArgumentException("node is null");
@@ -70,8 +92,8 @@ public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
             }
         }
         return routeEdges;
-    }    
-    
+    }
+
     private void extractVecicle(final Node node) {
         if (node == null) {
             throw new IllegalArgumentException("node is null");
@@ -95,29 +117,7 @@ public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
         final SpawnInfo route = new Route(vehicle, routeStart, routeEnd, departureTime, departurePos, departureSpeed, arrivalPos, arrivalSpeed);
         routes.add(route);
     }
-    
-    private void extractFlow(final Node node) {
-        if (node == null) {
-            throw new IllegalArgumentException("node is null");
-        }
-        final String type = getAttribute(node, "type", String.class);
-        final double departureSpeed = getAttribute(node, "departSpeed", Double.class);
-        final double arrivalSpeed = getAttribute(node, "arrivalSpeed", Double.class);
-        final double frequency = getAttribute(node, "frequency", Double.class);
-        final Vehicle vehicle = vehicles.get(type);
-        final String routeEdges = extractRouteJunctions(node);
-        final String[] edges = routeEdges.split(" ");
-        if (edges.length < 2) {
-            throw new IllegalArgumentException("illegal format of attribute edges in node route");
-        }
-        final String edgeIdStart = edges[0];
-        final String edgeIdEnd = edges[edges.length - 1];
-        final Junction routeStart = (Junction) net.getElementStream(Junction.class).filter(x -> x.getName().equals(edgeIdStart)).findFirst().orElse(null);
-        final Junction routeEnd = (Junction) net.getElementStream(Junction.class).filter(x -> x.getName().equals(edgeIdEnd)).findFirst().orElse(null);
-        final SpawnInfo route = new Flow(vehicle, routeStart, routeEnd, departureSpeed, arrivalSpeed, frequency);
-        routes.add(route);
-    }
-    
+
     private void extractVecicleType(final Node node) {
         if (node == null) {
             throw new IllegalArgumentException("node is null");
@@ -131,7 +131,7 @@ public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
         final Vehicle vehicle = new Vehicle(-decel, accel, 0, maxSpeed, length, agent);
         vehicles.put(id, vehicle);
     }
-    
+
     public void setNet(final Net net) {
         this.net = net;
     }

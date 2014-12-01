@@ -13,48 +13,48 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 
 public class JtsConsole extends BasicConsole {
-    
+
     public class MainParams {
-        
+
         @Parameter(names = { "-help", "-h" }, description = "Help")
         private final boolean help = false;
     }
-    
+
     private JCommander                jc;
     private final MainParams          mainParams = new MainParams();
     private final Collection<Command> commands   = new LinkedList<>();
-    
+
     private JCommander buildCommander() {
-        
+
         final JCommander jcommander = new JCommander(mainParams);
-        
+
         // TODO: do this with reflection?
         commands.clear();
         commands.add(new TimeCommand());
         commands.add(new SpawnCommand());
         commands.add(new RestartCommand());
-        
+
         commands.forEach(command -> {
             final String name = command.getName();
             jcommander.addCommand(name, command);
         });
-        
+
         return jcommander;
     }
-    
+
     private void execute(final Command command) {
         getSimulation().addCommand(command);
     }
-    
+
     @Override
     protected void parseCommand(final String line) {
         if (line != null && !"".equals(line)) {
             try {
                 final String[] args = line.split(" ");
-                
+
                 jc = buildCommander();
                 jc.parse(args);
-                
+
                 final String commandName = jc.getParsedCommand();
                 if (commandName != null) {
                     final Command command = commands.stream().filter(x -> x.getName().equals(commandName)).findFirst().orElse(null);
@@ -69,7 +69,7 @@ public class JtsConsole extends BasicConsole {
                         write(sb.toString());
                     }
                 }
-                
+
             } catch (final ParameterException ex) {
                 write(ex.getMessage());
                 ex.printStackTrace();

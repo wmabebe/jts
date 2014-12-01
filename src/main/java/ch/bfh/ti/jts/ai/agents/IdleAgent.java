@@ -3,13 +3,13 @@ package ch.bfh.ti.jts.ai.agents;
 import ch.bfh.ti.jts.ai.Decision;
 
 public class IdleAgent extends RandomAgent {
-    
+
+    private static final long serialVersionUID = 1L;
+
     public IdleAgent() {
         super();
     }
-    
-    private static final long serialVersionUID = 1L;
-    
+
     @Override
     public void think() {
         super.think();

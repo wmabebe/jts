@@ -18,7 +18,7 @@ import java.io.ObjectOutputStream;
  * @author ente
  */
 public class DeepCopy {
-    
+
     /**
      * Returns a copy of the object, or null if the object cannot be serialized.
      *

@@ -14,7 +14,7 @@ import ch.bfh.ti.jts.utils.Helpers;
 import ch.bfh.ti.jts.utils.graph.DirectedGraphEdge;
 
 public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Edge, Junction>, Simulatable, Renderable {
-    
+
     private static final long      serialVersionUID = 1L;
     private final Junction         start;
     private final Junction         end;
@@ -23,7 +23,7 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
      */
     private final int              priority;
     private final Collection<Lane> lanes;
-    
+
     public Edge(final String name, final Junction start, final Junction end, final int priority) {
         super(name);
         if (start == null) {
@@ -39,24 +39,46 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
         this.priority = Helpers.clamp(priority, 1, Integer.MAX_VALUE);
         lanes = new LinkedList<Lane>();
     }
-    
+
+    public void addLane(final Lane lane) {
+        lanes.add(lane);
+    }
+
+    public Map<Agent, Lane> getEdgeSwitchCandidates() {
+        final Map<Agent, Lane> switchAgents = new ConcurrentHashMap<>();
+        lanes.forEach(lane -> {
+            switchAgents.putAll(lane.getEdgeLeaveCandidates());
+        });
+        return switchAgents;
+    }
+
     @Override
     public Junction getEnd() {
         return end;
     }
-    
+
     public Lane getFirstLane() {
         return getLanes().stream().sequential().findFirst().orElse(null);
     }
-    
+
     public Collection<Lane> getLanes() {
         return lanes;
     }
-    
-    public void addLane(final Lane lane) {
-        lanes.add(lane);
+
+    public int getPriority() {
+        return priority;
     }
-    
+
+    @Override
+    public Lane getSpawnLane() {
+        return getFirstLane();
+    }
+
+    @Override
+    public Junction getStart() {
+        return start;
+    }
+
     @Override
     public double getWeight() {
         double maxLenght = Double.POSITIVE_INFINITY;
@@ -68,53 +90,31 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
         }
         return maxLenght / getPriority();
     }
-    
-    public int getPriority() {
-        return priority;
-    }
-    
-    @Override
-    public Junction getStart() {
-        return start;
-    }
-    
+
     @Override
     public void render(final Graphics2D g) {
         // do nothing
     }
-    
-    public Map<Agent, Lane> getEdgeSwitchCandidates() {
-        final Map<Agent, Lane> switchAgents = new ConcurrentHashMap<>();
-        lanes.forEach(lane -> {
-            switchAgents.putAll(lane.getEdgeLeaveCandidates());
-        });
-        return switchAgents;
-    }
-    
+
     @Override
     public void simulate(final double duration) {
         // do lane switching
         getLanes().forEach(lane -> {
             lane.getLaneChangeCandidates().forEach((agent, changeLane) -> {
                 try {
+                    // lane switch possible?
                     if (changeLane.isPresent()) {
-                        // lane switch
-                    agent.setLane(changeLane.get());
-                    changeLane.get().addLaneAgent(agent);
-                    lane.removeLaneAgent(agent);
-                } else {
-                    // despawn
-                    agent.remove();
+                        agent.setLane(changeLane.get());
+                        changeLane.get().addLaneAgent(agent);
+                        lane.removeLaneAgent(agent);
+                    } else {
+                        // despawn
+                        agent.remove();
+                    }
+                } catch (final Exception e) {
+                    Logger.getLogger(Edge.class.getName()).info("Agent cannot swith lane");
                 }
-            } catch (Exception e) {
-                Logger.getLogger(Edge.class.getName()).info("Agent cannot swith lane");
-            }
-        }   );
+            });
         });
-    }
-    
-    @Override
-    public Lane getSpawnLane() {
-        return getFirstLane();
     }
 }

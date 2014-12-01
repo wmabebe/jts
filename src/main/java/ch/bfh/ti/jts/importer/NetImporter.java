@@ -17,14 +17,14 @@ import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 
 public class NetImporter extends Importer<Net> {
-    
+
     private Net                         net;
     private final Collection<Node>      edgesNodes      = new LinkedList<Node>();
     private final Collection<Node>      connectionNodes = new LinkedList<Node>();
     private final Map<String, Junction> junctions       = new LinkedHashMap<String, Junction>();
     private final Map<String, Edge>     edges           = new LinkedHashMap<String, Edge>();
     private final Map<String, Lane>     lanes           = new LinkedHashMap<String, Lane>();
-    
+
     private void extractConnection(final Node node) {
         if (node == null) {
             throw new IllegalArgumentException("node is null");
@@ -35,9 +35,9 @@ public class NetImporter extends Importer<Net> {
         final String toLane = getAttribute(node, "toLane", String.class);
         final Lane laneFrom = lanes.get(String.format("%s_%s", from, fromLane));
         final Lane laneTo = lanes.get(String.format("%s_%s", to, toLane));
-        laneFrom.getLanes().add(laneTo);      
+        laneFrom.getLanes().add(laneTo);
     }
-    
+
     @Override
     protected Net extractData(final Document document) {
         net = new Net();
@@ -67,7 +67,7 @@ public class NetImporter extends Importer<Net> {
         }
         return net;
     }
-    
+
     private void extractEdge(final Node node) {
         if (node == null) {
             throw new IllegalArgumentException("node is null");
@@ -89,7 +89,7 @@ public class NetImporter extends Importer<Net> {
             }
         }
     }
-    
+
     private void extractJunction(final Node node) {
         if (node == null) {
             throw new IllegalArgumentException("node is null");
@@ -103,7 +103,7 @@ public class NetImporter extends Importer<Net> {
         junctions.put(id, junction);
         net.addElement(junction);
     }
-    
+
     private void extractLane(final Node node, final Edge edge) {
         if (node == null) {
             throw new IllegalArgumentException("node is null");
@@ -117,7 +117,7 @@ public class NetImporter extends Importer<Net> {
         net.addElement(lane);
         lanes.put(id, lane);
     }
-    
+
     private void extractLocation(final Node node) {
     }
 }

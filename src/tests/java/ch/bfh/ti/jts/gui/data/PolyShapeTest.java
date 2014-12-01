@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.Test;
 
 public class PolyShapeTest {
-    
+
     @Test
     public void constructor() {
         // length: 363.83
@@ -26,7 +26,7 @@ public class PolyShapeTest {
         assertEquals(ps.getStartPoint(), points.get(0));
         assertEquals(ps.getEndPoint(), points.get(2));
     }
-    
+
     @Test
     public void getLengthMorePoints() {
         final List<Point2D> points = new LinkedList<Point2D>();
@@ -36,7 +36,7 @@ public class PolyShapeTest {
         final PolyShape ps = new PolyShape(points);
         assertTrue(ps.getLength() == 20.0);
     }
-    
+
     @Test
     public void getLengthTwoPoints() {
         final List<Point2D> points = new LinkedList<Point2D>();
@@ -45,7 +45,7 @@ public class PolyShapeTest {
         final PolyShape ps = new PolyShape(points);
         assertTrue(ps.getLength() == 10.0);
     }
-    
+
     @Test
     public void getOrientation() {
         // angle: 0
@@ -79,7 +79,7 @@ public class PolyShapeTest {
         ps = new PolyShape(points);
         assertTrue(ps.getRelativeOrientation(0.5) == -Math.PI / 2);
     }
-    
+
     @Test
     public void getRelativePosition() {
         final List<Point2D> points = new LinkedList<Point2D>();

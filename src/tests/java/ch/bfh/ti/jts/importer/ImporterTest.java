@@ -8,7 +8,7 @@ import org.junit.Test;
 import ch.bfh.ti.jts.data.Net;
 
 public class ImporterTest {
-    
+
     @Test
     public void testImport() {
         try {
