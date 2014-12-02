@@ -16,48 +16,42 @@ import ch.bfh.ti.jts.utils.layers.Layers;
  * @author ente
  */
 public class Simulation {
-
+    
     /**
-     * Factor by which the simulation should take place. 1 means real time
-     * speed.
-     */
-    private final static double  TIME_FACTOR              = 1;
-
-    /**
-     * The duration of one simulation step in seconds. INFO: static here because
-     * agent is missing a reference to the simulation object.
+     * The 'virtual' duration of one simulation step in seconds. INFO: static
+     * here because agent is missing a reference to the simulation object.
      */
     public final static double   SIMULATION_STEP_DURATION = 0.25;
-
+    
     /**
      * Commands the simulation should execute.
      */
     private final Queue<Command> commands                 = new ConcurrentLinkedQueue<>();
-
+    
     private Console              console;
-
+    
     /**
      * If the simulation should call the think method of each agent in every
      * step. If false, the simulation is "dumb" and does only the basic physics
      * (for example the gui thread).
      */
     private final boolean        doThink;
-
+    
     private App                  app;
-
+    
     public Simulation(final App app) {
         this(true);
         this.app = app;
     }
-
+    
     public Simulation(final boolean doThink) {
         this.doThink = doThink;
     }
-
+    
     public void addCommand(final Command command) {
         commands.add(command);
     }
-
+    
     private void executeCommands(final Net simulateNet) {
         while (commands.size() > 0) {
             final Command command = commands.poll();
@@ -73,38 +67,47 @@ public class Simulation {
             }
         }
     }
-
+    
     public Console getConsole() {
         return console;
     }
-
+    
     public void restart() {
         app.restart();
     }
-
+    
     public void setConsole(final Console console) {
         this.console = console;
     }
-
+    
     /**
      * Do a simulation step
+     * 
+     * @param simulateNet
+     *            for this net
+     * @param duration
+     *            for this duration [s]
      */
-    public void tick(final Net simulateNet) {
-        // Time that has passed since the last simulation step [s].
-        final double timeDelta = simulateNet.tick() * TIME_FACTOR;
-
+    public void tick(final Net simulateNet, final double duration) {
+        if (duration < 0) {
+            throw new IllegalArgumentException("duration");
+        }
+        if (simulateNet == null) {
+            throw new IllegalArgumentException("simulateNet");
+        }
+        
         // execute all queued commands
         executeCommands(simulateNet);
-
+        
         // simulate
         // delegate simulation to @{link Simulatable}s
         final Layers<Simulatable> simulatables = simulateNet.getSimulatable();
         for (final int layer : simulatables.getLayersIterator()) {
             simulatables.getLayerStream(layer).parallel().forEach(e -> {
-                e.simulate(timeDelta);
+                e.simulate(duration);
             });
         }
-
+        
         if (doThink) {
             // think
             simulateNet.getThinkableStream().forEach(e -> {

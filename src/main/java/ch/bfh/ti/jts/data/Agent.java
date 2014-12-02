@@ -215,10 +215,10 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     }
 
     @Override
-    public void render(final Graphics2D g, final NavigableMap<Double, Net> simulationHistory) {
-        simulationHistory.ceilingEntry(CHANGE_LINE_ANIMATION_DURATION);
-        simulationHistory.headMap(CHANGE_LINE_ANIMATION_DURATION).values().stream().map(oldNet -> {
-            return new Element.ElementInTime(oldNet.getTimeTotal(), oldNet.getElement(getId()));
+    public void render(final Graphics2D g, final NavigableMap<Double, Net> simulationStates) {
+        simulationStates.ceilingEntry(CHANGE_LINE_ANIMATION_DURATION);
+        simulationStates.headMap(CHANGE_LINE_ANIMATION_DURATION).values().stream().map(oldNet -> {
+            return new Element.ElementInTime(oldNet.getSimulationTime(), oldNet.getElement(getId()));
 
         }).filter(oldAgentInTime -> {
             final Agent oldAgent = (Agent) oldAgentInTime.getElement();
@@ -231,7 +231,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
                 }).sorted();
         // TODO: finish
 
-        Renderable.super.render(g, simulationHistory);
+        Renderable.super.render(g, simulationStates);
     }
 
     public void setAcceleration(final double acceleration) {

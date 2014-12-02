@@ -37,7 +37,7 @@ public class SpawnCommand implements Command {
             final Edge routeStart = (Edge) edges.get(ThreadLocalRandom.current().nextInt(edges.size()));
             final Edge routeEnd = (Edge) edges.get(ThreadLocalRandom.current().nextInt(edges.size()));
             final double position = ThreadLocalRandom.current().nextDouble();
-            final double departureTime = net.getTimeTotal();
+            final double departureTime = net.getSimulationTime();
             final double speed = vehicle.getMaxVelocity();
 
             final SpawnInfo route = new Route(vehicle, routeStart, routeEnd, departureTime, position, speed, 0.0, 0.0);

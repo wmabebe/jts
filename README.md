@@ -60,7 +60,7 @@ Enteee, winki
 Enteee
 * Basic simulator setup [done]
 
-winku
+winki
 * Projekt setup [done]
 * Basic data structure [done]
 * Implement xml importer [done]
@@ -73,7 +73,7 @@ Enteee
   * fill a collection [done]
   * loop through decisions -> simulate every decision (serial) [done, without lane switching]
 
-winku
+winki
 * Spawn agents [done]
 * Dummy AI [done]
 * Move agents [done]
@@ -130,6 +130,7 @@ winki
 
 Enteee
 * Draw fake laneswitch [progress]
+* Extended render interface with simulationStates [done] 
 
 winki
 * Improvement of realistic agent [done]
@@ -137,6 +138,9 @@ winki
 ### Calendar week 48
 
 Enteee
+
+* Fixed interval simulation [done]
+* Dynamic app sleeping [done]
 
 winki
 * Bugfix in lane
@@ -149,6 +153,9 @@ winki
 ### Calendar week 49
 
 Enteee
+* Bugfix time conversion 10E-9 -> 1E-9 for nano [done]
+* Wall clock time in Window introduced [done]
+* Wall clock / simulation time decoupling [done] -> issue lag
 
 winki
 
@@ -170,6 +177,7 @@ winki
 
 * Bugfixes
   * Transcendent agents when collision happend
+  * Simulation lag
 * Agent handling on junctions
 * Area restricted tick method
 * Console can receive parameters from clickable GUI

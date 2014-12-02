@@ -7,7 +7,7 @@ public class TimeCommand implements Command {
     @Override
     public String execute(final Object executor) {
         final Net net = (Net) executor;
-        return String.format("time: %.2f seconds", net.getTimeTotal());
+        return String.format("time: %.2f seconds", net.getSimulationTime());
     }
 
     @Override

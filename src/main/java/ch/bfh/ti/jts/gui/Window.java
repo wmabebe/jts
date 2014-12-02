@@ -19,9 +19,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,35 +37,26 @@ import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
 public class Window {
-
+    
     private class FrameComponentAdapter extends ComponentAdapter {
-
+        
         @Override
         public void componentResized(final ComponentEvent componentEvent) {
             windoww = renderPanel.getWidth();
             windowh = renderPanel.getHeight();
         }
     }
-
+    
     private class RenderPanel extends JPanel {
-
+        
         private static final long serialVersionUID = 1L;
-
+        
         @Override
         public void paintComponent(final Graphics g) {
             final Graphics2D g2d = (Graphics2D) g;
             // simulate parts of the net
-            final Net saveCopyNet = netSaveCopy.get();
-            final ConcurrentSkipListMap<Double, Net> newSimulationHistory = new ConcurrentSkipListMap<>();
-            // remove old nets from history
-            simulationHistory.entrySet().parallelStream().forEach(entry -> {
-                final Net net = entry.getValue();
-                if (net.getTimeTotal() > saveCopyNet.getTimeTotal() - SIMULATION_HISTORY_KEEP_WINDOW) {
-                    newSimulationHistory.put(saveCopyNet.getTimeTotal() - net.getTimeTotal(), net);
-                }
-            });
-            simulationHistory = newSimulationHistory;
-            windowSimulation.tick(saveCopyNet);
+            final Net currentSimulationNet = getCurrentSimulationNet();
+            windowSimulation.tick(currentSimulationNet, getWallClockTime() - currentSimulationNet.getSimulationTime());
             try {
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 8));
@@ -100,19 +92,19 @@ public class Window {
                 // a result all the agents are driving on the wrong side.
                 g2d.transform(AffineTransform.getScaleInstance(1, -1));
                 // render everything
-                final Layers<Renderable> renderables = netSaveCopy.get().getRenderable();
+                final Layers<Renderable> renderables = currentSimulationNet.getRenderable();
                 for (final int layer : renderables.getLayersIterator()) {
                     renderables.getLayerStream(layer).sequential().forEach(e -> {
-                        e.render(g2d, simulationHistory);
+                        e.render(g2d, simulationStates);
                     });
                 }
                 // render console
                 g2d.setTransform(tConsole);
                 console.render(g2d);
-
+                
                 // Let the OS have a little time...
                 Thread.yield();
-
+                
                 // repaint after every step
                 frame.repaint();
             } finally {
@@ -122,35 +114,35 @@ public class Window {
             }
         }
     }
-
+    
     private class RenderPanelKeyAdapter extends KeyAdapter {
-
+        
         @Override
         public void keyPressed(final KeyEvent keyEvent) {
             final int keyCode = keyEvent.getKeyCode();
             keys.add(keyCode);
         }
-
+        
         @Override
         public void keyReleased(final KeyEvent keyEvent) {
             final int keyCode = keyEvent.getKeyCode();
             keys.remove(keyCode);
         }
-
+        
         @Override
         public void keyTyped(final KeyEvent keyEvent) {
             // keyCode is undefinet in this event
             // so we use the character instead
             console.keyTyped(keyEvent.getKeyChar());
         }
-
+        
     }
-
+    
     private class RenderPanelMouseAdapter extends MouseAdapter {
-
+        
         private boolean isDown            = false;
         private Point   mousePressedPoint = new Point();
-
+        
         @Override
         public void mouseDragged(final MouseEvent mouseEvent) {
             if (isDown) {
@@ -160,18 +152,18 @@ public class Window {
                 mousePressedPoint = mouseEvent.getPoint();
             }
         }
-
+        
         @Override
         public void mousePressed(final MouseEvent mouseEvent) {
             mousePressedPoint = mouseEvent.getPoint();
             isDown = true;
         }
-
+        
         @Override
         public void mouseReleased(final MouseEvent mouseEvent) {
             isDown = false;
         }
-
+        
         @Override
         public void mouseWheelMoved(final MouseWheelEvent mouseEvent) {
             final Point mousePoint = mouseEvent.getPoint();
@@ -197,49 +189,52 @@ public class Window {
             }
         }
     }
-
+    
+    /**
+     * A factor which accelerates wallclock time. For faster rendering progress.
+     * 1 := WallclockTime = PhysicalTime
+     */
+    private static final double             WALL_CLOCK_ACCELERATION_FACTOR = 1;
     /**
      * Keep the last {@link Net} for this amount of time in [s];
      */
-    private static final double                SIMULATION_HISTORY_KEEP_WINDOW = 10;
-
+    private static final double             SIMULATION_HISTORY_KEEP_WINDOW = 10;
     /**
      * Zoom delta. Determines how much to change the zoom when scrolling. Also
      * sets the minimum zoom
      */
-    private static final double                ZOOM_DELTA                     = 0.05;
-    private final JFrame                       frame;
-    private final JPanel                       renderPanel;
-    private int                                windoww                        = 1000;
-    private int                                windowh                        = 600;
+    private static final double             ZOOM_DELTA                     = 0.05;
+    private final JFrame                    frame;
+    private final JPanel                    renderPanel;
+    private int                             windoww                        = 1000;
+    private int                             windowh                        = 600;
     /**
      * Offset in x and y direction from (0/0)
      */
-    private final Point2D                      offset                         = new Point2D.Double();
+    private final Point2D                   offset                         = new Point2D.Double();
     /**
      * Zoom factor
      */
-    private double                             zoom                           = 1;
-    private AffineTransform                    t                              = new AffineTransform();
-    private final Point2D                      zoomCenter                     = new Point2D.Double();
-    private final Set<Integer>                 keys                           = new HashSet<Integer>();
-    private final AtomicReference<Net>         netSaveCopy                    = new AtomicReference<Net>();
+    private double                          zoom                           = 1;
+    private AffineTransform                 t                              = new AffineTransform();
+    private final Point2D                   zoomCenter                     = new Point2D.Double();
+    private final Set<Integer>              keys                           = new HashSet<Integer>();
     /**
-     * Simulation history. Whereas Key = time distance from current newest net
+     * Start wallclock time of the simulation [s].
      */
-    private ConcurrentSkipListMap<Double, Net> simulationHistory              = new ConcurrentSkipListMap<>();
-    private final Simulation                   windowSimulation;
-    private final Console                      console;
-
-    public Window(final Net net, final Console console) {
-        if (net == null) {
-            throw new IllegalArgumentException("net is null");
-        }
+    private final double                    startWallClockTime             = System.nanoTime() * 1E-9;
+    /**
+     * Simulation states. Whereas Key = absolute simulation time
+     */
+    private final NavigableMap<Double, Net> simulationStates               = new ConcurrentSkipListMap<>();
+    private final Simulation                windowSimulation;
+    private final Console                   console;
+    
+    public Window(final Console console) {
         if (console == null) {
             throw new IllegalArgumentException("console is null");
         }
         this.console = console;
-        netSaveCopy.set(DeepCopy.copy(net));
         windowSimulation = new Simulation(false); // no ai
         frame = new JFrame();
         frame.setTitle("JavaTrafficSimulator");
@@ -256,15 +251,48 @@ public class Window {
         renderPanel.addMouseWheelListener(renderPanelMouseAdaptor);
         frame.setContentPane(renderPanel);
     }
-
-    public void setNet(final Net net) {
-        netSaveCopy.set(DeepCopy.copy(net));
-        final Net netCopy = DeepCopy.copy(net);
-        simulationHistory.put(0.0, netCopy);
+    
+    /**
+     * Get the wall clock time spent. [s]
+     * 
+     * @return wall clock time spent in [s].
+     */
+    public double getWallClockTime() {
+        return ((System.nanoTime() * 1E-9) - startWallClockTime) * WALL_CLOCK_ACCELERATION_FACTOR;
     }
-
+    
+    public void addNet(final Net net) {
+        final Net netCopy = DeepCopy.copy(net);
+        // remove old nets from history
+        final double simulationStatesWindowMin = getWallClockTime() - SIMULATION_HISTORY_KEEP_WINDOW;
+        simulationStates.headMap(simulationStatesWindowMin).forEach((key, value) -> {
+            simulationStates.remove(key, value);
+        });
+        simulationStates.put(netCopy.getSimulationTime(), netCopy);
+        if (!App.DEBUG) {
+            Logger.getLogger(Window.class.getName()).info("simulationStates.size:" + simulationStates.size());
+        }
+    }
+    
     public void setVisible(final boolean visible) {
         frame.setVisible(visible);
     }
-
+    
+    /**
+     * Get the current net to simulate. This method will block until such a net
+     * is available.
+     * 
+     * @return the net to simulate
+     */
+    private Net getCurrentSimulationNet() {
+        Net returnNet = null;
+        do {
+            final double wallClockTime = getWallClockTime();
+            Entry<Double, Net> entry = simulationStates.floorEntry(wallClockTime);
+            if (entry != null) {
+                returnNet = entry.getValue();
+            }
+        } while (returnNet == null);
+        return returnNet;
+    }
 }

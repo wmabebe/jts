@@ -12,23 +12,23 @@ import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
 
 public interface Renderable {
-
+    
     /**
      * Known classes to layer mappings
      */
     static Map<Class<?>, Integer> KNOWN_CLASSES = new HashMap<Class<?>, Integer>() {
-
-        private static final long serialVersionUID = 1L;
-
-        {
-            put(Agent.class, 4);
-            put(Lane.class, 3);
-            put(Edge.class, 2);
-            put(Junction.class, 1);
-            put(Net.class, 0);
-        }
-    };
-
+                                                    
+                                                    private static final long serialVersionUID = 1L;
+                                                    
+                                                    {
+                                                        put(Agent.class, 4);
+                                                        put(Lane.class, 3);
+                                                        put(Edge.class, 2);
+                                                        put(Junction.class, 1);
+                                                        put(Net.class, 0);
+                                                    }
+                                                };
+    
     /**
      * The rendering layer of the object. 0: Background 1: First layer
      *
@@ -40,7 +40,7 @@ public interface Renderable {
         }
         return KNOWN_CLASSES.get(getClass());
     }
-
+    
     /**
      * Render the implementing object.
      *
@@ -48,17 +48,17 @@ public interface Renderable {
      *            the object to render with.
      */
     void render(final Graphics2D g);
-
+    
     /**
      * Render the implementing object.
      *
      * @param g
      *            the object to render with.
-     * @param simulationHistory
-     *            the history of the simulation. Key:= relative distance in time
-     *            from current newest @{link Net} [s]. Value:=@{link Net}
+     * @param simulationStates
+     *            Saved simulation states. Key:= wall clock time [s].
+     *            Value:=@{link Net}
      */
-    default void render(final Graphics2D g, final NavigableMap<Double, Net> simulationHistory) {
+    default void render(final Graphics2D g, final NavigableMap<Double, Net> simulationStates) {
         render(g);
     }
 }
