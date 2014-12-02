@@ -269,7 +269,7 @@ public class Window {
             simulationStates.remove(key, value);
         });
         simulationStates.put(netCopy.getSimulationTime(), netCopy);
-        if (!App.DEBUG) {
+        if (App.DEBUG) {
             Logger.getLogger(Window.class.getName()).info("simulationStates.size:" + simulationStates.size());
         }
     }

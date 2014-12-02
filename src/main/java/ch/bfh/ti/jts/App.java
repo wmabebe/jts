@@ -110,7 +110,7 @@ public class App implements Runnable {
                 // simulation is in advance too much
                 if (simulationAdvancedTooMuch > 0) {
                     try {
-                        if (!App.DEBUG) {
+                        if (App.DEBUG) {
                             Logger.getLogger(App.class.getName()).info(
                                     "App sleep:" + simulationAdvancedTooMuch + " s simulationWallClockDiff:" + simulationWallClockDiff + " s floatAverageWallClockLoopDuration:"
                                             + floatAverageWallClockLoopDuration + " s");
