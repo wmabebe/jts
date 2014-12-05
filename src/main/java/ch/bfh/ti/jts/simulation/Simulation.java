@@ -3,6 +3,7 @@ package ch.bfh.ti.jts.simulation;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.logging.log4j.LogManager;
@@ -65,6 +66,10 @@ public class Simulation {
      * Simulation states. Whereas Key = absolute simulation time
      */
     private final ConcurrentSkipListMap<Double, Net> simulationStates                 = new ConcurrentSkipListMap<>();
+    /**
+     * Interpolate the wall clock state.
+     */
+    private final AtomicBoolean                      interpolateWallClockState        = new AtomicBoolean(true);
     
     public Simulation(final Net simulateNet) {
         this.simulateNet = simulateNet;
@@ -84,6 +89,7 @@ public class Simulation {
         simulationStates.headMap(simulationStatesWindowMin).forEach((key, value) -> {
             simulationStates.remove(key, value);
         });
+        
         simulationStates.put(netCopy.getSimulationTime(), netCopy);
         LOG.debug("simulationStates.size:" + simulationStates.size());
     }
@@ -99,7 +105,9 @@ public class Simulation {
                 wallClockSimulationState = entry.getValue();
             }
         } while (wallClockSimulationState == null);
-        simulate(wallClockSimulationState, getWallClockTime() - wallClockSimulationState.getSimulationTime());
+        if (interpolateWallClockState.get()) {
+            simulate(wallClockSimulationState, getWallClockTime() - wallClockSimulationState.getSimulationTime());
+        }
         return wallClockSimulationState;
     }
     
@@ -108,6 +116,10 @@ public class Simulation {
      */
     public void resetSimulation() {
         simulationStates.clear();
+    }
+    
+    public void toggleInterpolateWallClockState() {
+        interpolateWallClockState.set(!interpolateWallClockState.get());
     }
     
     /**

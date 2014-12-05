@@ -7,7 +7,7 @@ public class SimulationTimeCommand implements Command {
     @Override
     public String execute(final Object executor) {
         final Net net = (Net) executor;
-        return String.format("Simulation time: %.2f", net.getSimulationTime());
+        return String.format("Simulation time: %.5f seconds", net.getSimulationTime());
     }
     
     @Override

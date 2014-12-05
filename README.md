@@ -159,7 +159,7 @@ Enteee
 * Restart command fixing [done]
 * singleton app / window [done]
 * reflection for command finding [done]
-* toggleInterpolate command added
+* toggleInterpolate command added [done]
 
 winki
 

@@ -37,7 +37,7 @@ public class JtsConsole extends BasicConsole {
                 Command command = clazz.newInstance();
                 commands.add(command);
                 jc.addCommand(command.getName(), command);
-                LOG.info("Loaded command:" + command);
+                LOG.info("Loaded command:" + command.getName());
             } catch (Exception e) {
                 LOG.fatal("Failed instantiating:" + clazz, e);
             }

@@ -7,7 +7,7 @@ public class WallClockTimeCommand implements Command {
     @Override
     public String execute(final Object executor) {
         final Simulation simulation = (Simulation) executor;
-        return String.format("Wall clock time: %.2f", simulation.getWallClockTime());
+        return String.format("Wall clock time: %.5f seconds", simulation.getWallClockTime());
     }
     
     @Override

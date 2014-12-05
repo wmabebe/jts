@@ -1,13 +1,14 @@
 package ch.bfh.ti.jts.gui.console.commands;
 
-import ch.bfh.ti.jts.gui.console.JtsConsole;
+import ch.bfh.ti.jts.simulation.Simulation;
 
 public class ToggleInterpolate implements Command {
     
     @Override
     public String execute(Object executor) {
-        final JtsConsole console = (JtsConsole) executor;
-        return "";
+        final Simulation simulation = (Simulation) executor;
+        simulation.toggleInterpolateWallClockState();
+        return "toggled";
     }
     
     @Override
@@ -17,7 +18,7 @@ public class ToggleInterpolate implements Command {
     
     @Override
     public Class<?> getTargetType() {
-        return JtsConsole.class;
+        return Simulation.class;
     }
     
 }
