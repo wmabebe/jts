@@ -177,7 +177,7 @@ winki
 
 * Bugfixes
   * Transcendent agents when collision happend
-  * Simulation lag
+  * Simulation lag -> fixed with average velocity
 * Agent handling on junctions
 * Area restricted tick method
 * Console can receive parameters from clickable GUI
