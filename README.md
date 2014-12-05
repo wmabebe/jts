@@ -184,9 +184,12 @@ winki
 * Console commands:
   * agent removing
   * restart simulation
+  * import OpenStreetMap data
 * Weather / daylight
 * Write project documentation
 * RealisitcAgent can use GPS
+* Record statistics data
+  * average traffic flow
 
 ## Resources
 
