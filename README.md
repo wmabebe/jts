@@ -156,6 +156,10 @@ Enteee
 * Bugfix time conversion 10E-9 -> 1E-9 for nano [done]
 * Wall clock time in Window introduced [done]
 * Wall clock / simulation time decoupling [done] -> issue lag
+* Restart command fixing [done]
+* singleton app / window [done]
+* reflection for command finding
+* toggleInterpolate command added
 
 winki
 

@@ -290,12 +290,12 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
                 if (thisAgent.isOnLane() && oldAgents.size() > 0) {
                     final Entry<Double, Set<Agent>> nextEntry = oldAgents.firstEntry();
                     for (final Agent nextAgent : nextEntry.getValue()) {
-                        final double distanceLeft = thisAgent.getPosition().distance(nextAgent.getPosition()) - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
+                        final double distanceLeft = nextAgent.getPositionOnLane() - thisAgent.getPositionOnLane() - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
                         if (nextAgent.isOnLane() && distanceLeft <= 0) {
                             // collision!
                             thisAgent.collide();
                             nextAgent.collide();
-                            LOG.debug("Collision: " + thisAgent + " into " + nextAgent);
+                            LOG.debug("Collision: " + thisAgent + " into " + nextAgent + " distance left: " + distanceLeft);
                         }
                     }
                 }

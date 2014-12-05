@@ -11,7 +11,9 @@ import java.util.regex.Pattern;
 import ch.bfh.ti.jts.utils.Helpers;
 
 public class PolyShape implements Serializable {
-
+    
+    private static final long   serialVersionUID   = 1L;
+    private static final String SHAPE_REGEX_STRING = "^[-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+)([ ][-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+))*$";
     private static List<Point2D> buildPoints(final String shapeString) {
         if (shapeString == null) {
             throw new IllegalArgumentException("shapeString is null");
@@ -34,20 +36,18 @@ public class PolyShape implements Serializable {
         }
         return pointlist;
     }
-    private static final long   serialVersionUID   = 1L;
-    private static final String SHAPE_REGEX_STRING = "^[-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+)([ ][-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+))*$";
     private final List<Point2D> points;
     private final Shape         shape;
     private final double        length;
     private final boolean       closedPath;
     private Point2D             position;
-
+    
     private double              orientation;
-
+    
     public PolyShape(final List<Point2D> points) {
         this(points, false);
     }
-
+    
     public PolyShape(final List<Point2D> points, final boolean closedPath) {
         if (points == null) {
             throw new IllegalArgumentException("points is null");
@@ -60,15 +60,15 @@ public class PolyShape implements Serializable {
         shape = buildShape();
         length = buildLength();
     }
-
+    
     public PolyShape(final String shapeString) {
         this(buildPoints(shapeString), false);
     }
-
+    
     public PolyShape(final String shapeString, final boolean closedPath) {
         this(buildPoints(shapeString), closedPath);
     }
-
+    
     private double buildLength() {
         double length = 0;
         if (points.size() > 1) {
@@ -81,7 +81,7 @@ public class PolyShape implements Serializable {
         }
         return length;
     }
-
+    
     private Shape buildShape() {
         final Path2D path = new Path2D.Double();
         for (int i = 0; i < points.size(); i++) {
@@ -97,7 +97,7 @@ public class PolyShape implements Serializable {
         }
         return path;
     }
-
+    
     private void calculate(double relative) {
         relative = Helpers.clamp(relative, 0, 1.0);
         if (points.size() == 2) {
@@ -109,7 +109,7 @@ public class PolyShape implements Serializable {
         final double lengthOnPolyline = relative * length;
         followPolygon(lengthOnPolyline, 0);
     }
-
+    
     private void followPolygon(final double distanceToFollow, int segment) {
         double distanceOnSegment;
         if (segment > points.size() - 2) {
@@ -139,42 +139,42 @@ public class PolyShape implements Serializable {
             followPolygon(distanceToDriveOnNextSegment, segment + 1);
         }
     }
-
+    
     private double getAngleBetweenTwoPoints(final Point2D p1, final Point2D p2) {
         final double dx = p2.getX() - p1.getX();
         final double dy = p2.getY() - p1.getY();
         return Math.atan2(dy, dx);
     }
-
+    
     public Point2D getEndPoint() {
         return points.get(points.size() - 1);
     }
-
+    
     public double getLength() {
         return length;
     }
-
+    
     public double getRelativeOrientation(final double relative) {
         calculate(relative);
         return orientation;
     }
-
+    
     public Point2D getRelativePosition(final double relative) {
         calculate(relative);
         return position;
     }
-
+    
     private double getSegmentLength(final int index) {
         if (index < 0 || index > points.size() - 2) {
             throw new IndexOutOfBoundsException("index: " + index + " points.size: " + points.size());
         }
         return points.get(index).distance(points.get(index + 1));
     }
-
+    
     public Shape getShape() {
         return shape;
     }
-
+    
     public Point2D getStartPoint() {
         return points.get(0);
     }

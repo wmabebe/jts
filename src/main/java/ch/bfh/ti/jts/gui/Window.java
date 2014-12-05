@@ -19,10 +19,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.HashSet;
-import java.util.Map.Entry;
-import java.util.NavigableMap;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -31,10 +28,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import ch.bfh.ti.jts.App;
+import ch.bfh.ti.jts.Main;
 import ch.bfh.ti.jts.console.Console;
+import ch.bfh.ti.jts.console.JtsConsole;
 import ch.bfh.ti.jts.data.Net;
-import ch.bfh.ti.jts.simulation.Simulation;
-import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
 public class Window {
@@ -56,8 +53,7 @@ public class Window {
         public void paintComponent(final Graphics g) {
             final Graphics2D g2d = (Graphics2D) g;
             // simulate parts of the net
-            final Net currentSimulationNet = getCurrentSimulationNet();
-            windowSimulation.tick(currentSimulationNet, getWallClockTime() - currentSimulationNet.getSimulationTime());
+            final Net wallClockSimulationState = App.getInstance().getSimulation().getWallCLockSimulationState();
             try {
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 8));
@@ -71,13 +67,13 @@ public class Window {
                 t.scale(1 / zoom, 1 / zoom);
                 // move to the zoom center
                 t.translate(-zoomCenter.getX(), -zoomCenter.getY());
-                if (App.DEBUG) {
+                if (Main.DEBUG) {
                     g2d.setColor(Color.GREEN);
                     g2d.drawLine(0, 0, (int) offset.getX(), (int) offset.getY());
                     g2d.drawOval((int) zoomCenter.getX() - 10, (int) zoomCenter.getY() - 10, 20, 20);
                 }
                 g2d.setTransform(t);
-                if (App.DEBUG) {
+                if (Main.DEBUG) {
                     g2d.setColor(Color.RED);
                     g2d.drawLine(-20, 0, 20, 0);
                     g2d.drawLine(0, -20, 0, 20);
@@ -93,10 +89,10 @@ public class Window {
                 // a result all the agents are driving on the wrong side.
                 g2d.transform(AffineTransform.getScaleInstance(1, -1));
                 // render everything
-                final Layers<Renderable> renderables = currentSimulationNet.getRenderable();
+                final Layers<Renderable> renderables = wallClockSimulationState.getRenderable();
                 for (final int layer : renderables.getLayersIterator()) {
                     renderables.getLayerStream(layer).sequential().forEach(e -> {
-                        e.render(g2d, simulationStates);
+                        e.render(g2d);
                     });
                 }
                 // render console
@@ -191,54 +187,45 @@ public class Window {
         }
     }
     
-    public final static Logger              LOG                            = LogManager.getLogger(Window.class);
-    
+    public final static Logger   LOG         = LogManager.getLogger(Window.class);
     /**
-     * A factor which accelerates wallclock time. For faster rendering progress.
-     * 1 := WallclockTime = PhysicalTime
+     * Do interpolate simulation steps?
      */
-    private static final double             WALL_CLOCK_ACCELERATION_FACTOR = 1;
-    /**
-     * Keep the last {@link Net} for this amount of time in [s];
-     */
-    private static final double             SIMULATION_HISTORY_KEEP_WINDOW = 10;
+    private final static boolean INTERPOLATE = false;
     /**
      * Zoom delta. Determines how much to change the zoom when scrolling. Also
      * sets the minimum zoom
      */
-    private static final double             ZOOM_DELTA                     = 0.05;
-    private final JFrame                    frame;
-    private final JPanel                    renderPanel;
-    private int                             windoww                        = 1000;
-    private int                             windowh                        = 600;
+    private static final double  ZOOM_DELTA  = 0.05;
+    
+    private static final Window  INSTANCE    = new Window();
+    
+    /**
+     * singleton
+     * 
+     * @return instance
+     */
+    public static Window getInstance() {
+        return INSTANCE;
+    }
+    private final JFrame       frame;
+    private final JPanel       renderPanel;
+    private int                windoww    = 1000;
+    private int                windowh    = 600;
     /**
      * Offset in x and y direction from (0/0)
      */
-    private final Point2D                   offset                         = new Point2D.Double();
+    private final Point2D      offset     = new Point2D.Double();
     /**
      * Zoom factor
      */
-    private double                          zoom                           = 1;
-    private AffineTransform                 t                              = new AffineTransform();
-    private final Point2D                   zoomCenter                     = new Point2D.Double();
-    private final Set<Integer>              keys                           = new HashSet<Integer>();
-    /**
-     * Start wallclock time of the simulation [s].
-     */
-    private final double                    startWallClockTime             = System.nanoTime() * 1E-9;
-    /**
-     * Simulation states. Whereas Key = absolute simulation time
-     */
-    private final NavigableMap<Double, Net> simulationStates               = new ConcurrentSkipListMap<>();
-    private final Simulation                windowSimulation;
-    private final Console                   console;
+    private double             zoom       = 1;
+    private AffineTransform    t          = new AffineTransform();
+    private final Point2D      zoomCenter = new Point2D.Double();
+    private final Set<Integer> keys       = new HashSet<Integer>();
+    private final Console      console    = new JtsConsole();
     
-    public Window(final Console console) {
-        if (console == null) {
-            throw new IllegalArgumentException("console is null");
-        }
-        this.console = console;
-        windowSimulation = new Simulation(false); // no ai
+    public Window() {
         frame = new JFrame();
         frame.setTitle("JavaTrafficSimulator");
         frame.setIgnoreRepaint(true);
@@ -255,45 +242,12 @@ public class Window {
         frame.setContentPane(renderPanel);
     }
     
-    /**
-     * Get the wall clock time spent. [s]
-     * 
-     * @return wall clock time spent in [s].
-     */
-    public double getWallClockTime() {
-        return ((System.nanoTime() * 1E-9) - startWallClockTime) * WALL_CLOCK_ACCELERATION_FACTOR;
-    }
-    
-    public void addNet(final Net net) {
-        final Net netCopy = DeepCopy.copy(net);
-        // remove old nets from history
-        final double simulationStatesWindowMin = getWallClockTime() - SIMULATION_HISTORY_KEEP_WINDOW;
-        simulationStates.headMap(simulationStatesWindowMin).forEach((key, value) -> {
-            simulationStates.remove(key, value);
-        });
-        simulationStates.put(netCopy.getSimulationTime(), netCopy);
-        LOG.debug("simulationStates.size:" + simulationStates.size());
+    public Console getConsole() {
+        return console;
     }
     
     public void setVisible(final boolean visible) {
         frame.setVisible(visible);
     }
     
-    /**
-     * Get the current net to simulate. This method will block until such a net
-     * is available.
-     * 
-     * @return the net to simulate
-     */
-    private Net getCurrentSimulationNet() {
-        Net returnNet = null;
-        do {
-            final double wallClockTime = getWallClockTime();
-            Entry<Double, Net> entry = simulationStates.floorEntry(wallClockTime);
-            if (entry != null) {
-                returnNet = entry.getValue();
-            }
-        } while (returnNet == null);
-        return returnNet;
-    }
 }

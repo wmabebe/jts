@@ -3,58 +3,60 @@ package ch.bfh.ti.jts.console;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.reflections.Reflections;
+
+import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.console.commands.Command;
-import ch.bfh.ti.jts.console.commands.RestartCommand;
-import ch.bfh.ti.jts.console.commands.SpawnCommand;
-import ch.bfh.ti.jts.console.commands.TimeCommand;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 
 public class JtsConsole extends BasicConsole {
-
+    
+    public final static Logger LOG = LogManager.getLogger(JtsConsole.class);
+    
     public class MainParams {
-
+        
         @Parameter(names = { "-help", "-h" }, description = "Help")
         private final boolean help = false;
     }
-
-    private JCommander                jc;
+    
     private final MainParams          mainParams = new MainParams();
+    private final JCommander          jc         = new JCommander(mainParams);
     private final Collection<Command> commands   = new LinkedList<>();
-
-    private JCommander buildCommander() {
-
-        final JCommander jcommander = new JCommander(mainParams);
-
+    
+    public JtsConsole() {
+        
         // TODO: do this with reflection?
-        commands.clear();
-        commands.add(new TimeCommand());
-        commands.add(new SpawnCommand());
-        commands.add(new RestartCommand());
-
-        commands.forEach(command -> {
-            final String name = command.getName();
-            jcommander.addCommand(name, command);
+        Reflections reflections = new Reflections(Command.class.getPackage());
+        reflections.getSubTypesOf(Command.class).forEach((clazz) -> {
+            try {
+                Command command = clazz.newInstance();
+                commands.add(command);
+                jc.addCommand(command.getName(), command);
+                LOG.info("Loaded command:" + command);
+            } catch (Exception e) {
+                LOG.fatal("Failed instantiating:" + clazz, e);
+            }
         });
-
-        return jcommander;
     }
-
+    
     private void execute(final Command command) {
-        getSimulation().addCommand(command);
+        // forward command to App thread
+        App.getInstance().addCommand(command);
     }
-
+    
     @Override
     protected void parseCommand(final String line) {
         if (line != null && !"".equals(line)) {
             try {
                 final String[] args = line.split(" ");
-
-                jc = buildCommander();
+                
                 jc.parse(args);
-
+                
                 final String commandName = jc.getParsedCommand();
                 if (commandName != null) {
                     final Command command = commands.stream().filter(x -> x.getName().equals(commandName)).findFirst().orElse(null);
@@ -69,10 +71,10 @@ public class JtsConsole extends BasicConsole {
                         write(sb.toString());
                     }
                 }
-
-            } catch (final ParameterException ex) {
-                write(ex.getMessage());
-                ex.printStackTrace();
+                
+            } catch (final ParameterException e) {
+                write("Invalid command");
+                LOG.warn("Invalid command");
             }
         }
     }

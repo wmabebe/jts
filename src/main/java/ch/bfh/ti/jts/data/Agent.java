@@ -8,7 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.NavigableMap;
 
-import ch.bfh.ti.jts.App;
+import ch.bfh.ti.jts.Main;
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
 import ch.bfh.ti.jts.ai.Thinkable;
@@ -62,7 +62,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      */
     public void collide() {
         setVelocity(0.0);
-        
     }
     
     public double getAcceleration() {
@@ -85,10 +84,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return decision;
     }
     
-    public double getDistanceOnLaneLeft() {
-        return getLane().getLength() - positionOnLane;
-    }
-    
     public double getDistanceToNextAgent() {
         final double oPosition = getLane().getNextAgentsOnLine(this).stream().mapToDouble(x -> x.getPositionOnLane()).min().orElse(0.0);
         final double tPosition = getPositionOnLane();
@@ -100,20 +95,31 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return lane;
     }
     
+    /**
+     * @return absolute coordinates of agent on world
+     */
     public Point2D getPosition() {
         return getLane().getPolyShape().getRelativePosition(getRelativePositionOnLane());
     }
     
     /**
-     * The absolute position of the agent on the lane. From the start to the
-     * current position of the agent.
-     *
-     * @return
+     * @return absolute position on the lane. From the start to the current
+     *         position of the agent.
      */
     public double getPositionOnLane() {
         return positionOnLane;
     }
     
+    /**
+     * @return the absolute distance to the end of the line.
+     */
+    public double getAbsoluteDistanceOnLaneLeft() {
+        return getLane().getLength() - getPositionOnLane();
+    }
+    
+    /**
+     * @return relative position on lane.
+     */
     public double getRelativePositionOnLane() {
         return positionOnLane / getLane().getLength();
     }
@@ -205,7 +211,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         g.setColor(getColor());
         g.translate(x, y);
         g.fill(at.createTransformedShape(vehicle.getShape()));
-        if (App.DEBUG) {
+        if (Main.DEBUG) {
             g.setFont(new Font("sans-serif", Font.PLAIN, 4));
             g.scale(1, -1);
             g.drawString("Agent " + getId(), 5, 1);
