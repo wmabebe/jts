@@ -8,11 +8,11 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import ch.bfh.ti.jts.console.Console;
-import ch.bfh.ti.jts.console.commands.Command;
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.gui.Window;
+import ch.bfh.ti.jts.gui.console.Console;
+import ch.bfh.ti.jts.gui.console.commands.Command;
 import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 import ch.bfh.ti.jts.utils.layers.Layers;
 

@@ -158,7 +158,7 @@ Enteee
 * Wall clock / simulation time decoupling [done] -> issue lag
 * Restart command fixing [done]
 * singleton app / window [done]
-* reflection for command finding
+* reflection for command finding [done]
 * toggleInterpolate command added
 
 winki

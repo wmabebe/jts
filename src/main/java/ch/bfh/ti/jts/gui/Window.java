@@ -29,9 +29,9 @@ import org.apache.logging.log4j.Logger;
 
 import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.Main;
-import ch.bfh.ti.jts.console.Console;
-import ch.bfh.ti.jts.console.JtsConsole;
 import ch.bfh.ti.jts.data.Net;
+import ch.bfh.ti.jts.gui.console.Console;
+import ch.bfh.ti.jts.gui.console.JtsConsole;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
 public class Window {

@@ -1,4 +1,4 @@
-package ch.bfh.ti.jts.console;
+package ch.bfh.ti.jts.gui.console;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 
 import ch.bfh.ti.jts.App;
-import ch.bfh.ti.jts.console.commands.Command;
+import ch.bfh.ti.jts.gui.console.commands.Command;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -31,7 +31,7 @@ public class JtsConsole extends BasicConsole {
     public JtsConsole() {
         
         // TODO: do this with reflection?
-        Reflections reflections = new Reflections(Command.class.getPackage());
+        Reflections reflections = new Reflections(Command.class.getPackage().getName());
         reflections.getSubTypesOf(Command.class).forEach((clazz) -> {
             try {
                 Command command = clazz.newInstance();

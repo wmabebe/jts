@@ -1,4 +1,4 @@
-package ch.bfh.ti.jts.console.commands;
+package ch.bfh.ti.jts.gui.console.commands;
 
 /**
  * Interface describing available console commands.

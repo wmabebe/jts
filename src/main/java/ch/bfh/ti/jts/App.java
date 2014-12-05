@@ -7,11 +7,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import ch.bfh.ti.jts.console.Console;
-import ch.bfh.ti.jts.console.commands.Command;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.SpawnInfo;
 import ch.bfh.ti.jts.gui.Window;
+import ch.bfh.ti.jts.gui.console.Console;
+import ch.bfh.ti.jts.gui.console.commands.Command;
 import ch.bfh.ti.jts.importer.NetImporter;
 import ch.bfh.ti.jts.importer.RoutesImporter;
 import ch.bfh.ti.jts.simulation.Simulation;

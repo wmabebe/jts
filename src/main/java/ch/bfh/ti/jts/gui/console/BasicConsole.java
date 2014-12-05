@@ -1,4 +1,4 @@
-package ch.bfh.ti.jts.console;
+package ch.bfh.ti.jts.gui.console;
 
 import java.awt.Color;
 import java.awt.Font;

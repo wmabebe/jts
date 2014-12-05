@@ -18,3 +18,4 @@ hs_err_pid*
 # Binaries
 *.exe
 *.dll
+/bin/
