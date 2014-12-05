@@ -15,7 +15,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import ch.bfh.ti.jts.App;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 import ch.bfh.ti.jts.simulation.Simulatable;
@@ -23,6 +25,7 @@ import ch.bfh.ti.jts.simulation.Simulatable;
 public class Lane extends Element implements SpawnLocation, Simulatable, Renderable {
     
     private static final long                      serialVersionUID = 1L;
+    public final static Logger                     LOG              = LogManager.getLogger(Lane.class);
     private final Edge                             edge;
     private final int                              index;
     private final double                           speed;
@@ -292,10 +295,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
                             // collision!
                             thisAgent.collide();
                             nextAgent.collide();
-                            if (App.DEBUG) {
-                                // Logger.getLogger(Lane.class.getName()).info("Collision: ["
-                                // + thisAgent + "] <->[" + nextAgent + "]");
-                            }
+                            LOG.debug("Collision: " + thisAgent + " into " + nextAgent);
                         }
                     }
                 }

@@ -23,11 +23,12 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.console.Console;
@@ -185,10 +186,12 @@ public class Window {
                 zoomCenter.setLocation(mousePointInverse.getX(), mousePointInverse.getY());
                 offset.setLocation(mousePoint.getX() - mousePointInverse.getX(), mousePoint.getY() - mousePointInverse.getY());
             } catch (final NoninvertibleTransformException e) {
-                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, "Can not invert mouse drag vector", e);
+                LOG.error("Can not invert mouse drag vector", e);
             }
         }
     }
+    
+    public final static Logger              LOG                            = LogManager.getLogger(Window.class);
     
     /**
      * A factor which accelerates wallclock time. For faster rendering progress.
@@ -269,9 +272,7 @@ public class Window {
             simulationStates.remove(key, value);
         });
         simulationStates.put(netCopy.getSimulationTime(), netCopy);
-        if (App.DEBUG) {
-            Logger.getLogger(Window.class.getName()).info("simulationStates.size:" + simulationStates.size());
-        }
+        LOG.debug("simulationStates.size:" + simulationStates.size());
     }
     
     public void setVisible(final boolean visible) {

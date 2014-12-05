@@ -2,9 +2,10 @@ package ch.bfh.ti.jts;
 
 import java.util.Collection;
 import java.util.Queue;
-import java.util.logging.Logger;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.console.JtsConsole;
@@ -17,8 +18,8 @@ import ch.bfh.ti.jts.simulation.Simulation;
 
 public class App implements Runnable {
     
-    public static final boolean   DEBUG                                       = false;
-    
+    public static final boolean   DEBUG                                       = true;
+    public final static Logger    LOG                                         = LogManager.getLogger(App.class);
     /**
      * Size of the floating average for wall clock loop duration.
      */
@@ -110,14 +111,12 @@ public class App implements Runnable {
                 // simulation is in advance too much
                 if (simulationAdvancedTooMuch > 0) {
                     try {
-                        if (App.DEBUG) {
-                            Logger.getLogger(App.class.getName()).info(
-                                    "App sleep:" + simulationAdvancedTooMuch + " s simulationWallClockDiff:" + simulationWallClockDiff + " s floatAverageWallClockLoopDuration:"
-                                            + floatAverageWallClockLoopDuration + " s");
-                        }
+                        LOG.debug("App sleep:" + simulationAdvancedTooMuch + " s simulationWallClockDiff:" + simulationWallClockDiff + " s floatAverageWallClockLoopDuration:"
+                                + floatAverageWallClockLoopDuration + " s");
+                        
                         Thread.sleep((long) (simulationAdvancedTooMuch * 1E3));
                     } catch (InterruptedException e) {
-                        Logger.getLogger(App.class.getName()).warning("Thread sleep interrupted");
+                        LOG.warn("Thread sleep interrupted");
                     }
                 }
             }
