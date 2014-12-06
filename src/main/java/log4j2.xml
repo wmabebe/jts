@@ -12,11 +12,12 @@
     <Loggers>
         <Logger name="org.apache.log4j.xml" level="info"/>
         <Logger name="ch.bfh.ti.jts.App" level="info"/>
-        <Logger name="ch.bfh.ti.jts.simulation.Simulation" level="debug"/>
+        <Logger name="ch.bfh.ti.jts.simulation.Simulation" level="info"/>
         <Logger name="ch.bfh.ti.jts.gui.Window" level="info"/>
         <Logger name="ch.bfh.ti.jts.gui.console.JtsConsole" level="info"/>
         <Logger name="ch.bfh.ti.jts.data.Net" level="info"/>
-        <Logger name="ch.bfh.ti.jts.data.Lane" level="debug"/>
+        <Logger name="ch.bfh.ti.jts.data.Lane" level="info"/>
+        <Logger name="ch.bfh.ti.jts.data.Agent" level="debug"/>
         <Root level="debug">
             <AppenderRef ref="STDOUT"/>
         </Root>

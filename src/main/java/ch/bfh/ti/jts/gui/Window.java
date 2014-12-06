@@ -92,7 +92,7 @@ public class Window {
                 final Layers<Renderable> renderables = wallClockSimulationState.getRenderable();
                 for (final int layer : renderables.getLayersIterator()) {
                     renderables.getLayerStream(layer).sequential().forEach(e -> {
-                        e.render(g2d);
+                        e.render(g2d, App.getInstance().getSimulation().getSavedStates());
                     });
                 }
                 // render console

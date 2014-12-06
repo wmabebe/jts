@@ -7,7 +7,12 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.NavigableMap;
+import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.Main;
 import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
@@ -19,6 +24,8 @@ import ch.bfh.ti.jts.utils.Helpers;
 public abstract class Agent extends Element implements Thinkable, Simulatable, Renderable {
     
     private static final long  serialVersionUID               = 1L;
+    
+    public final static Logger LOG                            = LogManager.getLogger(Agent.class);
     /**
      * The hue of the agent when driving with maximum velocity. Slower is in the
      * range [0 , AGENT_MAX_VELOCITY_COLOR]. 0.33 : Green
@@ -110,6 +117,10 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return positionOnLane;
     }
     
+    public void setPositionOnLane(final double positionOnLane) {
+        this.positionOnLane = Math.max(positionOnLane, 0);
+    }
+    
     /**
      * @return the absolute distance to the end of the line.
      */
@@ -175,11 +186,13 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     public boolean isLaneChangeCandidate() {
         //@formatter:off
         return  getVelocity() > 0
-                && (
+                && ( 
                         getDecision().getLaneChangeDirection() == LaneChangeDirection.RIGHT
-                        && getLane().getRightLane().isPresent()||getDecision().getLaneChangeDirection() == LaneChangeDirection.LEFT
+                        && getLane().getRightLane().isPresent() 
+                    ) || (
+                        getDecision().getLaneChangeDirection() == LaneChangeDirection.LEFT
                         && getLane().getLeftLane().isPresent()
-                        );
+                   );
         //@formatter:on
     }
     
@@ -205,12 +218,11 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         final Point2D position = getPosition();
         final double x = position.getX();
         final double y = position.getY();
-        final double orientation = getLane().getPolyShape().getRelativeOrientation(getRelativePositionOnLane());
-        final AffineTransform at = AffineTransform.getRotateInstance(orientation);
         g.setStroke(new BasicStroke(1));
         g.setColor(getColor());
         g.translate(x, y);
-        g.fill(at.createTransformedShape(vehicle.getShape()));
+        final double orientation = getLane().getPolyShape().getRelativeOrientation(getRelativePositionOnLane());
+        g.fill(AffineTransform.getRotateInstance(orientation).createTransformedShape(vehicle.getShape()));
         if (Main.DEBUG) {
             g.setFont(new Font("sans-serif", Font.PLAIN, 4));
             g.scale(1, -1);
@@ -222,22 +234,53 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     
     @Override
     public void render(final Graphics2D g, final NavigableMap<Double, Net> simulationStates) {
-        simulationStates.ceilingEntry(CHANGE_LINE_ANIMATION_DURATION);
-        simulationStates.headMap(CHANGE_LINE_ANIMATION_DURATION).values().stream().map(oldNet -> {
+        final Point2D position = getPosition();
+        final double x = position.getX();
+        final double y = position.getY();
+        double xChangeLaneShift = 0;
+        double yChangeLaneShift = 0;
+        g.translate(x, y);
+        final double wallClockTime = App.getInstance().getSimulation().getWallClockTime();
+        // check old simulation states
+        Optional<Element.ElementInTime> lastAgentStateBeforeLaneChange = simulationStates.headMap(wallClockTime).values().stream().map(oldNet -> {
             return new Element.ElementInTime(oldNet.getSimulationTime(), oldNet.getElement(getId()));
-
         }).filter(oldAgentInTime -> {
             final Agent oldAgent = (Agent) oldAgentInTime.getElement();
             // lane changed on same edge?
             // @formatter:off
-            return getLane().getLeftLane().isPresent()
-                    && oldAgent.getLane() == getLane().getLeftLane().get() || getLane().getRightLane().isPresent()
-                    && oldAgent.getLane() == getLane().getRightLane().get();
+            return  oldAgent != null
+                    && (
+                            (
+                                    getLane().getLeftLane().isPresent()
+                                    && oldAgent.getLane().getId() == getLane().getLeftLane().get().getId()
+                             ) || ( 
+                                     getLane().getRightLane().isPresent()
+                                     && oldAgent.getLane().getId() == getLane().getRightLane().get().getId()
+                             )
+                    );
             // @formatter:on
-                }).sorted();
-        // TODO: finish
-        
+                }).sorted().findFirst();
+        if (lastAgentStateBeforeLaneChange.isPresent()) {
+            final double lastTimeBeforeChange = lastAgentStateBeforeLaneChange.get().getTime();
+            final Agent lastAgentStateBeforeChange = (Agent) lastAgentStateBeforeLaneChange.get().getElement();
+            final double lastLaneChangeRelativeTime = wallClockTime - lastTimeBeforeChange;
+            if (lastLaneChangeRelativeTime < CHANGE_LINE_ANIMATION_DURATION) {
+                final double changeLaneFactor = 1 - lastLaneChangeRelativeTime / CHANGE_LINE_ANIMATION_DURATION;
+                xChangeLaneShift = changeLaneFactor * (lastAgentStateBeforeChange.getPosition().getX() - getPosition().getX());
+                yChangeLaneShift = changeLaneFactor * (lastAgentStateBeforeChange.getPosition().getY() - getPosition().getY());
+                if (Main.DEBUG) {
+                    Color c = g.getColor();
+                    g.setColor(Color.GREEN);
+                    g.setStroke(new BasicStroke(.5f));
+                    g.drawLine(0, 0, (int) xChangeLaneShift, (int) yChangeLaneShift);
+                    g.setColor(c);
+                }
+                // g.translate(xChangeLaneShift, yChangeLaneShift);
+            }
+        }
+        g.translate(-x, -y);
         Renderable.super.render(g, simulationStates);
+        // g.translate(-xChangeLaneShift, -yChangeLaneShift);
     }
     
     public void setAcceleration(final double acceleration) {
@@ -260,10 +303,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         }
         setPositionOnLane(getPositionOnLane() - lane.getLength());
         lane = nextEdgeLane;
-    }
-    
-    private void setPositionOnLane(final double positionOnLane) {
-        this.positionOnLane = Math.max(positionOnLane, 0);
     }
     
     private void setSpawnInfo(final SpawnInfo spawnInfo) {

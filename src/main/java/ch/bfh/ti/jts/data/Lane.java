@@ -293,9 +293,10 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
                         final double distanceLeft = nextAgent.getPositionOnLane() - thisAgent.getPositionOnLane() - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
                         if (nextAgent.isOnLane() && distanceLeft <= 0) {
                             // collision!
+                            LOG.debug("Collision: " + thisAgent + " into " + nextAgent + " distance left: " + distanceLeft);
                             thisAgent.collide();
                             nextAgent.collide();
-                            LOG.debug("Collision: " + thisAgent + " into " + nextAgent + " distance left: " + distanceLeft);
+                            thisAgent.setPositionOnLane(thisAgent.getPositionOnLane() + distanceLeft);
                         }
                     }
                 }

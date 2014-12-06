@@ -8,6 +8,9 @@ import org.apache.logging.log4j.Logger;
 public class Main {
     
     public final static Logger  LOG   = LogManager.getLogger(Main.class);
+    /**
+     * Debug mode?
+     */
     public static final boolean DEBUG = false;
     
     public static void main(final String[] args) {
@@ -21,7 +24,7 @@ public class Main {
         
         // start app
         final App app = App.getInstance();
-        app.loadSimulation("mini_round");
+        app.loadSimulation("round");
         app.run();
     }
     

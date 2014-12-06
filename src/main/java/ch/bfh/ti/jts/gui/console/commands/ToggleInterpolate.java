@@ -7,7 +7,7 @@ public class ToggleInterpolate implements Command {
     @Override
     public String execute(Object executor) {
         final Simulation simulation = (Simulation) executor;
-        simulation.toggleInterpolateWallClockState();
+        simulation.toggleInterpolateWallClockSimulationState();
         return "toggled";
     }
     
