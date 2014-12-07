@@ -15,7 +15,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import ch.bfh.ti.jts.App;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.gui.data.PolyShape;
@@ -24,6 +26,7 @@ import ch.bfh.ti.jts.simulation.Simulatable;
 public class Lane extends Element implements SpawnLocation, Simulatable, Renderable {
     
     private static final long                      serialVersionUID = 1L;
+    public final static Logger                     LOG              = LogManager.getLogger(Lane.class);
     private final Edge                             edge;
     private final int                              index;
     private final double                           speed;
@@ -288,15 +291,13 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
                 if (thisAgent.isOnLane() && oldAgents.size() > 0) {
                     final Entry<Double, Set<Agent>> nextEntry = oldAgents.firstEntry();
                     for (final Agent nextAgent : nextEntry.getValue()) {
-                        final double distanceLeft = thisAgent.getPosition().distance(nextAgent.getPosition()) - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
+                        final double distanceLeft = nextAgent.getPositionOnLane() - thisAgent.getPositionOnLane() - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
                         if (nextAgent.isOnLane() && distanceLeft <= 0) {
                             // collision!
+                            LOG.debug("Collision: " + thisAgent + " into " + nextAgent + " distance left: " + distanceLeft);
                             thisAgent.collide();
                             nextAgent.collide();
-                            if (App.DEBUG) {
-                                // Logger.getLogger(Lane.class.getName()).info("Collision: ["
-                                // + thisAgent + "] <->[" + nextAgent + "]");
-                            }
+                            thisAgent.setPositionOnLane(thisAgent.getPositionOnLane() + distanceLeft);
                         }
                     }
                 }

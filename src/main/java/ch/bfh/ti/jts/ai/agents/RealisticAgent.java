@@ -157,7 +157,7 @@ public class RealisticAgent extends RandomAgent {
 
     private double simulateMove(final double velocity) {
         final double distanceToDrive = velocity * timeStep;
-        final double distanceOnLaneLeft = getDistanceOnLaneLeft();
+        final double distanceOnLaneLeft = getAbsoluteDistanceOnLaneLeft();
         if (distanceOnLaneLeft >= distanceToDrive) {
             // stay on this lane
             return getPositionOnLane() + distanceToDrive;

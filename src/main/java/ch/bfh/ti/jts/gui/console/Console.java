@@ -1,7 +1,6 @@
-package ch.bfh.ti.jts.console;
+package ch.bfh.ti.jts.gui.console;
 
 import ch.bfh.ti.jts.gui.Renderable;
-import ch.bfh.ti.jts.simulation.Simulation;
 
 /**
  * Interface for the gui console.
@@ -33,14 +32,6 @@ public interface Console extends Renderable {
      *            typed string
      */
     void stringTyped(final String string);
-    
-    /**
-     * Set the net where the console can execute commands on.
-     *
-     * @param net
-     *            data object
-     */
-    void setSimulation(final Simulation simulation);
     
     /**
      * Write a line to the console which is not being executed (just output).

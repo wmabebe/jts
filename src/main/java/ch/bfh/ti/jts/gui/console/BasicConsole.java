@@ -1,4 +1,4 @@
-package ch.bfh.ti.jts.console;
+package ch.bfh.ti.jts.gui.console;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -6,8 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import ch.bfh.ti.jts.simulation.Simulation;
 
 public abstract class BasicConsole implements Console {
     
@@ -24,7 +22,6 @@ public abstract class BasicConsole implements Console {
     private Font                font;
     private final Queue<String> lines             = new ConcurrentLinkedQueue<String>();
     private final StringBuffer  buffer            = new StringBuffer();
-    private Simulation          simulation;
     
     public BasicConsole() {
         font = new Font("Courier New", Font.PLAIN, 14);
@@ -44,10 +41,6 @@ public abstract class BasicConsole implements Console {
         return Integer.MAX_VALUE;
     }
     
-    public Simulation getSimulation() {
-        return simulation;
-    }
-    
     @Override
     public void keyTyped(final char character) {
         if (character >= 32 && character <= 127) {
@@ -63,7 +56,7 @@ public abstract class BasicConsole implements Console {
     
     @Override
     public void stringTyped(String string) {
-        writeString(string);
+        writsString(string);
     }
     
     protected abstract void parseCommand(final String line);
@@ -100,12 +93,6 @@ public abstract class BasicConsole implements Console {
     }
     
     @Override
-    public void setSimulation(final Simulation simulation) {
-        this.simulation = simulation;
-        this.simulation.setConsole(this);
-    }
-    
-    @Override
     public void write(final String text) {
         
         if (text.contains("\n")) {
@@ -127,7 +114,7 @@ public abstract class BasicConsole implements Console {
         buffer.append(character);
     }
     
-    private void writeString(final String string) {
+    private void writsString(final String string) {
         buffer.append(string);
     }
 }

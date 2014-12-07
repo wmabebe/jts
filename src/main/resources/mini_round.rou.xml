@@ -27,7 +27,7 @@
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo-sim.org/xsd/routes_file.xsd">
 	
-	<vType id="car" accel="4.0" decel="8.0" sigma="0.0" length="5" minGap="2.5" maxSpeed="90"/>
+	<vType id="car" accel="4.0" decel="8.0" sigma="0.0" length="5" minGap="2.5" maxSpeed="90" agent="Realistic"/>
 
 	<vehicle id="v0" type="car" depart="0" departPos="0" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
 		<route edges="e0 e0"/>
@@ -35,7 +35,7 @@
 	<vehicle id="v0" type="car" depart="0" departPos="10" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
 		<route edges="e0 e0"/>
 	</vehicle>
-<!--
+	<!--
 	<vehicle id="v0" type="car" depart="0" departPos="20" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
 		<route edges="e0 e0"/>
 	</vehicle>
@@ -59,6 +59,6 @@
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="90" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
 		<route edges="e0 e0"/>
-	
+	</vehicle>
 	-->
 </routes>

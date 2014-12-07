@@ -8,11 +8,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import ch.bfh.ti.jts.App;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.ai.agents.IdleAgent;
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
@@ -29,6 +30,7 @@ import ch.bfh.ti.jts.utils.layers.Layers;
 public class Net extends Element implements Serializable, Simulatable {
     
     private static final long              serialVersionUID  = 1L;
+    public final static Logger             LOG               = LogManager.getLogger(Net.class);
     /**
      * Factor by which the spawning should take place. 1 means real time speed.
      * 1440 = 1 day in one minute
@@ -84,19 +86,15 @@ public class Net extends Element implements Serializable, Simulatable {
                 final Class<?> clazz = Class.forName(name);
                 final Constructor<?> ctor = clazz.getConstructor();
                 final Object object = ctor.newInstance();
-                if (App.DEBUG) {
-                    Logger.getLogger(Net.class.getName()).info("Create agent: " + object.getClass());
-                }
+                LOG.debug("Create agent: " + object.getClass());
                 
                 return (Agent) object;
             } catch (final Exception e) {
-                Logger.getLogger(Net.class.getName()).warning("Creating agent failed: " + name);
+                LOG.warn("Creating agent failed: " + name);
             }
         }
-        if (App.DEBUG) {
-            // default agent
-            Logger.getLogger(Net.class.getName()).info("Create default agent: " + IdleAgent.class);
-        }
+        // default agent
+        LOG.debug("Create default agent: " + IdleAgent.class);
         return new IdleAgent();
     }
     
@@ -210,10 +208,7 @@ public class Net extends Element implements Serializable, Simulatable {
         
         agent.setLane(lane);
         lane.addLaneAgent(agent);
-        if (App.DEBUG) {
-            // Logger.getLogger(Net.class.getName()).info(agent +
-            // " spawned at: " + lane);
-        }
+        LOG.debug(agent + " spawned at: " + lane);
     }
     
 }

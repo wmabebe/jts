@@ -3,64 +3,118 @@ package ch.bfh.ti.jts;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.Queue;
-import java.util.logging.Logger;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import ch.bfh.ti.jts.console.Console;
-import ch.bfh.ti.jts.console.JtsConsole;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.SpawnInfo;
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Window;
+import ch.bfh.ti.jts.gui.console.Console;
+import ch.bfh.ti.jts.gui.console.commands.Command;
 import ch.bfh.ti.jts.importer.NetImporter;
 import ch.bfh.ti.jts.importer.RoutesImporter;
 import ch.bfh.ti.jts.simulation.Simulation;
 
 public class App implements Runnable {
     
-    public static final boolean   DEBUG                                       = false;
-    
+    public final static Logger   LOG                = LogManager.getLogger(App.class);
     /**
-     * Size of the floating average for wall clock loop duration.
+     * Format string used for net loading.
      */
-    private static final int      FLOAT_AVERAGE_WALL_CLOCK_LOOP_DURATION_SIZE = 20;
+    private static final String  NET_LOAD_FORMAT    = "src/main/resources/%s.net.xml";
     /**
-     * Wall clock time the simulation is in advance before stopping [s].
+     * Format string used for routes loading.
      */
-    private static final double   SIMULATION_ADVANCED                         = 20;
+    private static final String  ROUTES_LOAD_FORMAT = "src/main/resources/%s.rou.xml";
+    /**
+     * Commands the simulation should execute.
+     */
+    private final Queue<Command> commands           = new ConcurrentLinkedQueue<>();
+    /**
+     * Singleton
+     */
+    private static App           instance           = new App();
     
-    public boolean                isRunning                                   = false;
-    private Net                   net;
-    private Collection<SpawnInfo> routes;
-    private Window                window;
-    private Simulation            simulation;
-    private Console               console;
+    public static App getInstance() {
+        return instance;
+    }
+    public boolean     isRunning = false;
+    private String     netName;
+    private Simulation simulation;
     
-    private String                netName;
+    public Simulation getSimulation() {
+        return simulation;
+    }
+    
+    public void loadSimulation(final String netName) {
+        if (netName == null) {
+            throw new IllegalArgumentException("netName");
+        }
+        this.netName = netName;
+        
+        // import net
+        final NetImporter netImporter = new NetImporter();
+        final Net net = netImporter.importData(String.format(NET_LOAD_FORMAT, this.netName));
+        
+        // import routes data
+        final RoutesImporter routesImporter = new RoutesImporter();
+        routesImporter.setNet(net);
+        final Collection<SpawnInfo> routes = routesImporter.importData(String.format(ROUTES_LOAD_FORMAT, this.netName));
+        net.addRoutes(routes);
+        simulation = new Simulation(net);
+    }
     
     private void end() {
         // free resources or clean up stuff...
     }
     
     private void init() {
-        
-        // create simulation
-        simulation = new Simulation(this);
-        
-        // create console
-        console = new JtsConsole(this);
-        console.setSimulation(simulation);
-        
-        // create window
-        window = new Window(this);
-        
-        isRunning = true;
-        window.setVisible(true);
+        if (simulation == null) {
+            throw new RuntimeException("Simulation not loaded");
+        }
+        Window.getInstance().setVisible(true);
     }
     
     private boolean isRunning() {
         return isRunning;
+    }
+    
+    public void restart() {
+        loadSimulation(netName); // load same net again
+    }
+    
+    @Override
+    public void run() {
+        isRunning = true;
+        init();
+        while (isRunning() && !Thread.interrupted()) {
+            executeCommands();
+            simulation.tick();
+        }
+        end();
+    }
+    
+    private void executeCommands() {
+        while (commands.size() > 0) {
+            final Command command = commands.poll();
+            @SuppressWarnings("unused")
+            final Class<?> targetType = command.getTargetType();
+            final Console console = Window.getInstance().getConsole();
+            if (command.getTargetType() == App.class) {
+                // command for app
+                console.write(command.execute(this));
+            } else {
+                // delegate to simulation
+                simulation.executeCommand(command);
+            }
+        }
+    }
+    
+    public void addCommand(final Command command) {
+        commands.add(command);
     }
     
     public void addIdToConsole(final Point worldCoordinates) {
@@ -68,79 +122,7 @@ public class App implements Runnable {
             throw new ArgumentNullException("worldCoordinates");
         
         // TODO: set id not coordinates into console
-        getConsole().stringTyped(String.format("coordinates: %d %d", worldCoordinates.x, worldCoordinates.y));        
-    }
-    
-    public void loadNet(final String netName) {
-        if (netName != null) {
-            this.netName = netName;
-        }
-        
-        // import net
-        final NetImporter netImporter = new NetImporter();
-        net = netImporter.importData(String.format("src/main/resources/%s.net.xml", this.netName));
-        
-        // import routes data
-        final RoutesImporter routesImporter = new RoutesImporter();
-        routesImporter.setNet(net);
-        routes = routesImporter.importData(String.format("src/main/resources/%s.rou.xml", this.netName));
-        net.addRoutes(routes);
-    }
-    
-    
-    public Console getConsole() {
-        return console;
-    }
-        
-    public Window getWindow() {
-        return window;
-    }
-    
-    public void reloadNet() {
-        loadNet(null);
-    }
-    
-    public void restart() {
-        reloadNet();
-        // create simulation
-        simulation = new Simulation(this);
-        console.setSimulation(simulation);
-    }
-    
-    @Override
-    public void run() {
-        init();
-        // floating average wall clock time of one loop [s]
-        Queue<Double> floatAverageWallClockLoopDurationQueue = new CircularFifoQueue<>(FLOAT_AVERAGE_WALL_CLOCK_LOOP_DURATION_SIZE);
-        while (isRunning() && !Thread.interrupted()) {
-            final double wallClockStart = window.getWallClockTime();
-            simulation.tick(net, Simulation.SIMULATION_STEP_DURATION);
-            window.addNet(net);
-            floatAverageWallClockLoopDurationQueue.add(window.getWallClockTime() - wallClockStart);
-            // we have enough for floating average
-            if (floatAverageWallClockLoopDurationQueue.size() == FLOAT_AVERAGE_WALL_CLOCK_LOOP_DURATION_SIZE) {
-                // get average wall tlock time of one loop
-                final double floatAverageWallClockLoopDuration = floatAverageWallClockLoopDurationQueue.stream().mapToDouble(x -> {
-                    return x;
-                }).average().orElse(0);
-                final double simulationMinAdvance = Math.max(SIMULATION_ADVANCED, floatAverageWallClockLoopDuration);
-                final double simulationWallClockDiff = net.getSimulationTime() - window.getWallClockTime();
-                final double simulationAdvancedTooMuch = simulationWallClockDiff - simulationMinAdvance;
-                // simulation is in advance too much
-                if (simulationAdvancedTooMuch > 0) {
-                    try {
-                        if (App.DEBUG) {
-                            Logger.getLogger(App.class.getName()).info(
-                                    "App sleep:" + simulationAdvancedTooMuch + " s simulationWallClockDiff:" + simulationWallClockDiff + " s floatAverageWallClockLoopDuration:"
-                                            + floatAverageWallClockLoopDuration + " s");
-                        }
-                        Thread.sleep((long) (simulationAdvancedTooMuch * 1E3));
-                    } catch (InterruptedException e) {
-                        Logger.getLogger(App.class.getName()).warning("Thread sleep interrupted");
-                    }
-                }
-            }
-        }
-        end();
-    }
+        final Console console = Window.getInstance().getConsole();
+        console.stringTyped(String.format("coordinates: %d %d", worldCoordinates.x, worldCoordinates.y));
+    }    
 }

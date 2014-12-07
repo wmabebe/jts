@@ -1,26 +1,23 @@
-package ch.bfh.ti.jts.console.commands;
+package ch.bfh.ti.jts.gui.console.commands;
 
 import ch.bfh.ti.jts.simulation.Simulation;
 
-public class RestartCommand implements Command {
-
+public class WallClockTimeCommand implements Command {
+    
     @Override
     public String execute(final Object executor) {
         final Simulation simulation = (Simulation) executor;
-        assert simulation != null;
-
-        simulation.restart();
-
-        return "simulation restarted.";
+        return String.format("Wall clock time: %.5f seconds", simulation.getWallClockTime());
     }
-
+    
     @Override
     public String getName() {
-        return "restart";
+        return "wctime";
     }
-
+    
     @Override
     public Class<?> getTargetType() {
         return Simulation.class;
     }
+    
 }
