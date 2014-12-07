@@ -1,5 +1,6 @@
 package ch.bfh.ti.jts;
 
+import java.awt.Point;
 import java.util.Collection;
 import java.util.Queue;
 import java.util.logging.Logger;
@@ -10,6 +11,7 @@ import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.console.JtsConsole;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.SpawnInfo;
+import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Window;
 import ch.bfh.ti.jts.importer.NetImporter;
 import ch.bfh.ti.jts.importer.RoutesImporter;
@@ -47,11 +49,11 @@ public class App implements Runnable {
         simulation = new Simulation(this);
         
         // create console
-        console = new JtsConsole();
+        console = new JtsConsole(this);
         console.setSimulation(simulation);
         
         // create window
-        window = new Window(console);
+        window = new Window(this);
         
         isRunning = true;
         window.setVisible(true);
@@ -59,6 +61,14 @@ public class App implements Runnable {
     
     private boolean isRunning() {
         return isRunning;
+    }
+    
+    public void addIdToConsole(final Point worldCoordinates) {
+        if (worldCoordinates == null)
+            throw new ArgumentNullException("worldCoordinates");
+        
+        // TODO: set id not coordinates into console
+        getConsole().stringTyped(String.format("coordinates: %d %d", worldCoordinates.x, worldCoordinates.y));        
     }
     
     public void loadNet(final String netName) {
@@ -75,6 +85,15 @@ public class App implements Runnable {
         routesImporter.setNet(net);
         routes = routesImporter.importData(String.format("src/main/resources/%s.rou.xml", this.netName));
         net.addRoutes(routes);
+    }
+    
+    
+    public Console getConsole() {
+        return console;
+    }
+        
+    public Window getWindow() {
+        return window;
     }
     
     public void reloadNet() {

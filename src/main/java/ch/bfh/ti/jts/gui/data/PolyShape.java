@@ -8,13 +8,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.utils.Helpers;
 
 public class PolyShape implements Serializable {
 
     private static List<Point2D> buildPoints(final String shapeString) {
         if (shapeString == null) {
-            throw new IllegalArgumentException("shapeString is null");
+            throw new ArgumentNullException("shapeString");
         }
         if (!Pattern.matches(SHAPE_REGEX_STRING, shapeString)) {
             throw new IllegalArgumentException("shapeString has wrong format");
@@ -50,7 +51,7 @@ public class PolyShape implements Serializable {
 
     public PolyShape(final List<Point2D> points, final boolean closedPath) {
         if (points == null) {
-            throw new IllegalArgumentException("points is null");
+            throw new ArgumentNullException("points");
         }
         if (points.size() == 0) {
             throw new IllegalArgumentException("points is empty");

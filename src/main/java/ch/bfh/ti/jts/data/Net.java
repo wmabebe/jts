@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.ai.agents.IdleAgent;
+import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
@@ -199,7 +200,7 @@ public class Net extends Element implements Serializable, Simulatable {
         
         final Lane lane = spawnLocation.getSpawnLane();
         if (lane == null) {
-            throw new RuntimeException("lane is null");
+            throw new ArgumentNullException("lane");
         }
         
         final double posOnLane = Helpers.clamp(spawnInfo.getDeparturePos(), 0.0, lane.getLength());

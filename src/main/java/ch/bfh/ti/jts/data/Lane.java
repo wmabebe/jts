@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import ch.bfh.ti.jts.App;
+import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 import ch.bfh.ti.jts.simulation.Simulatable;
@@ -45,10 +46,10 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
     public Lane(final String name, final Edge edge, final int index, final double speed, final double length, final PolyShape polyShape) {
         super(name);
         if (edge == null) {
-            throw new IllegalArgumentException("edge is null");
+            throw new ArgumentNullException("edge");
         }
         if (polyShape == null) {
-            throw new IllegalArgumentException("polyShape is null");
+            throw new ArgumentNullException("polyShape");
         }
         this.edge = edge;
         this.edge.addLane(this);
@@ -177,7 +178,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
      */
     public Set<Agent> getNextAgentsOnLine(final Agent agent) {
         if (agent == null) {
-            throw new IllegalArgumentException("agent is null");
+            throw new ArgumentNullException("agent");
         }
         if (agent.getLane() != this) {
             throw new IllegalArgumentException("agent is not on this lane");

@@ -16,6 +16,7 @@ import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.Route;
 import ch.bfh.ti.jts.data.SpawnInfo;
 import ch.bfh.ti.jts.data.Vehicle;
+import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 
 public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
 
@@ -44,7 +45,7 @@ public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
 
     private void extractFlow(final Node node) {
         if (node == null) {
-            throw new IllegalArgumentException("node is null");
+            throw new ArgumentNullException("node");
         }
         final String type = getAttribute(node, "type", String.class);
         final double departureSpeed = getAttribute(node, "departSpeed", Double.class);
@@ -66,7 +67,7 @@ public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
 
     private String extractRouteEdges(final Node node) {
         if (node == null) {
-            throw new IllegalArgumentException("node is null");
+            throw new ArgumentNullException("node");
         }
         String routeEdges = null;
         if (node.hasChildNodes()) {
@@ -81,7 +82,7 @@ public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
 
     private String extractRouteJunctions(final Node node) {
         if (node == null) {
-            throw new IllegalArgumentException("node is null");
+            throw new ArgumentNullException("node");
         }
         String routeEdges = null;
         if (node.hasChildNodes()) {
@@ -96,7 +97,7 @@ public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
 
     private void extractVecicle(final Node node) {
         if (node == null) {
-            throw new IllegalArgumentException("node is null");
+            throw new ArgumentNullException("node");
         }
         final String type = getAttribute(node, "type", String.class);
         final double departureTime = getAttribute(node, "depart", Double.class);
@@ -120,7 +121,7 @@ public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
 
     private void extractVecicleType(final Node node) {
         if (node == null) {
-            throw new IllegalArgumentException("node is null");
+            throw new ArgumentNullException("node");
         }
         final String id = getAttribute(node, "id", String.class);
         final double accel = getAttribute(node, "accel", Double.class);

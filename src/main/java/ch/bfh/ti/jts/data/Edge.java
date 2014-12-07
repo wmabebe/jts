@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
@@ -27,10 +28,10 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
     public Edge(final String name, final Junction start, final Junction end, final int priority) {
         super(name);
         if (start == null) {
-            throw new IllegalArgumentException("start is null");
+            throw new ArgumentNullException("start");
         }
         if (end == null) {
-            throw new IllegalArgumentException("end is null");
+            throw new ArgumentNullException("end");
         }
         this.start = start;
         this.start.addEdge(this);

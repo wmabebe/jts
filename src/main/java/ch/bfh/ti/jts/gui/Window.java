@@ -30,8 +30,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import ch.bfh.ti.jts.App;
-import ch.bfh.ti.jts.console.Console;
 import ch.bfh.ti.jts.data.Net;
+import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.simulation.Simulation;
 import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 import ch.bfh.ti.jts.utils.layers.Layers;
@@ -60,6 +60,8 @@ public class Window {
             try {
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 8));
+                
+                // tranformations
                 t = new AffineTransform();
                 final AffineTransform tConsole = new AffineTransform(t);
                 // move to offset
@@ -91,6 +93,15 @@ public class Window {
                 // Therefore the origin is in the left upper corner. As
                 // a result all the agents are driving on the wrong side.
                 g2d.transform(AffineTransform.getScaleInstance(1, -1));
+                
+                try {
+                    // save inverse transformation to get world coordinates from
+                    // screen coordinates later
+                    screenToWorldTransform = g2d.getTransform().createInverse();
+                } catch (final NoninvertibleTransformException e) {
+                    Logger.getLogger(Window.class.getName()).log(Level.SEVERE, "Can not invert world-->screen matrix.", e);
+                }
+                
                 // render everything
                 final Layers<Renderable> renderables = currentSimulationNet.getRenderable();
                 for (final int layer : renderables.getLayersIterator()) {
@@ -100,7 +111,7 @@ public class Window {
                 }
                 // render console
                 g2d.setTransform(tConsole);
-                console.render(g2d);
+                app.getConsole().render(g2d);
                 
                 // Let the OS have a little time...
                 Thread.yield();
@@ -133,7 +144,7 @@ public class Window {
         public void keyTyped(final KeyEvent keyEvent) {
             // keyCode is undefinet in this event
             // so we use the character instead
-            console.keyTyped(keyEvent.getKeyChar());
+            app.getConsole().keyTyped(keyEvent.getKeyChar());
         }
         
     }
@@ -162,6 +173,19 @@ public class Window {
         @Override
         public void mouseReleased(final MouseEvent mouseEvent) {
             isDown = false;
+        }
+        
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.isControlDown()) {
+                Point screenPoint = e.getPoint();
+                
+                // get world coordinates from screen coordinates
+                final Point realPoint = new Point();
+                screenToWorldTransform.transform(screenPoint, realPoint);
+                
+                app.addIdToConsole(realPoint);
+            }
         }
         
         @Override
@@ -199,6 +223,12 @@ public class Window {
      * Keep the last {@link Net} for this amount of time in [s];
      */
     private static final double             SIMULATION_HISTORY_KEEP_WINDOW = 10;
+    
+    /**
+     * App that this Window belongs to.
+     */
+    private final App                       app;
+    
     /**
      * Zoom delta. Determines how much to change the zoom when scrolling. Also
      * sets the minimum zoom
@@ -217,6 +247,7 @@ public class Window {
      */
     private double                          zoom                           = 1;
     private AffineTransform                 t                              = new AffineTransform();
+    private AffineTransform                 screenToWorldTransform         = new AffineTransform();
     private final Point2D                   zoomCenter                     = new Point2D.Double();
     private final Set<Integer>              keys                           = new HashSet<Integer>();
     /**
@@ -228,13 +259,12 @@ public class Window {
      */
     private final NavigableMap<Double, Net> simulationStates               = new ConcurrentSkipListMap<>();
     private final Simulation                windowSimulation;
-    private final Console                   console;
     
-    public Window(final Console console) {
-        if (console == null) {
-            throw new IllegalArgumentException("console is null");
+    public Window(App app) {
+        if (app == null) {
+            throw new ArgumentNullException("app");
         }
-        this.console = console;
+        this.app = app;
         windowSimulation = new Simulation(false); // no ai
         frame = new JFrame();
         frame.setTitle("JavaTrafficSimulator");

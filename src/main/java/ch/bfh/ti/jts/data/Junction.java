@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.graph.DirectedGraphVertex;
@@ -25,7 +26,7 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
     public Junction(final String name, final double x, final double y, final Shape shape) {
         super(name);
         if (shape == null) {
-            throw new IllegalArgumentException("shape is null");
+            throw new ArgumentNullException("shape");
         }
         this.x = x;
         this.y = y;

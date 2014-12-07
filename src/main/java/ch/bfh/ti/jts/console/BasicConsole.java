@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import ch.bfh.ti.jts.simulation.Simulation;
 
 public abstract class BasicConsole implements Console {
-
+    
     private final static String PROMPT            = "jts>";
     private final static String CURSOR            = "█";
     /**
@@ -25,11 +25,11 @@ public abstract class BasicConsole implements Console {
     private final Queue<String> lines             = new ConcurrentLinkedQueue<String>();
     private final StringBuffer  buffer            = new StringBuffer();
     private Simulation          simulation;
-
+    
     public BasicConsole() {
         font = new Font("Courier New", Font.PLAIN, 14);
     }
-
+    
     @Override
     public void executeCommand(final String line) {
         write(PROMPT + line);
@@ -37,17 +37,17 @@ public abstract class BasicConsole implements Console {
             parseCommand(line);
         }
     }
-
+    
     @Override
     public int getRenderLayer() {
         // doesn't matter at the moment
         return Integer.MAX_VALUE;
     }
-
+    
     public Simulation getSimulation() {
         return simulation;
     }
-
+    
     @Override
     public void keyTyped(final char character) {
         if (character >= 32 && character <= 127) {
@@ -60,19 +60,24 @@ public abstract class BasicConsole implements Console {
             pressEnter();
         }
     }
-
+    
+    @Override
+    public void stringTyped(String string) {
+        writeString(string);
+    }
+    
     protected abstract void parseCommand(final String line);
-
+    
     private void pressEnter() {
         final String line = buffer.toString();
         buffer.setLength(0);
         executeCommand(line);
     }
-
+    
     private void removeChar() {
         buffer.deleteCharAt(buffer.length() - 1);
     }
-
+    
     @Override
     public void render(final Graphics2D g) {
         g.setColor(Color.BLACK);
@@ -89,20 +94,20 @@ public abstract class BasicConsole implements Console {
         }
         g.drawString(output, POS_X, POS_Y + yoffset);
     }
-
+    
     protected void setFont(final Font font) {
         this.font = font;
     }
-
+    
     @Override
     public void setSimulation(final Simulation simulation) {
         this.simulation = simulation;
         this.simulation.setConsole(this);
     }
-
+    
     @Override
     public void write(final String text) {
-
+        
         if (text.contains("\n")) {
             // multiple lines
             final String[] helpLines = text.split("\n");
@@ -117,8 +122,12 @@ public abstract class BasicConsole implements Console {
             }
         }
     }
-
+    
     private void writeChar(final char character) {
         buffer.append(character);
+    }
+    
+    private void writeString(final String string) {
+        buffer.append(string);
     }
 }

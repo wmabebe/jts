@@ -14,6 +14,7 @@ import ch.bfh.ti.jts.data.Edge;
 import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
+import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.data.PolyShape;
 
 public class NetImporter extends Importer<Net> {
@@ -27,7 +28,7 @@ public class NetImporter extends Importer<Net> {
 
     private void extractConnection(final Node node) {
         if (node == null) {
-            throw new IllegalArgumentException("node is null");
+            throw new ArgumentNullException("node");
         }
         final String from = getAttribute(node, "from", String.class);
         final String to = getAttribute(node, "to", String.class);
@@ -70,7 +71,7 @@ public class NetImporter extends Importer<Net> {
 
     private void extractEdge(final Node node) {
         if (node == null) {
-            throw new IllegalArgumentException("node is null");
+            throw new ArgumentNullException("node");
         }
         final String id = getAttribute(node, "id", String.class);
         final String from = getAttribute(node, "from", String.class);
@@ -92,7 +93,7 @@ public class NetImporter extends Importer<Net> {
 
     private void extractJunction(final Node node) {
         if (node == null) {
-            throw new IllegalArgumentException("node is null");
+            throw new ArgumentNullException("node");
         }
         final String id = getAttribute(node, "id", String.class);
         final double x = getAttribute(node, "x", Double.class);
@@ -106,7 +107,7 @@ public class NetImporter extends Importer<Net> {
 
     private void extractLane(final Node node, final Edge edge) {
         if (node == null) {
-            throw new IllegalArgumentException("node is null");
+            throw new ArgumentNullException("node");
         }
         final String id = getAttribute(node, "id", String.class);
         final int index = getAttribute(node, "index", Integer.class);

@@ -9,7 +9,7 @@ import ch.bfh.ti.jts.simulation.Simulation;
  * @author Mathias
  */
 public interface Console extends Renderable {
-
+    
     /**
      * Write a line to the console which will be executed.
      *
@@ -17,7 +17,7 @@ public interface Console extends Renderable {
      *            line to be executed
      */
     void executeCommand(final String line);
-
+    
     /**
      * Key is typed on the console.
      *
@@ -25,7 +25,15 @@ public interface Console extends Renderable {
      *            typed character
      */
     void keyTyped(final char character);
-
+    
+    /**
+     * String is typed on the console.
+     *
+     * @param string
+     *            typed string
+     */
+    void stringTyped(final String string);
+    
     /**
      * Set the net where the console can execute commands on.
      *
@@ -33,7 +41,7 @@ public interface Console extends Renderable {
      *            data object
      */
     void setSimulation(final Simulation simulation);
-
+    
     /**
      * Write a line to the console which is not being executed (just output).
      *

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 11/13/14 11:33:18 by SUMO netgenerate Version 0.21.0
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo-sim.org/xsd/netgenerateConfiguration.xsd">
+
+    <spider_network>
+        <spider value="true"/>
+        <spider.arm-number value="10"/>
+        <spider.circle-number value="1"/>
+        <spider.space-radius value="200"/>
+    </spider_network>
+
+    <random_network>
+        <rand.bidi-probability value="1"/>
+    </random_network>
+
+    <output>
+        <output-file value="..\round.net.xml"/>
+    </output>
+
+    <processing>
+        <no-internal-links value="true"/>
+    </processing>
+
+    <building_defaults>
+        <default.lanenumber value="2"/>
+    </building_defaults>
+
+    <random_number>
+        <seed value="88"/>
+    </random_number>
+
+</configuration>
+-->
+
+<net version="0.13" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo-sim.org/xsd/net_file.xsd">
+
+	<location />
+
+	<edge id="e0" from="j0" to="j1" priority="-1">
+		<lane id="e0_0" index="0" speed="13.90" length="200.0" shape="0.0,0.0 198.0,0.0"/>
+		<lane id="e0_1" index="1" speed="13.90" length="200.0" shape="0.0,-4.0 198.0,-4.0"/>
+	</edge>
+	<edge id="e1" from="j1" to="j2" priority="-1">
+		<lane id="e1_0" index="0" speed="13.90" length="200.0" shape="202.0,0.0 398.0,0.0"/>
+		<lane id="e1_1" index="1" speed="13.90" length="200.0" shape="202.0,-4.0 398.0,-4.0"/>
+		<lane id="e1_2" index="2" speed="13.90" length="200.0" shape="202.0,-8.0 398.0,-8.0"/>
+	</edge>
+	<edge id="e2" from="j2" to="j3" priority="-1">
+		<lane id="e2_0" index="1" speed="13.90" length="200.0" shape="402.0,0.0 598.0,0.0"/>
+		<lane id="e2_1" index="0" speed="13.90" length="200.0" shape="402.0,-4.0 598.0,-4.0"/>
+	</edge>
+	<edge id="ex" from="jx" to="j1" priority="-1">
+		<lane id="ex_0" index="1" speed="13.90" length="200.0" shape="0.0,-20.0 198.0,-8.0"/>
+	</edge>
+
+	<junction id="j0" x="0.0" y="0.0" shape="0.0,0.0 0.0,0.0" />
+	<junction id="j1" x="200.0" y="0.0" shape="0.0,0.0 0.0,0.0" />
+	<junction id="j2" x="400.0" y="0.0" shape="0.0,0.0 0.0,0.0" />
+	<junction id="j3" x="600.0" y="0.0" shape="0.0,0.0 0.0,0.0" />
+	<junction id="jx" x="0.0" y="-20.0" shape="0.0,0.0 0.0,0.0" />
+
+	<connection from="e0" to="e1" fromLane="0" toLane="1" />
+	<connection from="e0" to="e1" fromLane="1" toLane="2" />
+	
+	<connection from="e1" to="e2" fromLane="0" toLane="0" />
+	<connection from="e1" to="e2" fromLane="1" toLane="0" />
+	<connection from="e1" to="e2" fromLane="2" toLane="1" />
+	
+	<connection from="ex" to="e1" fromLane="0" toLane="0" />
+
+</net>
