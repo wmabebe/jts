@@ -170,6 +170,7 @@ winki
 Enteee
 
 winki
+* Added "ramp" net [done] -> error at junctions
 
 ## 
 
