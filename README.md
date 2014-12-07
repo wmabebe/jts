@@ -175,6 +175,7 @@ Enteee
 
 winki
 * Added "ramp" net [done] -> error at junctions
+* Console can receive parameters from clickable GUI [progress]
 
 ## 
 
@@ -185,7 +186,6 @@ winki
   * Simulation lag -> fixed with average velocity
 * Agent handling on junctions
 * Area restricted tick method
-* Console can receive parameters from clickable GUI
 * Console commands:
   * agent removing
   * restart simulation
