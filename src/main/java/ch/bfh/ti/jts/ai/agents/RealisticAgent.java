@@ -110,6 +110,7 @@ public class RealisticAgent extends RandomAgent {
      * agent will not wait. For everything between 0 and 1, the agent will after
      * the formula 300^patienceFactor.
      */
+    @SuppressWarnings("unused")
     private double getPatientTime() {
         assert patienceFactor >= 0.0;
         assert patienceFactor <= 1.0;
