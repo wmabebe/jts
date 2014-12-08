@@ -162,6 +162,8 @@ Enteee
 * toggleInterpolate command added [done]
 
 winki
+* Added "ramp" net [done] -> error at junctions
+* Console can receive parameters from clickable GUI [progress]
 
 ### Calendar week 50
 
@@ -174,8 +176,6 @@ winki
 Enteee
 
 winki
-* Added "ramp" net [done] -> error at junctions
-* Console can receive parameters from clickable GUI [progress]
 
 ## 
 
