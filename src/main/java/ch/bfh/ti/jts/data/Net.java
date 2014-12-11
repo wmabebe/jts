@@ -53,7 +53,10 @@ public class Net extends Element implements Serializable, Simulatable {
     }
     
     public void addElement(final Element element) {
+        // add element to net        
         elements.add(element);
+        // set net on element
+        element.setNet(this);        
         // element renderable?
         if (Renderable.class.isInstance(element)) {
             final Renderable renderable = (Renderable) element;

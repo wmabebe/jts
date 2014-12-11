@@ -171,6 +171,7 @@ Enteee
 
 winki
 * Every element has a position and can be located [done]
+* RealisitcAgent uses GPS [done]
 
 ### Calendar week 51
 
@@ -192,7 +193,6 @@ winki
   * import OpenStreetMap data
 * Weather / daylight
 * Write project documentation
-* RealisitcAgent can use GPS
 * Record statistics data
   * average traffic flow
 

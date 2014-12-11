@@ -48,10 +48,19 @@ public abstract class Element implements Serializable, Comparable<Element> {
     
     private final String               name;
     private final int                  id;
+    private Net net;
     
     public Element(final String name) {
         this.name = name;
         id = NEXT_ID.incrementAndGet();
+    }    
+    
+    public void setNet(Net net) {
+        this.net = net;
+    }    
+    
+    public Net getNet() {
+        return net;
     }
     
     @Override
