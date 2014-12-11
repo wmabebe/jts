@@ -2,12 +2,15 @@ package ch.bfh.ti.jts;
 
 import java.awt.Point;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import ch.bfh.ti.jts.data.Agent;
+import ch.bfh.ti.jts.data.Element;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.SpawnInfo;
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
@@ -121,8 +124,13 @@ public class App implements Runnable {
         if (worldCoordinates == null)
             throw new ArgumentNullException("worldCoordinates");
         
-        // TODO: set id not coordinates into console
-        final Console console = Window.getInstance().getConsole();
-        console.stringTyped(String.format("coordinates: %d %d", worldCoordinates.x, worldCoordinates.y));
-    }    
+        final Net wallClockSimulationState = App.getInstance().getSimulation().getWallCLockSimulationState();
+        Collection<Class<?>> typeFilter = new LinkedList<Class<?>>();
+        typeFilter.add(Agent.class); // only search agents
+        Element element = wallClockSimulationState.getElementByCoordinates(worldCoordinates, 30, typeFilter);
+        if (element != null) {
+            final Console console = Window.getInstance().getConsole();
+            console.stringTyped(String.format("%d", element.getId()));
+        }
+    }
 }

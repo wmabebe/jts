@@ -1,5 +1,6 @@
 package ch.bfh.ti.jts.data;
 
+import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
@@ -135,7 +136,11 @@ public class Net extends Element implements Serializable, Simulatable {
     }
     
     public Stream<Element> getElementStream(final Class<?> filter) {
-        return elements.stream().sequential().filter(x -> x.getClass() == filter);
+        return elements.stream().sequential().filter(x -> filter.isAssignableFrom(x.getClass()));
+    }
+    
+    public Stream<Element> getElementStream(final Collection<Class<?>> filter) {
+        return elements.stream().sequential().filter(x -> filter.stream().anyMatch(f -> f.isAssignableFrom(x.getClass())));
     }
     
     public Layers<Renderable> getRenderable() {
@@ -211,4 +216,33 @@ public class Net extends Element implements Serializable, Simulatable {
         LOG.debug(agent + " spawned at: " + lane);
     }
     
+    /**
+     * Returns the element that is nearest to a specified coordinat pair. The
+     * elements can be filtered by max distance away from the coordinates and by
+     * its type.
+     * 
+     * @param maxDistance
+     *            max distance that the element can be away from the coordinates
+     *            [m].
+     * @param types
+     *            types of the elements that should be considered
+     * @return nearest element
+     */
+    public Element getElementByCoordinates(Point2D coordinates, double maxDistance, final Collection<Class<?>> types) {
+        Element nearestElement = null;
+        double minDistance = Double.MAX_VALUE;
+        List<Element> elements = getElementStream(types).filter(x -> x.getDistance(coordinates) <= maxDistance).collect(Collectors.toList());
+        for (Element element : elements) {
+            if (element.getDistance(coordinates) < minDistance) {
+                nearestElement = element;
+                minDistance = element.getDistance(coordinates);
+            }
+        }
+        return nearestElement;
+    }
+    
+    @Override
+    public Point2D getPosition() {
+        return new Point2D.Double(); // not supported yet
+    }
 }

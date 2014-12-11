@@ -163,13 +163,14 @@ Enteee
 
 winki
 * Added "ramp" net [done] -> error at junctions
-* Console can receive parameters from clickable GUI [progress]
+* Console can receive parameters from clickable GUI [done]
 
 ### Calendar week 50
 
 Enteee
 
 winki
+* Every element has a position and can be located [done]
 
 ### Calendar week 51
 
@@ -188,7 +189,6 @@ winki
 * Area restricted tick method
 * Console commands:
   * agent removing
-  * restart simulation
   * import OpenStreetMap data
 * Weather / daylight
 * Write project documentation

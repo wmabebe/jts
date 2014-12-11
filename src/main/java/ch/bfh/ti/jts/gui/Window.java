@@ -150,28 +150,20 @@ public class Window {
         private Point   mousePressedPoint = new Point();
         
         @Override
-        public void mouseDragged(final MouseEvent mouseEvent) {
+        public void mouseDragged(final MouseEvent e) {
             if (isDown) {
-                final double deltaX = mouseEvent.getX() - mousePressedPoint.getX();
-                final double deltaY = mouseEvent.getY() - mousePressedPoint.getY();
+                final double deltaX = e.getX() - mousePressedPoint.getX();
+                final double deltaY = e.getY() - mousePressedPoint.getY();
                 offset.setLocation(offset.getX() + deltaX, offset.getY() + deltaY);
-                mousePressedPoint = mouseEvent.getPoint();
+                mousePressedPoint = e.getPoint();
             }
         }
         
         @Override
-        public void mousePressed(final MouseEvent mouseEvent) {
-            mousePressedPoint = mouseEvent.getPoint();
+        public void mousePressed(final MouseEvent e) {
+            mousePressedPoint = e.getPoint();
             isDown = true;
-        }
-        
-        @Override
-        public void mouseReleased(final MouseEvent mouseEvent) {
-            isDown = false;
-        }
-        
-        @Override
-        public void mouseClicked(MouseEvent e) {
+            
             if (e.isControlDown()) {
                 Point screenPoint = e.getPoint();
                 
@@ -183,6 +175,11 @@ public class Window {
             }
         }
         
+        @Override
+        public void mouseReleased(final MouseEvent e) {
+            isDown = false;
+        }
+                
         @Override
         public void mouseWheelMoved(final MouseWheelEvent mouseEvent) {
             final Point mousePoint = mouseEvent.getPoint();

@@ -1,5 +1,6 @@
 package ch.bfh.ti.jts.data;
 
+import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -81,6 +82,35 @@ public abstract class Element implements Serializable, Comparable<Element> {
      */
     public String getName() {
         return name;
+    }
+    
+    /**
+     * Absolute position of this element on the world.
+     * 
+     * @return position as x and y coordinates
+     */
+    public abstract Point2D getPosition();
+    
+    /**
+     * Absolute distance to another element.
+     * 
+     * @param element
+     *            other element
+     * @return distance in [m]
+     */
+    public double getDistance(Element element) {
+        return getDistance(element.getPosition());
+    }
+    
+    /**
+     * Absolute distance to the specified world coordinates.
+     * 
+     * @param coordinates
+     *            world coordinates
+     * @return distance in [m]
+     */
+    public double getDistance(Point2D coordinates) {
+        return getPosition().distance(coordinates);
     }
     
     @Override

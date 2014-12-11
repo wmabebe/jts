@@ -1,6 +1,8 @@
 package ch.bfh.ti.jts.data;
 
 import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
@@ -71,6 +73,18 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
     
     public int getPriority() {
         return priority;
+    }
+    
+    @Override
+    public Point2D getPosition() {
+        Point2D start = getStart().getPosition();
+        Point2D end = getEnd().getPosition();
+        return Helpers.pointBetween(start, end);
+    }
+    
+    @Override
+    public double getDistance(Point2D coordinates) {
+        return Helpers.distancePointToLine(coordinates, new Line2D.Double(getStart().getPosition(), getEnd().getPosition()));
     }
     
     @Override

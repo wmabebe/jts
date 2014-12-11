@@ -3,6 +3,7 @@ package ch.bfh.ti.jts.data;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -112,6 +113,11 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
     
     public Edge getEdge() {
         return edge;
+    }
+    
+    @Override
+    public Point2D getPosition() {
+        return getEdge().getPosition();
     }
     
     public Map<Agent, Lane> getEdgeLeaveCandidates() {

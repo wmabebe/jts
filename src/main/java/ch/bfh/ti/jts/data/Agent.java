@@ -102,9 +102,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return lane;
     }
     
-    /**
-     * @return absolute coordinates of agent on world
-     */
+    @Override
     public Point2D getPosition() {
         return getLane().getPolyShape().getRelativePosition(getRelativePositionOnLane());
     }
