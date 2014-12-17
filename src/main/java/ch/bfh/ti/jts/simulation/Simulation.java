@@ -166,16 +166,20 @@ public class Simulation {
      */
     private void think(final Net simulateNet, final double duration) {
         // think
-        simulateNet.getThinkableStream().forEach(e -> {
-            assert e != null;
-            if (e instanceof Agent) {
-                final Agent a = (Agent) e;
+        simulateNet.getThinkableStream().forEach(element -> {
+            assert element != null;
+            if (element instanceof Agent) {
+                final Agent agent = (Agent) element;
                 // don't call think on this removed agent
-                if (a.isRemoveCandidate()) {
+                if (agent.isRemoveCandidate()) {
                     return;
                 }
             }
-            e.think();
+            try {
+                element.think();
+            } catch (Exception e) {
+                LOG.error(e);
+            }
         });
     }
     
