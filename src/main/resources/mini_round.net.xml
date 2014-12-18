@@ -40,10 +40,10 @@
 	<location />
 
 	<edge id="e0" from="j0" to="j1" priority="-1">
-		<lane id="e0_0" index="0" speed="13.90" length="300.00" shape="0.0,-6.0 300.0,-6.0"/>
+		<lane id="e0_0" index="0" speed="13.90" length="100.00" shape="0.0,-6.0 100.0,-6.0"/>
 	</edge>
 	<edge id="e1" from="j1" to="j0" priority="-1">
-		<lane id="e1_0" index="0" speed="13.90" length="300.00" shape="300.0,2.0 0.0,2.0"/>
+		<lane id="e1_0" index="0" speed="13.90" length="100.00" shape="100.0,2.0 0.0,2.0"/>
 	</edge>
 
 	<junction id="j0" x="0.0" y="0.0" shape="0.0,0.0 0.0,0.0" />

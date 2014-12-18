@@ -124,12 +124,15 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         final Map<Agent, Lane> edgeLeaveAgents = new HashMap<>();
         for (final Agent agent : edgeLeaveCandidates) {
             final Lane nextEdgeLane = agent.getDecision().getNextEdgeLane();
-            if (nextEdgeLane != null && lanes.contains(nextEdgeLane)) {
-                edgeLeaveAgents.put(agent, nextEdgeLane);
-            } else {
-                // not a valid decision, stop agent.
-                agent.collide();
+            
+            if (nextEdgeLane != null && !lanes.contains(nextEdgeLane)) {                
+                // not a valid decision
+                LOG.warn(String.format("Agent %d made no valid decision for next lane", agent.getId()));
             }
+            
+            // agent will switch edge
+            // or he will be removed because he reached his destination
+            edgeLeaveAgents.put(agent, nextEdgeLane);            
         }
         return edgeLeaveAgents;
     }
@@ -147,9 +150,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
                 if (agent.isLaneChangeCandidate()) {
                     laneChangeCandidates.add(agent);
                 }
-                
             }
-            
         }
         laneChangeCandidates.forEach(agent -> {
             switch (agent.getDecision().getLaneChangeDirection()) {

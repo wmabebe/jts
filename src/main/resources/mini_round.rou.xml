@@ -33,7 +33,7 @@
 		<route edges="e0 e0"/>
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="10" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e0"/>
+		<route edges="e1 e1"/>
 	</vehicle>
 	<!--
 	<vehicle id="v0" type="car" depart="0" departPos="20" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">

@@ -115,7 +115,12 @@ public class RoutesImporter extends Importer<Collection<SpawnInfo>> {
         final String edgeIdEnd = edges[edges.length - 1];
         final Edge routeStart = (Edge) net.getElementStream(Edge.class).filter(x -> x.getName().equals(edgeIdStart)).findFirst().orElse(null);
         final Edge routeEnd = (Edge) net.getElementStream(Edge.class).filter(x -> x.getName().equals(edgeIdEnd)).findFirst().orElse(null);
-        final SpawnInfo route = new Route(vehicle, routeStart, routeEnd, departureTime, departurePos, departureSpeed, arrivalPos, arrivalSpeed);
+        
+        // take junctions for spawning
+        final Junction jStart = routeStart.getStart();
+        final Junction jEnd = routeEnd.getEnd();        
+        
+        final SpawnInfo route = new Route(vehicle, jStart, jEnd, departureTime, departurePos, departureSpeed, arrivalPos, arrivalSpeed);
         routes.add(route);
     }
 

@@ -15,7 +15,9 @@
         <Logger name="ch.bfh.ti.jts.simulation.Simulation" level="info"/>
         <Logger name="ch.bfh.ti.jts.gui.Window" level="info"/>
         <Logger name="ch.bfh.ti.jts.gui.console.JtsConsole" level="info"/>
-        <Logger name="ch.bfh.ti.jts.data.Net" level="info"/>
+        <Logger name="ch.bfh.ti.jts.data.Net" level="debug"/>
+        <Logger name="ch.bfh.ti.jts.data.Edge" level="debug"/>
+        <Logger name="ch.bfh.ti.jts.data.Junction" level="debug"/>
         <Logger name="ch.bfh.ti.jts.data.Lane" level="info"/>
         <Logger name="ch.bfh.ti.jts.data.Agent" level="debug"/>
         <Root level="debug">

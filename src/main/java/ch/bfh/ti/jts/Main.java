@@ -24,7 +24,7 @@ public class Main {
         
         // start app
         final App app = App.getInstance();
-        app.loadSimulation("round");
+        app.loadSimulation("ramp");
         app.run();
     }
     

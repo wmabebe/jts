@@ -266,19 +266,22 @@ public class RealisticAgent extends RandomAgent {
         }
         getDecision().setLaneChangeDirection(direction);
         
-        Junction from = getLane().getEdge().getStart();
+        Junction from = getLane().getEdge().getEnd();
         Junction to = getSpawnInfo().getEndJunction();
         if (from != null && to != null) {
             // use gps
             Net net = getNet();
             if (net == null) {
                 throw new RuntimeException("agent has no net!");
-            }            
+            }
             GPS<Junction, Edge> gps = new GPS<Junction, Edge>(net);
             Edge goal = gps.getNextEdge(from, to).orElse(null);
             if (goal != null) {
                 // take first lane
-                getDecision().setNextEdgeLane(goal.getFirstLane());
+                Lane firstLane = (goal.getFirstLane());
+                if (firstLane != null) {
+                    getDecision().setNextEdgeLane(firstLane);
+                }
             }
         } else {
             // decide random (RandomAgent)

@@ -178,6 +178,8 @@ winki
 Enteee
 
 winki
+* Spawning and despawning only at junctions. Edges will be mapped to begin junction or end junction at importing time of the routes file [done]
+* Bugfix in RealisticAgent [done]
 
 ## 
 

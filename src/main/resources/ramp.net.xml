@@ -69,6 +69,6 @@
 	<connection from="e1" to="e2" fromLane="1" toLane="0" />
 	<connection from="e1" to="e2" fromLane="2" toLane="1" />
 	
-	<connection from="ex" to="e1" fromLane="0" toLane="0" />
+	<connection from="ex" to="e1" fromLane="0" toLane="2" />
 
 </net>

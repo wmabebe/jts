@@ -11,6 +11,9 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
@@ -19,6 +22,7 @@ import ch.bfh.ti.jts.utils.graph.DirectedGraphVertex;
 public class Junction extends Element implements SpawnLocation, DirectedGraphVertex<Junction, Edge>, Renderable, Simulatable {
     
     private static final long      serialVersionUID = 1L;
+    public final static Logger     LOG              = LogManager.getLogger(Junction.class);
     private final double           x;
     private final double           y;
     private final Shape            shape;
@@ -96,24 +100,29 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
         // move incoming agents over junction
         edges.stream().filter(edge -> edge.goesTo(this)).forEach(edge -> {
             edge.getEdgeSwitchCandidates().forEach((agent, nextEdgeLane) -> {
-                
-                // despawn agents
+                try {
+                    // despawn agents
                     final SpawnInfo spawnInfo = agent.getSpawnInfo();
-                    if (spawnInfo != null && spawnInfo instanceof Flow) {
-                        final SpawnLocation end = spawnInfo.getEnd();
-                        
+                    if (spawnInfo != null) {
+                        final SpawnLocation end = spawnInfo.getEnd();                        
                         if (equals(end)) {
                             // remove agent
                             agent.remove();
                             return;
                         }
                     }
-                    
+                } catch (final Exception e) {
+                    LOG.error(String.format("Agent %d can't despawn on junction %s", agent.getId(), getName()), e);
+                }
+                try {
+                    // switch edge
                     agent.getLane().removeEdgeLeaveCandidate(agent);
                     agent.setNextEdgeLane(nextEdgeLane);
                     nextEdgeLane.addLaneAgent(agent);
-                });
-        });
-        
+                } catch (final Exception e) {
+                    LOG.error(String.format("Agent %d can't switch edge on junction %s", agent.getId(), getName()), e);
+                }
+            });
+        });        
     }
 }
