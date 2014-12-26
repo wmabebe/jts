@@ -1,8 +1,11 @@
 package ch.bfh.ti.jts.gui.console.commands;
 
+import com.beust.jcommander.Parameters;
+
 import ch.bfh.ti.jts.App;
 
-public class RestartCommand implements Command {
+@Parameters(commandDescription = "Restart the simulation")
+public class RestartCommand extends Command {
     
     @Override
     public String execute(final Object executor) {

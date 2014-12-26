@@ -21,7 +21,7 @@ public class JtsConsole extends BasicConsole {
     public class MainParams {
         
         @Parameter(names = { "-help", "-h" }, description = "Help")
-        private final boolean help = false;
+        private boolean help = false;
     }
     
     private final MainParams          mainParams = new MainParams();
@@ -29,15 +29,19 @@ public class JtsConsole extends BasicConsole {
     private final Collection<Command> commands   = new LinkedList<>();
     
     public JtsConsole() {
+        init();
+    }
+    
+    private void init() {
         Reflections reflections = new Reflections(Command.class.getPackage().getName());
         reflections.getSubTypesOf(Command.class).forEach((clazz) -> {
             try {
                 Command command = clazz.newInstance();
                 commands.add(command);
                 jc.addCommand(command.getName(), command);
-                LOG.info("Loaded command:" + command.getName());
+                LOG.info(String.format("Loaded command %s", command.getName()));
             } catch (Exception e) {
-                LOG.fatal("Failed instantiating:" + clazz, e);
+                LOG.fatal("Failed instantiating command " + clazz, e);
             }
         });
     }
@@ -47,29 +51,41 @@ public class JtsConsole extends BasicConsole {
         App.getInstance().addCommand(command);
     }
     
+    private void showHelptext(String commandName) {
+        final StringBuilder sb = new StringBuilder();
+        if (commandName != null) {
+            jc.usage(commandName, sb);
+        } else {
+            jc.usage(sb);
+        }
+        write(sb.toString());
+    }
+    
     @Override
     protected void parseCommand(final String line) {
         if (line != null && !"".equals(line)) {
             try {
-                final String[] args = line.split(" ");
-                
+                final String[] args = line.trim().split(" ");
                 jc.parse(args);
                 
+                // display main help?
+                if (mainParams.help) {
+                    showHelptext(null);
+                    mainParams.help = false; // reset value
+                    return;
+                }
                 final String commandName = jc.getParsedCommand();
                 if (commandName != null) {
                     final Command command = commands.stream().filter(x -> x.getName().equals(commandName)).findFirst().orElse(null);
                     if (command != null) {
-                        execute(command);
-                    }
-                } else {
-                    // display help...
-                    if (mainParams.help) {
-                        final StringBuilder sb = new StringBuilder();
-                        jc.usage(sb);
-                        write(sb.toString());
+                        if (command.help) {
+                            showHelptext(commandName);
+                            command.help = false; // reset value
+                        } else {
+                            execute(command);
+                        }
                     }
                 }
-                
             } catch (final ParameterException e) {
                 write("Invalid command");
                 LOG.warn("Invalid command");

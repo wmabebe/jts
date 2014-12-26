@@ -138,8 +138,8 @@ public class Simulation {
         simulationStates.clear();
     }
     
-    public void toggleInterpolateWallClockSimulationState() {
-        interpolateWallClockSimulationState.set(!interpolateWallClockSimulationState.get());
+    public void setInterpolateWallClockSimulationState(boolean value) {
+        interpolateWallClockSimulationState.set(value);
     }
     
     /**
@@ -165,22 +165,21 @@ public class Simulation {
      * @param duration
      */
     private void think(final Net simulateNet, final double duration) {
-        // think
         simulateNet.getThinkableStream().forEach(element -> {
-            assert element != null;
-            if (element instanceof Agent) {
-                final Agent agent = (Agent) element;
-                // don't call think on this removed agent
-                if (agent.isRemoveCandidate()) {
-                    return;
+            // think
+                try {
+                    if (element instanceof Agent) {
+                        final Agent agent = (Agent) element;
+                        // don't call think on this removed agent
+                        if (agent.isRemoveCandidate()) {
+                            return;
+                        }
+                    }
+                    element.think();
+                } catch (Exception e) {
+                    LOG.error("Think failed", e);
                 }
-            }
-            try {
-                element.think();
-            } catch (Exception e) {
-                LOG.error(e);
-            }
-        });
+            });
     }
     
     /**

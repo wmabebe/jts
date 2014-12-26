@@ -1,8 +1,11 @@
 package ch.bfh.ti.jts.gui.console.commands;
 
+import com.beust.jcommander.Parameters;
+
 import ch.bfh.ti.jts.data.Net;
 
-public class SimulationTimeCommand implements Command {
+@Parameters(commandDescription = "Show simulation time")
+public class SimulationTimeCommand extends Command {
     
     @Override
     public String execute(final Object executor) {
@@ -18,6 +21,5 @@ public class SimulationTimeCommand implements Command {
     @Override
     public Class<?> getTargetType() {
         return Net.class;
-    }
-    
+    }    
 }

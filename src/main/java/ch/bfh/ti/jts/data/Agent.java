@@ -130,7 +130,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      * @return relative position on lane.
      */
     public double getRelativePositionOnLane() {
-        return positionOnLane / getLane().getLength();
+        return getPositionOnLane() / getLane().getLength();
     }
     
     @Override
@@ -171,10 +171,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      *         edge, @{code false} otherwise
      */
     public boolean isEdgeLeaveCandidate() {
-        //@formatter:off
-        return  getRelativePositionOnLane() > 1.0
-                && getDecision().getNextEdgeLane() != null;
-        //@formatter:on
+        return getRelativePositionOnLane() > 1.0;
     }
     
     /**
@@ -301,6 +298,9 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         }
         setPositionOnLane(getPositionOnLane() - lane.getLength());
         lane = nextEdgeLane;
+        if (getPositionOnLane() > getLane().getLength()) {
+            throw new RuntimeException("Position is greater than the length of the lane");
+        }
     }
     
     private void setSpawnInfo(final SpawnInfo spawnInfo) {

@@ -34,7 +34,7 @@ public class RandomAgent extends Agent {
             final List<Lane> nextLanes = new LinkedList<Lane>(nextEdges.get(ThreadLocalRandom.current().nextInt(nextEdges.size())).getLanes());
             // select a random lane
             final Lane nextLane = nextLanes.get(ThreadLocalRandom.current().nextInt(nextLanes.size()));
-            getDecision().setNextEdgeLane(nextLane);
+            getDecision().setTurning(nextLane);
         }
     }
 }

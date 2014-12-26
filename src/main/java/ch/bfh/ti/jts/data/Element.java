@@ -4,6 +4,8 @@ import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import ch.bfh.ti.jts.exceptions.ArgumentNullException;
+
 /**
  * Base class for all the elements.
  *
@@ -48,18 +50,24 @@ public abstract class Element implements Serializable, Comparable<Element> {
     
     private final String               name;
     private final int                  id;
-    private Net net;
+    private Net                        net;
     
     public Element(final String name) {
         this.name = name;
         id = NEXT_ID.incrementAndGet();
-    }    
+    }
     
     public void setNet(Net net) {
+        if (net == null) {
+            throw new ArgumentNullException("net");
+        }
         this.net = net;
-    }    
+    }
     
     public Net getNet() {
+        if (net == null) {
+            throw new ArgumentNullException("net");
+        }
         return net;
     }
     

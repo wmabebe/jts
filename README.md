@@ -176,27 +176,63 @@ winki
 ### Calendar week 51
 
 Enteee
+* Simulation lag -> fixed with average velocity [done]
 
 winki
 * Spawning and despawning only at junctions. Edges will be mapped to begin junction or end junction at importing time of the routes file [done]
 * Bugfix in RealisticAgent [done]
 
-## 
+### Calendar week 52
+
+Enteee
+
+winki
+* Bugfix (invalid relative positions) [done]
+* Agents can set turning (short-term decision) or destination (long-term decision) [done]
+* Console bugfix (command argument variables must not be final!) [done]
+* Help text for commands [done]
+* Added remove command [done]
+* Agent handling on junctions [progress]
 
 ## Open issues
 
+### Planned
+
 * Bugfixes
   * Transcendent agents when collision happend
-  * Simulation lag -> fixed with average velocity
-* Agent handling on junctions
-* Area restricted tick method
-* Console commands:
-  * agent removing
-  * import OpenStreetMap data
-* Weather / daylight
+  * A lot of collisions!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 * Write project documentation
 * Record statistics data
   * average traffic flow
+
+### Backlog
+
+* Area restricted tick method
+* Weather / daylight
+* Console command to import OpenStreetMap data
+
+## Documentation
+
+### Simulation cycle (pseudo code)
+
+```
+initialization();
+load_map();
+build_net();
+loop {
+	check_remove_agents();
+	spawn_agents();
+	think();
+	calculate_agents_drive_distance();
+	while (any_agent_has_to_drive()) {
+		check_switch_lane();
+		check_leave_lane();
+		redirect_agents();
+		check_collisions();
+	}
+}
+end();
+```
 
 ## Resources
 

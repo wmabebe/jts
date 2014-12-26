@@ -68,7 +68,9 @@ public abstract class BasicConsole implements Console {
     }
     
     private void removeChar() {
-        buffer.deleteCharAt(buffer.length() - 1);
+        if (buffer.length() > 0) {
+            buffer.deleteCharAt(buffer.length() - 1);
+        }
     }
     
     @Override

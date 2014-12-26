@@ -21,6 +21,7 @@ import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
+import ch.bfh.ti.jts.utils.graph.GPS;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
 /**
@@ -53,10 +54,10 @@ public class Net extends Element implements Serializable, Simulatable {
     }
     
     public void addElement(final Element element) {
-        // add element to net        
+        // add element to net
         elements.add(element);
         // set net on element
-        element.setNet(this);        
+        element.setNet(this);
         // element renderable?
         if (Renderable.class.isInstance(element)) {
             final Renderable renderable = (Renderable) element;
@@ -102,13 +103,13 @@ public class Net extends Element implements Serializable, Simulatable {
         return new IdleAgent();
     }
     
-    private void checkGoalReached(){
+    private void checkGoalReached() {
         List<Agent> agents = getElementStream(Agent.class).map(x -> (Agent) x).collect(Collectors.toList());
         for (Agent agent : agents) {
             SpawnInfo spawnInfo = agent.getSpawnInfo();
-            if (spawnInfo != null){
-                //if (spawnInfo.getEnd().equals(get));
-            } else{
+            if (spawnInfo != null) {
+                // if (spawnInfo.getEnd().equals(get));
+            } else {
                 LOG.warn(String.format("Agent %d has no spawn info", getId()));
             }
         }
@@ -142,6 +143,18 @@ public class Net extends Element implements Serializable, Simulatable {
         }
     }
     
+    public boolean removeAgent(int id) {
+        Element element = getElement(id);
+        if (element != null) {
+            if (element instanceof Agent) {
+                final Agent agent = (Agent) element;
+                agent.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private void doDespawning() {
         // remove agents...
         elements.removeIf(x -> {
@@ -160,6 +173,10 @@ public class Net extends Element implements Serializable, Simulatable {
         });
         renderables.removeAgents();
         simulatables.removeAgents();
+    }
+    
+    public GPS<Junction, Edge> getGPS() {
+        return new GPS<Junction, Edge>(this);
     }
     
     public Element getElement(final int elementId) {

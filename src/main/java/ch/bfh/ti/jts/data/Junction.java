@@ -14,10 +14,12 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import ch.bfh.ti.jts.ai.Decision;
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.graph.DirectedGraphVertex;
+import ch.bfh.ti.jts.utils.graph.GPS;
 
 public class Junction extends Element implements SpawnLocation, DirectedGraphVertex<Junction, Edge>, Renderable, Simulatable {
     
@@ -62,6 +64,24 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
         }).collect(Collectors.toList());
     }
     
+    public Collection<Lane> getOutgoingLanes() {
+        return edges.stream().filter(edge -> {
+            return edge.comesFrom(this);
+        }).flatMap(x -> x.getLanes().stream()).collect(Collectors.toList());
+    }
+    
+    public Collection<Edge> getIncomingEdges() {
+        return edges.stream().filter(edge -> {
+            return edge.goesTo(this);
+        }).collect(Collectors.toList());
+    }
+    
+    public Collection<Lane> getIncomingLanes() {
+        return edges.stream().filter(edge -> {
+            return edge.goesTo(this);
+        }).flatMap(x -> x.getLanes().stream()).collect(Collectors.toList());
+    }
+    
     @Override
     public Collection<Junction> getReachableVertices() {
         final Collection<Junction> neighbours = new HashSet<>();
@@ -95,34 +115,83 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
         g.fill(shape);
     }
     
+    private void switchLane(Agent agent, Lane nextLane) {
+        agent.getLane().removeEdgeLeaveCandidate(agent);
+        agent.setNextEdgeLane(nextLane);
+        nextLane.addLaneAgent(agent);
+    }
+        
     @Override
     public void simulate(final double duration) {
         // move incoming agents over junction
         edges.stream().filter(edge -> edge.goesTo(this)).forEach(edge -> {
-            edge.getEdgeSwitchCandidates().forEach((agent, nextEdgeLane) -> {
+            edge.getEdgeLeaveCandidates().forEach((agent) -> {
                 try {
                     // despawn agents
                     final SpawnInfo spawnInfo = agent.getSpawnInfo();
                     if (spawnInfo != null) {
-                        final SpawnLocation end = spawnInfo.getEnd();                        
+                        final SpawnLocation end = spawnInfo.getEnd();
                         if (equals(end)) {
                             // remove agent
                             agent.remove();
-                            return;
+                            return; // break!
                         }
                     }
                 } catch (final Exception e) {
                     LOG.error(String.format("Agent %d can't despawn on junction %s", agent.getId(), getName()), e);
                 }
                 try {
-                    // switch edge
-                    agent.getLane().removeEdgeLeaveCandidate(agent);
-                    agent.setNextEdgeLane(nextEdgeLane);
-                    nextEdgeLane.addLaneAgent(agent);
+                    // check switch edge...
+                    
+                    // 1. next edge lane?
+                    Decision decision = agent.getDecision();
+                    Lane nextEdgeLane = decision.getNextEdgeLane();
+                    if (nextEdgeLane != null) {
+                        // agent wants to switch on a specified lane
+                        if (agent.getLane().isValidOutgoingLane(nextEdgeLane)) {
+                            // switch to this lane
+                            switchLane(agent, nextEdgeLane);
+                            return; // break!
+                        } else {
+                            // not a valid decision
+                            LOG.warn(String.format("Agent %d made no valid decision for next lane", agent.getId()));
+                        }
+                    }
+                    
+                    // 2. destination?
+                    Junction destination = decision.getDestination();
+                    if (destination != null) {
+                        // agent has a destination
+                        // use gps to get there...
+                        Junction lastJunction = agent.getLane().getEdge().getEnd();
+                        if (lastJunction == null) {
+                            throw new ArgumentNullException("lastJunction");
+                        }
+                        GPS<Junction, Edge> gps = getNet().getGPS();
+                        Edge nextEdge = gps.getNextEdge(lastJunction, destination).orElse(null);
+                        if (nextEdge != null) {
+                            // take first lane
+                            Lane defaultLane = nextEdge.getDefaultLane(agent.getLane());
+                            if (defaultLane != null) {
+                                // switch to this lane
+                                switchLane(agent, defaultLane);
+                                return; // break!
+                            } else {
+                                LOG.warn("No default lane for this outgoing lane");
+                            }
+                        } else {
+                            LOG.warn("GPS didn't find a path");
+                        }
+                        
+                    }
+                    
+                    // 3. no decision?
+                    agent.collide();
+                    
                 } catch (final Exception e) {
                     LOG.error(String.format("Agent %d can't switch edge on junction %s", agent.getId(), getName()), e);
                 }
             });
-        });        
+        });
     }
 }

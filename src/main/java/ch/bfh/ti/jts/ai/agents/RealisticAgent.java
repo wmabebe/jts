@@ -5,14 +5,11 @@ import java.util.Random;
 
 import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
 import ch.bfh.ti.jts.data.Agent;
-import ch.bfh.ti.jts.data.Edge;
 import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
-import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.Vehicle;
 import ch.bfh.ti.jts.simulation.Simulation;
 import ch.bfh.ti.jts.utils.Helpers;
-import ch.bfh.ti.jts.utils.graph.GPS;
 
 /**
  * A agent which drives without collision.
@@ -266,25 +263,10 @@ public class RealisticAgent extends RandomAgent {
         }
         getDecision().setLaneChangeDirection(direction);
         
-        Junction from = getLane().getEdge().getEnd();
-        Junction to = getSpawnInfo().getEndJunction();
-        if (from != null && to != null) {
-            // use gps
-            Net net = getNet();
-            if (net == null) {
-                throw new RuntimeException("agent has no net!");
-            }
-            GPS<Junction, Edge> gps = new GPS<Junction, Edge>(net);
-            Edge goal = gps.getNextEdge(from, to).orElse(null);
-            if (goal != null) {
-                // take first lane
-                Lane firstLane = (goal.getFirstLane());
-                if (firstLane != null) {
-                    getDecision().setNextEdgeLane(firstLane);
-                }
-            }
-        } else {
-            // decide random (RandomAgent)
+        getDecision().setTurning(null); // no direct switch. use gps...        
+        Junction destination = getSpawnInfo().getEndJunction();
+        if (destination != null){
+            getDecision().setDestination(destination);
         }
     }
     

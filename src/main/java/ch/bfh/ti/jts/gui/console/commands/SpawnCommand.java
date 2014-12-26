@@ -14,45 +14,47 @@ import ch.bfh.ti.jts.data.SpawnInfo;
 import ch.bfh.ti.jts.data.Vehicle;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 
-public class SpawnCommand implements Command {
-
+@Parameters(commandDescription = "Spawn agents")
+public class SpawnCommand extends Command {
+    
     @Parameter(names = { "-number", "-n" }, description = "Number of vehicles to spawn")
-    private final int number = 1;
-
+    private int number = 1;
+    
     @Override
     public String execute(final Object executor) {
         final Net net = (Net) executor;
-
+        
         // get net data
         final List<Element> edges = net.getElementStream(Edge.class).collect(Collectors.toList());
-
+        
         // generate routes
         final Collection<SpawnInfo> routes = new LinkedList<>();
         for (int i = 0; i < number; i++) {
-
+            
             final Vehicle vehicle = new Vehicle();
-
+            
             // random route, random position
             final Edge routeStart = (Edge) edges.get(ThreadLocalRandom.current().nextInt(edges.size()));
             final Edge routeEnd = (Edge) edges.get(ThreadLocalRandom.current().nextInt(edges.size()));
             final double position = ThreadLocalRandom.current().nextDouble();
             final double departureTime = net.getSimulationTime();
             final double speed = vehicle.getMaxVelocity();
-
+            
             final SpawnInfo route = new Route(vehicle, routeStart, routeEnd, departureTime, position, speed, 0.0, 0.0);
             routes.add(route);
         }
         net.addRoutes(routes);
-
+        
         return String.format("%d vehicles spawned", number);
     }
-
+    
     @Override
     public String getName() {
         return "spawn";
     }
-
+    
     @Override
     public Class<?> getTargetType() {
         return Net.class;

@@ -1,8 +1,11 @@
 package ch.bfh.ti.jts.gui.console.commands;
 
+import com.beust.jcommander.Parameters;
+
 import ch.bfh.ti.jts.simulation.Simulation;
 
-public class WallClockTimeCommand implements Command {
+@Parameters(commandDescription = "Show the wall clock time")
+public class WallClockTimeCommand extends Command {
     
     @Override
     public String execute(final Object executor) {
@@ -18,6 +21,5 @@ public class WallClockTimeCommand implements Command {
     @Override
     public Class<?> getTargetType() {
         return Simulation.class;
-    }
-    
+    }    
 }

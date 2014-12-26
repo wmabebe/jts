@@ -5,9 +5,9 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,12 +50,8 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
         lanes.add(lane);
     }
     
-    public Map<Agent, Lane> getEdgeSwitchCandidates() {
-        final Map<Agent, Lane> switchAgents = new ConcurrentHashMap<>();
-        lanes.forEach(lane -> {
-            switchAgents.putAll(lane.getEdgeLeaveCandidates());
-        });
-        return switchAgents;
+    public Set<Agent> getEdgeLeaveCandidates() {
+        return lanes.stream().flatMap(x -> x.getEdgeLeaveCandidates().stream()).collect(Collectors.toSet());
     }
     
     @Override
@@ -65,6 +61,10 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
     
     public Lane getFirstLane() {
         return getLanes().stream().sequential().findFirst().orElse(null);
+    }
+    
+    public Lane getDefaultLane(Lane current) {
+        return current.getLanes().stream().filter(x -> x.comesFrom(current.getEdge().getEnd())).findFirst().orElse(null);
     }
     
     public Collection<Lane> getLanes() {
@@ -116,7 +116,7 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
     
     @Override
     public void simulate(final double duration) {
-        //despawn();
+        // despawn();
         switchLane();
     }
     
@@ -130,19 +130,19 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
                     // only if agent isn't already removed
                     try {
                         // lane switch possible?
-                    if (changeLane.isPresent()) {
-                        agent.setLane(changeLane.get());
-                        changeLane.get().addLaneAgent(agent);
-                        lane.removeLaneAgent(agent);
-                    } else {
-                        agent.remove();
-                        LOG.warn(String.format("Agent %d was removed due to an invalid lane change information", agent.getId()));
+                        if (changeLane.isPresent()) {
+                            agent.setLane(changeLane.get());
+                            changeLane.get().addLaneAgent(agent);
+                            lane.removeLaneAgent(agent);
+                        } else {
+                            agent.remove();
+                            LOG.warn(String.format("Agent %d was removed due to an invalid lane change information", agent.getId()));
+                        }
+                    } catch (final Exception e) {
+                        LOG.error(String.format("Agent %d can't switch lane", agent.getId()), e);
                     }
-                } catch (final Exception e) {
-                    LOG.error(String.format("Agent %d can't switch lane", agent.getId()), e);
                 }
-            }
-        }   );
+            });
         });
     }
 }

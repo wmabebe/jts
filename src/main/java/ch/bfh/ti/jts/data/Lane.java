@@ -5,10 +5,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Optional;
@@ -120,25 +120,49 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         return getEdge().getPosition();
     }
     
-    public Map<Agent, Lane> getEdgeLeaveCandidates() {
-        final Map<Agent, Lane> edgeLeaveAgents = new HashMap<>();
-        for (final Agent agent : edgeLeaveCandidates) {
-            final Lane nextEdgeLane = agent.getDecision().getNextEdgeLane();
-            
-            if (nextEdgeLane != null && !lanes.contains(nextEdgeLane)) {                
-                // not a valid decision
-                LOG.warn(String.format("Agent %d made no valid decision for next lane", agent.getId()));
-            }
-            
-            // agent will switch edge
-            // or he will be removed because he reached his destination
-            edgeLeaveAgents.put(agent, nextEdgeLane);            
-        }
-        return edgeLeaveAgents;
+    public Set<Agent> getEdgeLeaveCandidates() {
+        return edgeLeaveCandidates;
+    }
+    
+    public boolean isValidOutgoingLane(Lane lane) {
+        return lanes.contains(lane);
     }
     
     public int getIndex() {
         return index;
+    }
+    
+    private Set<SimpleEntry<Lane, Lane>> getConnections() {
+        Junction end = getEdge().getEnd();
+        Set<SimpleEntry<Lane, Lane>> connections = new HashSet<>();
+        for (Lane incoming : end.getIncomingLanes()) {
+            for (Lane outgoing : incoming.getLanes()) {
+                connections.add(new SimpleEntry<Lane, Lane>(incoming, outgoing));
+            }
+        }
+        return connections;
+    }
+    
+    public boolean isBranch() {
+        return getLanes().size() > 1;
+    }
+    
+    public boolean isMerging() {
+        // all connections on next junction
+        Set<SimpleEntry<Lane, Lane>> connections = getConnections();
+        // evaluate...
+        Collection<Lane> options = getLanes();
+        if (options.size() == 0) {
+            return false;
+        } else if (options.size() > 0) {
+            for (Lane option : options) {
+                long count = connections.stream().filter(x -> x.getValue().equals(option)).count();
+                if (count > 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     public Map<Agent, Optional<Lane>> getLaneChangeCandidates() {
@@ -206,6 +230,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
     public Set<Agent> getNextAgentsOnLine(final double relativePosition) {
         if (relativePosition < 0 || relativePosition > 1.0) {
             throw new IllegalArgumentException("relative position invalid: " + relativePosition);
+            // LOG.warn("Relative position of agent is invalid");
         }
         final Entry<Double, Set<Agent>> nextAgentsEntry = laneAgents.higherEntry(relativePosition);
         Set<Agent> nextAgents = new HashSet<>();
@@ -277,9 +302,9 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
     
     @Override
     public void render(final Graphics2D g) {
-        g.setStroke(new BasicStroke(4));
-        g.setColor(Color.WHITE);
-        g.draw(polyShape.getShape());
+        // g.setStroke(new BasicStroke(4));
+        // g.setColor(Color.WHITE);
+        // g.draw(polyShape.getShape());
         g.setStroke(new BasicStroke(3));
         g.setColor(Color.BLACK);
         g.draw(polyShape.getShape());
@@ -301,7 +326,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
                         final double distanceLeft = nextAgent.getPositionOnLane() - thisAgent.getPositionOnLane() - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
                         if (nextAgent.isOnLane() && distanceLeft <= 0) {
                             // collision!
-                            LOG.debug("Collision: " + thisAgent + " into " + nextAgent + " distance left: " + distanceLeft);
+                            LOG.warn(String.format("Collision between agents %d and %d (distance left: %f)", thisAgent.getId(), nextAgent.getId(), distanceLeft));
                             thisAgent.collide();
                             nextAgent.collide();
                             thisAgent.setPositionOnLane(thisAgent.getPositionOnLane() + distanceLeft);
