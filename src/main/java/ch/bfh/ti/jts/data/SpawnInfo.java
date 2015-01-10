@@ -2,6 +2,12 @@ package ch.bfh.ti.jts.data;
 
 import java.io.Serializable;
 
+/**
+ * SpawnInfo manages the spawning of agents.
+ *
+ * @author Enteee
+ * @author winki
+ */
 public class SpawnInfo implements Serializable {
     
     private static final long   serialVersionUID = 1L;
@@ -62,7 +68,7 @@ public class SpawnInfo implements Serializable {
         if (end instanceof Lane) {
             Lane lane = (Lane) end;
             Edge edge = lane.getEdge();
-            return edge.getEnd();            
+            return edge.getEnd();
         }
         return null;
     }

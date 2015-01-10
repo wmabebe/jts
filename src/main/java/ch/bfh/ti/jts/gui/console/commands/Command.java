@@ -5,7 +5,8 @@ import com.beust.jcommander.Parameter;
 /**
  * Interface describing available console commands.
  *
- * @author Mathias
+ * @author Enteee
+ * @author winki
  */
 public abstract class Command {
     

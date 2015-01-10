@@ -15,10 +15,11 @@ import java.io.ObjectOutputStream;
  *
  * @author Philip Isenhour {@link http
  *         ://javatechniques.com/blog/faster-deep-copies-of-java-objects/}
- * @author ente
+ * @author Enteee
+ * @author winki
  */
 public class DeepCopy {
-
+    
     /**
      * Returns a copy of the object, or null if the object cannot be serialized.
      *

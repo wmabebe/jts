@@ -11,9 +11,16 @@ import java.util.regex.Pattern;
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.utils.Helpers;
 
+/**
+ * Shape for polygons.
+ * 
+ * @author Enteee
+ * @author winki
+ */
 public class PolyShape implements Serializable {
     
     private static final long   serialVersionUID   = 1L;
+    
     private static final String SHAPE_REGEX_STRING = "^[-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+)([ ][-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+))*$";
     
     private static List<Point2D> buildPoints(final String shapeString) {

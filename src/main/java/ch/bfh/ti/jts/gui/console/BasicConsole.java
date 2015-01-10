@@ -7,6 +7,12 @@ import java.awt.event.KeyEvent;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Basic console that manages text input.
+ *
+ * @author Enteee
+ * @author winki
+ */
 public abstract class BasicConsole implements Console {
     
     private final static String PROMPT            = "jts>";

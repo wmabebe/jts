@@ -27,12 +27,14 @@ import ch.bfh.ti.jts.utils.layers.Layers;
 /**
  * Data holder for a traffic net.
  *
- * @author ente
+ * @author Enteee
+ * @author winki
  */
 public class Net extends Element implements Serializable, Simulatable {
     
     private static final long              serialVersionUID  = 1L;
-    public final static Logger             LOG               = LogManager.getLogger(Net.class);
+    private static final Logger            log               = LogManager.getLogger(Net.class);
+    
     /**
      * Factor by which the spawning should take place. 1 means real time speed.
      * 1440 = 1 day in one minute
@@ -91,15 +93,15 @@ public class Net extends Element implements Serializable, Simulatable {
                 final Class<?> clazz = Class.forName(name);
                 final Constructor<?> ctor = clazz.getConstructor();
                 final Object object = ctor.newInstance();
-                LOG.debug("Create agent: " + object.getClass());
+                log.debug("Create agent: " + object.getClass());
                 
                 return (Agent) object;
             } catch (final Exception e) {
-                LOG.warn("Creating agent failed: " + name);
+                log.warn("Creating agent failed: " + name);
             }
         }
         // default agent
-        LOG.debug("Create default agent: " + IdleAgent.class);
+        log.debug("Create default agent: " + IdleAgent.class);
         return new IdleAgent();
     }
     
@@ -110,7 +112,7 @@ public class Net extends Element implements Serializable, Simulatable {
             if (spawnInfo != null) {
                 // if (spawnInfo.getEnd().equals(get));
             } else {
-                LOG.warn(String.format("Agent %d has no spawn info", getId()));
+                log.warn(String.format("Agent %d has no spawn info", getId()));
             }
         }
     }
@@ -246,7 +248,7 @@ public class Net extends Element implements Serializable, Simulatable {
         
         agent.setLane(lane);
         lane.addLaneAgent(agent);
-        LOG.debug(agent + " spawned at: " + lane);
+        log.debug(agent + " spawned at: " + lane);
     }
     
     /**

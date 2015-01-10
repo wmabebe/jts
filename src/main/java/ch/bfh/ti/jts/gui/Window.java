@@ -34,7 +34,15 @@ import ch.bfh.ti.jts.gui.console.Console;
 import ch.bfh.ti.jts.gui.console.JtsConsole;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
+/**
+ * Window for the application.
+ * 
+ * @author Enteee
+ * @author winki
+ */
 public class Window {
+    
+    private static final Logger log = LogManager.getLogger(Window.class);
     
     private class FrameComponentAdapter extends ComponentAdapter {
         
@@ -81,13 +89,13 @@ public class Window {
                 }
                 // center on screen
                 g2d.transform(AffineTransform.getTranslateInstance(windoww / 2, windowh / 2));
-
+                
                 try {
                     // save inverse transformation to get world coordinates from
                     // screen coordinates later
                     screenToWorldTransform = g2d.getTransform().createInverse();
                 } catch (final NoninvertibleTransformException e) {
-                    LOG.error("Can not invert world-->screen matrix.", e);
+                    log.error("Can not invert world-->screen matrix.", e);
                 }
                 
                 // render everything
@@ -172,7 +180,7 @@ public class Window {
         public void mouseReleased(final MouseEvent e) {
             isDown = false;
         }
-                
+        
         @Override
         public void mouseWheelMoved(final MouseWheelEvent mouseEvent) {
             final Point mousePoint = mouseEvent.getPoint();
@@ -194,12 +202,10 @@ public class Window {
                 zoomCenter.setLocation(mousePointInverse.getX(), mousePointInverse.getY());
                 offset.setLocation(mousePoint.getX() - mousePointInverse.getX(), mousePoint.getY() - mousePointInverse.getY());
             } catch (final NoninvertibleTransformException e) {
-                LOG.error("Can not invert mouse drag vector", e);
+                log.error("Can not invert mouse drag vector", e);
             }
         }
     }
-    
-    public final static Logger  LOG        = LogManager.getLogger(Window.class);
     
     /**
      * Zoom delta. Determines how much to change the zoom when scrolling. Also

@@ -1,49 +1,42 @@
 package ch.bfh.ti.jts.ai;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
 
 import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
 
+/**
+ * Decision object. Contains all the decisions of an agent.
+ *
+ * @author Enteee
+ * @author winki
+ */
 public class Decision implements Serializable {
     
-    public static enum LaneChangeDirection {
-        NONE, LEFT, RIGHT;
-        
-        public static LaneChangeDirection randomLaneChange(final Random random) {
-            return VALUES.get(random.nextInt(VALUES.size()));
-        }
-        
-        private static final List<LaneChangeDirection> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
-        
-    }
-    private static final long   serialVersionUID    = 1L;
-    private double              acceleration        = 0.0;
-    private LaneChangeDirection laneChangeDirection = LaneChangeDirection.NONE;
+    private static final long serialVersionUID = 1L;
+
+    private double     acceleration = 0.0;
+    private LaneChange laneChange   = LaneChange.NONE;
     
     /**
      * Short-term decision. Can be null.
      */
-    private Lane                turning             = null;
+    private Lane       turning      = null;
     /**
      * Long-term decision. Used with GPS. Can be null.
      */
-    private Junction            destination         = null;
+    private Junction   destination  = null;
     
     public Decision() {
-        laneChangeDirection = LaneChangeDirection.NONE;
+        laneChange = LaneChange.NONE;
     }
     
     public double getAcceleration() {
         return acceleration;
     }
     
-    public LaneChangeDirection getLaneChangeDirection() {
-        return laneChangeDirection;
+    public LaneChange getLaneChangeDirection() {
+        return laneChange;
     }
     
     public Lane getNextEdgeLane() {
@@ -54,8 +47,8 @@ public class Decision implements Serializable {
         this.acceleration = acceleration;
     }
     
-    public void setLaneChangeDirection(final LaneChangeDirection laneChangeDirection) {
-        this.laneChangeDirection = laneChangeDirection;
+    public void setLaneChangeDirection(final LaneChange laneChangeDirection) {
+        this.laneChange = laneChangeDirection;
     }
     
     public void setTurning(final Lane turning) {
@@ -72,6 +65,6 @@ public class Decision implements Serializable {
     
     @Override
     public String toString() {
-        return "Decision a: " + acceleration + " laneChangeDirection: " + laneChangeDirection + " nextEdgeLane: " + turning;
-    }    
+        return String.format("Decision{ acceleration: %.2f, destination: %s, laneChange: %s, turning: %s }", acceleration, destination, laneChange, turning);
+    }
 }

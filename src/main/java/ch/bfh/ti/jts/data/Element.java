@@ -9,10 +9,12 @@ import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 /**
  * Base class for all the elements.
  *
+ * @author Enteee
  * @author winki
- * @author ente
  */
 public abstract class Element implements Serializable, Comparable<Element> {
+    
+    private static final long serialVersionUID = 1L;
     
     /**
      * Represents an element at a specific time. Natural order is descending
@@ -45,8 +47,7 @@ public abstract class Element implements Serializable, Comparable<Element> {
         
     }
     
-    private static final long          serialVersionUID = 1L;
-    private static final AtomicInteger NEXT_ID          = new AtomicInteger(0);
+    private static final AtomicInteger NEXT_ID = new AtomicInteger(0);
     
     private final String               name;
     private final int                  id;

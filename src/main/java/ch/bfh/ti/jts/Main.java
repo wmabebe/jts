@@ -5,27 +5,39 @@ import javax.swing.UIManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import ch.bfh.ti.jts.utils.Config;
+
+/**
+ * Entry point class with the main method.
+ * 
+ * @author Enteee
+ * @author winki
+ */
 public class Main {
     
-    public final static Logger  LOG   = LogManager.getLogger(Main.class);
+    private static final Logger log   = LogManager.getLogger(Main.class);
+    
     /**
-     * Debug mode?
+     * Debug mode
      */
-    public static final boolean DEBUG = false;
+    public static boolean DEBUG = false;
     
     public static void main(final String[] args) {
-        
+
         try {
             // set look and feel to native
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (final Exception e) {
-            LOG.warn("failed to set look and feel", e);
+            log.warn("Failed to set look and feel", e);
         }
+        
+        // load configuration
+        String net = Config.getInstance().getValue("net", "default");
+        DEBUG = Config.getInstance().getValue("debug", false);
         
         // start app
         final App app = App.getInstance();
-        app.loadSimulation("ramp");
+        app.loadSimulation(net);
         app.run();
     }
-    
 }

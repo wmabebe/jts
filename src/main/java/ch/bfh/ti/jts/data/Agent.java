@@ -9,56 +9,59 @@ import java.awt.geom.Point2D;
 import java.util.NavigableMap;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.Main;
 import ch.bfh.ti.jts.ai.Decision;
-import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
+import ch.bfh.ti.jts.ai.LaneChange;
 import ch.bfh.ti.jts.ai.Thinkable;
+import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
 
+/**
+ * Abstract agents which are the moving objects in the simulation (cars i.e.).
+ *
+ * @author Enteee
+ * @author winki
+ */
 public abstract class Agent extends Element implements Thinkable, Simulatable, Renderable {
     
-    private static final long  serialVersionUID               = 1L;
+    private static final long   serialVersionUID               = 1L;
     
-    public final static Logger LOG                            = LogManager.getLogger(Agent.class);
     /**
      * The hue of the agent when driving with maximum velocity. Slower is in the
      * range [0 , AGENT_MAX_VELOCITY_COLOR]. 0.33 : Green
      */
-    public final static double AGENT_MAX_VELOCITY_HUE         = 0.33;
+    public final static double  AGENT_MAX_VELOCITY_HUE         = 0.33;
     /**
      * Duration [s] of change line animation.
      */
-    public final static double CHANGE_LINE_ANIMATION_DURATION = 1;
-    private final Decision     decision                       = new Decision();
-    private Lane               lane;
+    public final static double  CHANGE_LINE_ANIMATION_DURATION = 1;
+    private final Decision      decision                       = new Decision();
+    private Lane                lane;
     /**
      * The velocity of an agent in m/s
      */
-    private double             velocity                       = 0;
+    private double              velocity                       = 0;
     /**
      * The acceleration of a agent in m/s^2
      */
-    private double             acceleration                   = 0;
+    private double              acceleration                   = 0;
     /**
      * Distance to drive in m
      */
-    private double             positionOnLane                 = 0;
+    private double              lanePosition                   = 0;
     /**
      * Vehicle of this agent
      */
-    private Vehicle            vehicle;
+    private Vehicle             vehicle;
     /**
      * Optional spawning information of this agent. Can be null.
      */
-    private SpawnInfo          spawnInfo;
+    private SpawnInfo           spawnInfo;
     
-    private boolean            isRemoveCandidate              = false;
+    private boolean             isRemoveCandidate              = false;
     
     public Agent() {
         super("Agent");
@@ -92,8 +95,8 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     }
     
     public double getDistanceToNextAgent() {
-        final double oPosition = getLane().getNextAgentsOnLine(this).stream().mapToDouble(x -> x.getPositionOnLane()).min().orElse(0.0);
-        final double tPosition = getPositionOnLane();
+        final double oPosition = getLane().getNextAgentsOnLine(this).stream().mapToDouble(x -> x.getLanePosition()).min().orElse(0.0);
+        final double tPosition = getLanePosition();
         final double delta = oPosition - tPosition;
         return Helpers.clamp(delta, 0.0, Double.MAX_VALUE);
     }
@@ -104,33 +107,37 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     
     @Override
     public Point2D getPosition() {
-        return getLane().getPolyShape().getRelativePosition(getRelativePositionOnLane());
+        return getLane().getPolyShape().getRelativePosition(getRelativeLanePosition());
     }
     
     /**
      * @return absolute position on the lane. From the start to the current
      *         position of the agent.
      */
-    public double getPositionOnLane() {
-        return positionOnLane;
+    public double getLanePosition() {
+        return lanePosition;
     }
     
-    public void setPositionOnLane(final double positionOnLane) {
-        this.positionOnLane = Math.max(positionOnLane, 0);
+    public void setLanePosition(final double lanePosition) {
+        this.lanePosition = Math.max(lanePosition, 0);
     }
     
     /**
      * @return the absolute distance to the end of the line.
      */
     public double getAbsoluteDistanceOnLaneLeft() {
-        return getLane().getLength() - getPositionOnLane();
+        return getLane().getLength() - getLanePosition();
     }
     
     /**
      * @return relative position on lane.
      */
-    public double getRelativePositionOnLane() {
-        return getPositionOnLane() / getLane().getLength();
+    public double getRelativeLanePosition() {
+        if (getLane() == null)
+            throw new ArgumentNullException("lane");
+        if (getLane().getLength() == 0)
+            throw new RuntimeException("lane lnegth is 0");
+        return getLanePosition() / getLane().getLength();
     }
     
     @Override
@@ -160,7 +167,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     }
     
     public void init(final double positionOnLane, final Vehicle vehicle, final double velocity, final SpawnInfo spawnInfo) {
-        setPositionOnLane(positionOnLane);
+        setLanePosition(positionOnLane);
         setVehicle(vehicle);
         setVelocity(velocity);
         setSpawnInfo(spawnInfo);
@@ -171,7 +178,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      *         edge, @{code false} otherwise
      */
     public boolean isEdgeLeaveCandidate() {
-        return getRelativePositionOnLane() > 1.0;
+        return getRelativeLanePosition() > 1.0;
     }
     
     /**
@@ -182,10 +189,10 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         //@formatter:off
         return  getVelocity() > 0
                 && ( 
-                        getDecision().getLaneChangeDirection() == LaneChangeDirection.RIGHT
+                        getDecision().getLaneChangeDirection() == LaneChange.RIGHT
                         && getLane().getRightLane().isPresent() 
                     ) || (
-                        getDecision().getLaneChangeDirection() == LaneChangeDirection.LEFT
+                        getDecision().getLaneChangeDirection() == LaneChange.LEFT
                         && getLane().getLeftLane().isPresent()
                    );
         //@formatter:on
@@ -216,7 +223,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         g.setStroke(new BasicStroke(1));
         g.setColor(getColor());
         g.translate(x, y);
-        final double orientation = getLane().getPolyShape().getRelativeOrientation(getRelativePositionOnLane());
+        final double orientation = getLane().getPolyShape().getRelativeOrientation(getRelativeLanePosition());
         g.fill(AffineTransform.getRotateInstance(orientation).createTransformedShape(vehicle.getShape()));
         if (Main.DEBUG) {
             g.setFont(new Font("sans-serif", Font.PLAIN, 4));
@@ -287,8 +294,8 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     }
     
     /**
-     * Sets a new lane of this agent and sets{@link Agent#positionOnLane}
-     * relative to new edge lane
+     * Sets a new lane of this agent and sets{@link Agent#lanePosition} relative
+     * to new edge lane
      *
      * @param nextEdgeLane
      */
@@ -296,9 +303,9 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         if (nextEdgeLane == null) {
             throw new IllegalArgumentException("nextEdgeLane");
         }
-        setPositionOnLane(getPositionOnLane() - lane.getLength());
+        setLanePosition(getLanePosition() - lane.getLength());
         lane = nextEdgeLane;
-        if (getPositionOnLane() > getLane().getLength()) {
+        if (getLanePosition() > getLane().getLength()) {
             throw new RuntimeException("Position is greater than the length of the lane");
         }
     }
@@ -326,11 +333,11 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         // update velocity
         setVelocity(oldVelocity + getAcceleration() * duration);
         // update position
-        setPositionOnLane(getPositionOnLane() + (oldVelocity + getVelocity()) / 2 * duration);
+        setLanePosition(getLanePosition() + (oldVelocity + getVelocity()) / 2 * duration);
     }
     
     @Override
     public String toString() {
-        return "Agent x: " + positionOnLane + " l.rel(x): " + getRelativePositionOnLane() + " v: " + velocity + " a: " + acceleration;
+        return String.format("Agent{ id: %d, v: %.2f, a: %.2f, lanePosition: %.2f, relativeLanePosition: %.2f }", getId(), velocity, acceleration, lanePosition, getRelativeLanePosition());
     }
 }

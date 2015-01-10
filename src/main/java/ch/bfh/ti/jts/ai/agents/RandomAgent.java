@@ -1,32 +1,36 @@
 package ch.bfh.ti.jts.ai.agents;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import ch.bfh.ti.jts.ai.Decision;
+import ch.bfh.ti.jts.ai.LaneChange;
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Edge;
 import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
+import ch.bfh.ti.jts.data.Vehicle;
 
 /**
- * A agent which does random stuff.
- *
- * @author ente
+ * Agent which decides always randomly.
+ * 
+ * @author Enteee
+ * @author winki
  */
 public class RandomAgent extends Agent {
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     public RandomAgent() {
         super();
     }
-
+    
     @Override
     public void think() {
-        getDecision().setAcceleration(ThreadLocalRandom.current().nextDouble() * (getVehicle().getMaxAcceleration() - getVehicle().getMinAcceleration()) + getVehicle().getMinAcceleration());
-        getDecision().setLaneChangeDirection(Decision.LaneChangeDirection.randomLaneChange(ThreadLocalRandom.current()));
+        getDecision().setAcceleration(getRandomAcceleration());
+        getDecision().setLaneChangeDirection(getRandomLaneChange());
         final Junction nextJunction = getLane().getEdge().getEnd();
         final List<Edge> nextEdges = new LinkedList<Edge>(nextJunction.getOutgoingEdges());
         if (nextEdges.size() > 0) {
@@ -36,5 +40,15 @@ public class RandomAgent extends Agent {
             final Lane nextLane = nextLanes.get(ThreadLocalRandom.current().nextInt(nextLanes.size()));
             getDecision().setTurning(nextLane);
         }
+    }
+    
+    private double getRandomAcceleration() {
+        Vehicle vehicle = getVehicle();
+        return ThreadLocalRandom.current().nextDouble() * (vehicle.getMaxAcceleration() - vehicle.getMinAcceleration()) + vehicle.getMinAcceleration();
+    }
+    
+    private LaneChange getRandomLaneChange() {
+        final List<LaneChange> values = Collections.unmodifiableList(Arrays.asList(LaneChange.values()));
+        return values.get(ThreadLocalRandom.current().nextInt(values.size()));
     }
 }

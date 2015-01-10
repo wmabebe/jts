@@ -11,12 +11,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import ch.bfh.ti.jts.data.Net;
 
+/**
+ * GPS class that implements the dijekstra algorithm to find shortest paths.
+ * 
+ * @author Enteee
+ * @author winki
+ * @param <V>
+ *            vertex type
+ * @param <E>
+ *            edge type
+ */
 public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdge<E, V>> {
-
+    
     private final List<V>                                             vertices = new LinkedList<>();
     private final List<E>                                             edges    = new LinkedList<>();
     private final ConcurrentHashMap<V, ConcurrentHashMap<V, List<V>>> routes   = new ConcurrentHashMap<>();
-
+    
     @SuppressWarnings("unchecked")
     public GPS(final Net net) {
         // extract all edges and vertices
@@ -43,7 +53,7 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
             routes.put(start, destinations);
         });
     }
-
+    
     /**
      * Dijekstra algorithm. TODO: implement faster with priority queue
      *
@@ -95,7 +105,7 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
         }
         return previous;
     }
-
+    
     public Optional<E> getNextEdge(final V from, final V to) {
         Optional<E> edgeBetween = Optional.empty();
         final List<V> path = routes.get(from).get(to);
@@ -104,5 +114,4 @@ public class GPS<V extends DirectedGraphVertex<V, E>, E extends DirectedGraphEdg
         }
         return edgeBetween;
     }
-
 }

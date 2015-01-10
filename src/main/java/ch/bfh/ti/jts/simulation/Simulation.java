@@ -22,11 +22,13 @@ import ch.bfh.ti.jts.utils.layers.Layers;
 /**
  * Simulates traffic on a @{link ch.bfh.ti.jts.data.Net}
  *
- * @author ente
+ * @author Enteee
+ * @author winki
  */
 public class Simulation {
     
-    public final static Logger  LOG                              = LogManager.getLogger(Simulation.class);
+    private static final Logger log                              = LogManager.getLogger(Simulation.class);
+    
     /**
      * The 'virtual' duration of one simulation step in seconds. INFO: static
      * here because agent is missing a reference to the simulation object.
@@ -181,7 +183,7 @@ public class Simulation {
                     }
                     element.think();
                 } catch (Exception e) {
-                    LOG.error("Think failed", e);
+                    log.error("Think failed", e);
                 }
             });
     }
@@ -213,7 +215,7 @@ public class Simulation {
         });
         
         simulationStates.put(netCopy.getSimulationTime(), new SaveState(net));
-        LOG.debug("simulationStates.size:" + simulationStates.size());
+        log.debug("simulationStates.size:" + simulationStates.size());
     }
     
     public void setAllowCollisions(boolean allowCollisions) {
@@ -246,11 +248,11 @@ public class Simulation {
             // simulation is in advance too much
             if (simulationAdvancedTooMuch > 0) {
                 try {
-                    LOG.debug("Tick sleep for " + simulationAdvancedTooMuch + " s simulationWallClockDiff:" + simulationWallClockDiff + " s floatAverageWallClockLoopDuration:"
+                    log.debug("Tick sleep for " + simulationAdvancedTooMuch + " s simulationWallClockDiff:" + simulationWallClockDiff + " s floatAverageWallClockLoopDuration:"
                             + floatAverageLoopDuration + " s");
                     Thread.sleep((long) (simulationAdvancedTooMuch * 1E3));
                 } catch (InterruptedException e) {
-                    LOG.warn("Tick sleep interrupted");
+                    log.warn("Tick sleep interrupted");
                 }
             }
         }

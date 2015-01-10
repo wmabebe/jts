@@ -6,9 +6,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Element;
 import ch.bfh.ti.jts.data.Net;
@@ -21,9 +18,14 @@ import ch.bfh.ti.jts.importer.NetImporter;
 import ch.bfh.ti.jts.importer.RoutesImporter;
 import ch.bfh.ti.jts.simulation.Simulation;
 
+/**
+ * Runnable application class.
+ * 
+ * @author Enteee
+ * @author winki
+ */
 public class App implements Runnable {
     
-    public final static Logger   LOG                = LogManager.getLogger(App.class);
     /**
      * Format string used for net loading.
      */

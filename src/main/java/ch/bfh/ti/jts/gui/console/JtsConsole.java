@@ -14,9 +14,15 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 
+/**
+ * Console for the JavaTrafficSimulator.
+ *
+ * @author Enteee
+ * @author winki
+ */
 public class JtsConsole extends BasicConsole {
     
-    public final static Logger LOG = LogManager.getLogger(JtsConsole.class);
+    private static final Logger log = LogManager.getLogger(JtsConsole.class);
     
     public class MainParams {
         
@@ -39,9 +45,9 @@ public class JtsConsole extends BasicConsole {
                 Command command = clazz.newInstance();
                 commands.add(command);
                 jc.addCommand(command.getName(), command);
-                LOG.info(String.format("Loaded command %s", command.getName()));
+                log.info(String.format("Loaded command %s", command.getName()));
             } catch (Exception e) {
-                LOG.fatal("Failed instantiating command " + clazz, e);
+                log.fatal("Failed instantiating command " + clazz, e);
             }
         });
     }
@@ -88,7 +94,7 @@ public class JtsConsole extends BasicConsole {
                 }
             } catch (final ParameterException e) {
                 write("Invalid command");
-                LOG.warn("Invalid command");
+                log.warn("Invalid command");
             }
         }
     }

@@ -1,10 +1,16 @@
-package ch.bfh.ti.jts.utils;
+package ch.bfh.ti.jts.simulation;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 import ch.bfh.ti.jts.data.Agent;
 
+/**
+ * Calculates some key values for traffic flow statistics.
+ * 
+ * @author Enteee
+ * @author winki
+ */
 public class Statistics {
     
     /**
@@ -15,9 +21,10 @@ public class Statistics {
      * However, average speed measurements obtained from this method are not
      * accurate because instantaneous speeds averaged among several vehicles
      * does not account for the difference in travel time for the vehicles that
-     * are traveling at different speeds over the same distance. See:
-     * http://en.wikipedia.org/wiki/Traffic_flow
+     * are traveling at different speeds over the same distance.
      * 
+     * @see <a href="http://en.wikipedia.org/wiki/Traffic_flow">Traffic flow
+     *      (Wikipedia)</a>
      * @param agents
      *            agents
      * @return time mean speed
@@ -38,9 +45,10 @@ public class Statistics {
      * track the speed of individual vehicles, and then the average speed is
      * calculated. It is considered more accurate than the time mean speed. The
      * data for space calculating space mean speed may be taken from satellite
-     * pictures, a camera, or both. See:
-     * http://en.wikipedia.org/wiki/Traffic_flow
+     * pictures, a camera, or both.
      * 
+     * @see <a href="http://en.wikipedia.org/wiki/Traffic_flow">Traffic flow
+     *      (Wikipedia)</a>
      * @param agents
      *            agents
      * @return space mean speed
@@ -64,9 +72,10 @@ public class Statistics {
      * achievable under free flow is kc, while kj is the maximum density
      * achieved under congestion. In general, jam density is seven times the
      * critical density. Inverse of density is spacing (s), which is the
-     * center-to-center distance between two vehicles. See:
-     * http://en.wikipedia.org/wiki/Traffic_flow
+     * center-to-center distance between two vehicles.
      * 
+     * @see <a href="http://en.wikipedia.org/wiki/Traffic_flow">Traffic flow
+     *      (Wikipedia)</a>
      * @param numAgents
      *            number of agents on the roadway
      * @param roadwayLength

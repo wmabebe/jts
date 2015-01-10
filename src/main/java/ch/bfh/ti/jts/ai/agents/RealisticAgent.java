@@ -3,7 +3,7 @@ package ch.bfh.ti.jts.ai.agents;
 import java.util.Collection;
 import java.util.Random;
 
-import ch.bfh.ti.jts.ai.Decision.LaneChangeDirection;
+import ch.bfh.ti.jts.ai.LaneChange;
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
@@ -12,9 +12,10 @@ import ch.bfh.ti.jts.simulation.Simulation;
 import ch.bfh.ti.jts.utils.Helpers;
 
 /**
- * A agent which drives without collision.
+ * Agent which tries to avoid collisions.
  *
- * @author ente
+ * @author Enteee
+ * @author winki
  */
 public class RealisticAgent extends RandomAgent {
     
@@ -142,10 +143,10 @@ public class RealisticAgent extends RandomAgent {
         // by the maximum?
         final double minVelocityOther = Helpers.clamp(o.getVelocity() + timeStep * o.getVehicle().getMinAcceleration(), o.getVehicle().getMinVelocity(), o.getVehicle().getMaxVelocity());
         // subtract the secure distance from the other agents position
-        final double oPos = o.getPositionOnLane() + minVelocityOther * timeStep - secureDistance;
-        if (oPos > getPositionOnLane()) {
+        final double oPos = o.getLanePosition() + minVelocityOther * timeStep - secureDistance;
+        if (oPos > getLanePosition()) {
             // calculate maximum possible speed
-            return (oPos - getPositionOnLane()) / timeStep;
+            return (oPos - getLanePosition()) / timeStep;
         }
         return getVehicle().getMinVelocity();
     }
@@ -161,7 +162,7 @@ public class RealisticAgent extends RandomAgent {
         final double distanceOnLaneLeft = getAbsoluteDistanceOnLaneLeft();
         if (distanceOnLaneLeft >= distanceToDrive) {
             // stay on this lane
-            return getPositionOnLane() + distanceToDrive;
+            return getLanePosition() + distanceToDrive;
         } else {
             // already on next lane
             // return max position (lane length)
@@ -241,31 +242,31 @@ public class RealisticAgent extends RandomAgent {
         getDecision().setAcceleration(targetAcceleration);
         
         // check lane switching possibilities
-        LaneChangeDirection direction = LaneChangeDirection.NONE;
+        LaneChange direction = LaneChange.NONE;
         
         // does the agent want to overtake?
         final boolean isImpatient = isImpatient();
         if (isImpatient) {
             final Lane lane = getLane().getLeftLane().orElse(null);
             if (canChangeLane(lane)) {
-                direction = LaneChangeDirection.LEFT;
+                direction = LaneChange.LEFT;
             } else {
-                direction = LaneChangeDirection.NONE;
+                direction = LaneChange.NONE;
             }
         } else {
             // try to go back on right lane
             final Lane lane = getLane().getRightLane().orElse(null);
             if (canChangeLane(lane)) {
-                direction = LaneChangeDirection.RIGHT;
+                direction = LaneChange.RIGHT;
             } else {
-                direction = LaneChangeDirection.NONE;
+                direction = LaneChange.NONE;
             }
         }
         getDecision().setLaneChangeDirection(direction);
         
-        getDecision().setTurning(null); // no direct switch. use gps...        
+        getDecision().setTurning(null); // no direct switch. use gps...
         Junction destination = getSpawnInfo().getEndJunction();
-        if (destination != null){
+        if (destination != null) {
             getDecision().setDestination(destination);
         }
     }

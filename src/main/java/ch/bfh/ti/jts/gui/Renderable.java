@@ -11,6 +11,12 @@ import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
 
+/**
+ * For all renderable elements.
+ * 
+ * @author Enteee
+ * @author winki
+ */
 public interface Renderable {
     
     /**

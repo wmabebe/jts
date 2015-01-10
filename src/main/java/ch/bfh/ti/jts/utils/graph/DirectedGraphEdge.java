@@ -1,7 +1,17 @@
 package ch.bfh.ti.jts.utils.graph;
 
+/**
+ * Interface for directed graph edges.
+ * 
+ * @author Enteee
+ * @author winki
+ * @param <E>
+ *            edge type
+ * @param <V>
+ *            vertex type
+ */
 public interface DirectedGraphEdge<E extends DirectedGraphEdge<E, V>, V extends DirectedGraphVertex<V, E>> {
-
+    
     /**
      * Check if vertex is at beginning of this edge
      *
@@ -9,31 +19,31 @@ public interface DirectedGraphEdge<E extends DirectedGraphEdge<E, V>, V extends 
      *            the vertex to check
      * @return {@code true} if vertex is at beginning, {@code false} otherwise
      */
-    public default boolean comesFrom(final V vertex) {
+    default boolean comesFrom(final V vertex) {
         return getStart() == vertex;
     }
-
+    
     /**
      * Get the vertex at the end of this edge
      *
      * @return end vertex
      */
-    public V getEnd();
-
+    V getEnd();
+    
     /**
      * Get the vertex at the start of this edge
      *
      * @return start vertex
      */
-    public V getStart();
-
+    V getStart();
+    
     /**
      * Get the weight of this edge
      *
      * @return the weight of this edge
      */
-    public double getWeight();
-
+    double getWeight();
+    
     /**
      * Check if vertex is at the end of this edge
      *
@@ -41,7 +51,7 @@ public interface DirectedGraphEdge<E extends DirectedGraphEdge<E, V>, V extends 
      *            the vertex to check
      * @return {@code true} if vertex is at end, {@code false} otherwise
      */
-    public default boolean goesTo(final V vertex) {
+    default boolean goesTo(final V vertex) {
         return getEnd() == vertex;
     }
 }

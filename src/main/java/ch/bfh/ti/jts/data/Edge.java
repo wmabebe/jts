@@ -18,10 +18,17 @@ import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Helpers;
 import ch.bfh.ti.jts.utils.graph.DirectedGraphEdge;
 
+/**
+ * Edges are connections between junctions and contains one or multiple lanes.
+ *
+ * @author Enteee
+ * @author winki
+ */
 public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Edge, Junction>, Simulatable, Renderable {
     
     private static final long      serialVersionUID = 1L;
-    public final static Logger     LOG              = LogManager.getLogger(Edge.class);
+    private static final Logger    log              = LogManager.getLogger(Edge.class);
+    
     private final Junction         start;
     private final Junction         end;
     /**
@@ -136,10 +143,10 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
                             lane.removeLaneAgent(agent);
                         } else {
                             agent.remove();
-                            LOG.warn(String.format("Agent %d was removed due to an invalid lane change information", agent.getId()));
+                            log.warn(String.format("Agent %d was removed due to an invalid lane change information", agent.getId()));
                         }
                     } catch (final Exception e) {
-                        LOG.error(String.format("Agent %d can't switch lane", agent.getId()), e);
+                        log.error(String.format("Agent %d can't switch lane", agent.getId()), e);
                     }
                 }
             });

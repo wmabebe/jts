@@ -200,6 +200,8 @@ Enteee
 
 winki
 * Record statistics data (space mean speed, time mean speed, density) [done]
+* Comments, refactoring [progress]
+* Configuration file [progress]
 
 ## Open issues
 

@@ -1,5 +1,11 @@
 package ch.bfh.ti.jts.data;
 
+/**
+ * Route is a specialized SpawnInfo where an agent drive from A to B.
+ *
+ * @author Enteee
+ * @author winki
+ */
 public class Route extends SpawnInfo {
     
     private static final long serialVersionUID = 1L;

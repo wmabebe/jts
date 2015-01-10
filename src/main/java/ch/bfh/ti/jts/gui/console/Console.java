@@ -3,9 +3,10 @@ package ch.bfh.ti.jts.gui.console;
 import ch.bfh.ti.jts.gui.Renderable;
 
 /**
- * Interface for the gui console.
+ * Interface for GUI consoles.
  *
- * @author Mathias
+ * @author Enteee
+ * @author winki
  */
 public interface Console extends Renderable {
     

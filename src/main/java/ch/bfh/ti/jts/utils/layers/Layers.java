@@ -16,13 +16,15 @@ import ch.bfh.ti.jts.simulation.Simulatable;
 /**
  * A data structure which holds its elements in layers.
  *
- * @author ente
+ * @author Enteee
+ * @author winki
  * @param <T>
- *            the object to hold
+ *            object type to hold
  */
 public class Layers<T> implements Serializable {
     
     private static final long                 serialVersionUID = 1L;
+    
     private final Map<Integer, Collection<T>> layers           = new HashMap<Integer, Collection<T>>();
     private final SortedSet<Integer>          layerKeys        = new TreeSet<>();
     
@@ -52,7 +54,8 @@ public class Layers<T> implements Serializable {
     }
     
     public void removeAgents() {
-        final int layer = Simulatable.KNOWN_CLASSES.get(Net.class); // why are the agents in the Net layer?
+        // TODO: why are the agents in the Net layer?
+        final int layer = Simulatable.KNOWN_CLASSES.get(Net.class);
         layers.get(layer).removeIf(x -> {
             if (x != null && x instanceof Agent) {
                 final Agent a = (Agent) x;

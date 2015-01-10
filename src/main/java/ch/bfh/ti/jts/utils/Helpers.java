@@ -3,7 +3,27 @@ package ch.bfh.ti.jts.utils;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
+/**
+ * Global helper functions.
+ * 
+ * @author Enteee
+ * @author winki
+ */
 public class Helpers {
+    
+    /**
+     * Converts a class into another.
+     *
+     * @param input
+     *            input class
+     * @param outputClass
+     *            output type
+     * @return converted object
+     * @throws Exception
+     */
+    public static <I, O> O convert(final I input, final Class<O> outputClass) throws Exception {
+        return input == null ? null : outputClass.getConstructor(String.class).newInstance(input.toString());
+    }
     
     /**
      * Make sure a value is in between the specified bounds.
@@ -58,9 +78,9 @@ public class Helpers {
      * http://mathworld.wolfram.com/Point-LineDistance2-Dimensional.html for
      * explanation and defination. Source:
      * 
-     * @see http 
+     * @see <a href="http
      *      ://www.java2s.com/Code/CSharp/Development-Class/DistanceFromPointToLine
-     *      .htm
+     *      .htm">DistanceFromPointToLine</a>
      * @param point
      * @param line
      * @return

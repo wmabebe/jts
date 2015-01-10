@@ -5,7 +5,15 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.io.Serializable;
 
+/**
+ * Vehicle which is used by agents.
+ *
+ * @author Enteee
+ * @author winki
+ */
 public class Vehicle implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
     
     private static final Shape buildShape() {
         final Path2D path = new Path2D.Double();
@@ -15,7 +23,6 @@ public class Vehicle implements Serializable {
         path.closePath();
         return path;
     }
-    private static final long  serialVersionUID = 1L;
     /**
      * Minimal acceleration (inclusive) [m/s^2]
      */
@@ -39,13 +46,13 @@ public class Vehicle implements Serializable {
     /**
      * Width of the vehicle [m]
      */
-    private final double       width            = 1.7;
+    private final double       width = 1.7;
     /**
      * String representing the agent class (without suffix "Agent").
      */
     private final String       agent;
     
-    private final static Shape SHAPE            = buildShape();
+    private final static Shape SHAPE = buildShape();
     
     public Vehicle() {
         this(-5, 5, 0, 33.3, 3, null);

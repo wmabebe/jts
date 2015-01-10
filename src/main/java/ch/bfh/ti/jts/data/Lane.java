@@ -26,13 +26,20 @@ import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.PolyShape;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
+import ch.bfh.ti.jts.simulation.Statistics;
 import ch.bfh.ti.jts.utils.Helpers;
-import ch.bfh.ti.jts.utils.Statistics;
 
+/**
+ * Lanes are the container within agents can move.
+ *
+ * @author Enteee
+ * @author winki
+ */
 public class Lane extends Element implements SpawnLocation, Simulatable, Renderable {
     
     private static final long                      serialVersionUID = 1L;
-    public final static Logger                     LOG              = LogManager.getLogger(Lane.class);
+    private static final Logger                    log              = LogManager.getLogger(Lane.class);
+    
     private final Edge                             edge;
     private final int                              index;
     private final double                           speed;
@@ -92,11 +99,11 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         if (agent == null) {
             throw new IllegalArgumentException("agent");
         }
-        Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePositionOnLane());
+        Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativeLanePosition());
         if (agentsAtPosition == null) {
             // position not yet known.
             agentsAtPosition = new HashSet<>();
-            laneAgents.put(agent.getRelativePositionOnLane(), agentsAtPosition);
+            laneAgents.put(agent.getRelativeLanePosition(), agentsAtPosition);
         }
         agentsAtPosition.add(agent);
     }
@@ -228,7 +235,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         if (agent.getLane() != this) {
             throw new IllegalArgumentException("agent is not on this lane");
         }
-        return getNextAgentsOnLine(agent.getRelativePositionOnLane());
+        return getNextAgentsOnLine(agent.getRelativeLanePosition());
     }
     
     /**
@@ -304,7 +311,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         if (agent == null) {
             throw new IllegalArgumentException("agent");
         }
-        final Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativePositionOnLane());
+        final Set<Agent> agentsAtPosition = laneAgents.get(agent.getRelativeLanePosition());
         if (agentsAtPosition != null) {
             agentsAtPosition.remove(agent);
         }
@@ -348,13 +355,13 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
                     if (thisAgent.isOnLane() && oldAgents.size() > 0) {
                         final Entry<Double, Set<Agent>> nextEntry = oldAgents.firstEntry();
                         for (final Agent nextAgent : nextEntry.getValue()) {
-                            final double distanceLeft = nextAgent.getPositionOnLane() - thisAgent.getPositionOnLane() - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
+                            final double distanceLeft = nextAgent.getLanePosition() - thisAgent.getLanePosition() - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
                             if (nextAgent.isOnLane() && distanceLeft <= 0) {
                                 // collision!
-                                LOG.warn(String.format("Collision between agents %d and %d (distance left: %f)", thisAgent.getId(), nextAgent.getId(), distanceLeft));
+                                log.warn(String.format("Collision between agents %d and %d (distance left: %f)", thisAgent.getId(), nextAgent.getId(), distanceLeft));
                                 thisAgent.collide();
                                 nextAgent.collide();
-                                thisAgent.setPositionOnLane(thisAgent.getPositionOnLane() + distanceLeft);
+                                thisAgent.setLanePosition(thisAgent.getLanePosition() + distanceLeft);
                             }
                         }
                     }

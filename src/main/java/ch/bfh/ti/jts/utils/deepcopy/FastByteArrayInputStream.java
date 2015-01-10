@@ -7,10 +7,11 @@ import java.io.InputStream;
  *
  * @author Philip Isenhour {@link http
  *         ://javatechniques.com/blog/faster-deep-copies-of-java-objects/}
- * @author ente
+ * @author Enteee
+ * @author winki
  */
 public class FastByteArrayInputStream extends InputStream {
-
+    
     /**
      * Our byte buffer
      */
@@ -23,22 +24,22 @@ public class FastByteArrayInputStream extends InputStream {
      * Number of bytes that have been read from the buffer
      */
     protected int    pos   = 0;
-
+    
     public FastByteArrayInputStream(final byte[] buf, final int count) {
         this.buf = buf;
         this.count = count;
     }
-
+    
     @Override
     public final int available() {
         return count - pos;
     }
-
+    
     @Override
     public final int read() {
         return pos < count ? buf[pos++] & 0xff : -1;
     }
-
+    
     @Override
     public final int read(final byte[] b, final int off, int len) {
         if (pos >= count) {
@@ -51,7 +52,7 @@ public class FastByteArrayInputStream extends InputStream {
         pos += len;
         return len;
     }
-
+    
     @Override
     public final long skip(long n) {
         if (pos + n > count) {
