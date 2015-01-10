@@ -194,6 +194,13 @@ winki
 * Added remove command [done]
 * Agent handling on junctions [progress]
 
+### Calendar week 2
+
+Enteee
+
+winki
+* Record statistics data (space mean speed, time mean speed, density) [done]
+
 ## Open issues
 
 ### Planned
@@ -202,8 +209,6 @@ winki
   * Transcendent agents when collision happend
   * A lot of collisions!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 * Write project documentation
-* Record statistics data
-  * average traffic flow
 
 ### Backlog
 

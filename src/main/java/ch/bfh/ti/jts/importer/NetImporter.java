@@ -15,7 +15,7 @@ import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
-import ch.bfh.ti.jts.gui.data.PolyShape;
+import ch.bfh.ti.jts.gui.PolyShape;
 
 public class NetImporter extends Importer<Net> {
 
@@ -97,7 +97,8 @@ public class NetImporter extends Importer<Net> {
         }
         final String id = getAttribute(node, "id", String.class);
         final double x = getAttribute(node, "x", Double.class);
-        final double y = getAttribute(node, "y", Double.class);
+        final double y = -getAttribute(node, "y", Double.class); // invert y coordinates (different origin in C++ and Java)!
+        
         final PolyShape polyShape = new PolyShape(getAttribute(node, "shape", String.class));
         final Shape shape = polyShape.getShape();
         final Junction junction = new Junction(id, x, y, shape);

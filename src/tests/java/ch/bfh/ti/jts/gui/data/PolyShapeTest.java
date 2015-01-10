@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import ch.bfh.ti.jts.gui.PolyShape;
+
 public class PolyShapeTest {
 
     @Test

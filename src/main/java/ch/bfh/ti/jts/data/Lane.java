@@ -2,13 +2,15 @@ package ch.bfh.ti.jts.data;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Optional;
@@ -19,10 +21,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
+import ch.bfh.ti.jts.gui.PolyShape;
 import ch.bfh.ti.jts.gui.Renderable;
-import ch.bfh.ti.jts.gui.data.PolyShape;
 import ch.bfh.ti.jts.simulation.Simulatable;
+import ch.bfh.ti.jts.utils.Helpers;
+import ch.bfh.ti.jts.utils.Statistics;
 
 public class Lane extends Element implements SpawnLocation, Simulatable, Renderable {
     
@@ -46,6 +51,10 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
      * Agents which have reached the end of the lane.
      */
     final Set<Agent>                               edgeLeaveCandidates;
+    
+    private double                                 spaceMeanSpeed   = 0;
+    private double                                 timeMeanSpeed    = 0;
+    private double                                 density          = 0;
     
     public Lane(final String name, final Edge edge, final int index, final double speed, final double length, final PolyShape polyShape) {
         super(name);
@@ -117,7 +126,8 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
     
     @Override
     public Point2D getPosition() {
-        return getEdge().getPosition();
+        Point2D position = getEdge().getPosition();
+        return new Point2D.Double(position.getX(), position.getY() + 10 * getIndex());
     }
     
     public Set<Agent> getEdgeLeaveCandidates() {
@@ -168,6 +178,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
     public Map<Agent, Optional<Lane>> getLaneChangeCandidates() {
         final Map<Agent, Optional<Lane>> changeAgents = new ConcurrentHashMap<>();
         final Set<Agent> laneChangeCandidates = new HashSet<>();
+        
         // TODO: this as stream
         for (final Set<Agent> agents : laneAgents.values()) {
             for (final Agent agent : agents) {
@@ -302,37 +313,53 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
     
     @Override
     public void render(final Graphics2D g) {
-        // g.setStroke(new BasicStroke(4));
-        // g.setColor(Color.WHITE);
-        // g.draw(polyShape.getShape());
+        float h = 0.0f;
+        float s = (float) Helpers.clamp(spaceMeanSpeed / 80.0, 0, 1);
+        float b = 0.8f - (float) Helpers.clamp(density * 5.0, 0, 0.8);
+        Color col = Color.getHSBColor(h, s, b);
+        
         g.setStroke(new BasicStroke(3));
-        g.setColor(Color.BLACK);
+        g.setColor(col);
         g.draw(polyShape.getShape());
+        
+        g.setFont(new Font("sans-serif", Font.PLAIN, 6));
+        g.setColor(Color.BLACK);
+        String text = (String.format("Lane %s: v_sms = %.2f, v_tms = %.2f, d = %.2f", getName(), spaceMeanSpeed, timeMeanSpeed, density));
+        g.drawString(text, (int) getPosition().getX(), (int) getPosition().getY());
     }
     
     @Override
     public void simulate(final double duration) {
         final NavigableMap<Double, Set<Agent>> oldAgents = new TreeMap<>(laneAgents);
         laneAgents.clear();
+        
+        List<Agent> allAgents = new LinkedList<>();
+        
         // go through agents in order
         while (oldAgents.size() > 0) {
             final Entry<Double, Set<Agent>> entry = oldAgents.pollFirstEntry();
             for (final Agent thisAgent : entry.getValue()) {
-                // check for collision with next, if there is a next and
-                // thisAgent was fully moved
-                if (thisAgent.isOnLane() && oldAgents.size() > 0) {
-                    final Entry<Double, Set<Agent>> nextEntry = oldAgents.firstEntry();
-                    for (final Agent nextAgent : nextEntry.getValue()) {
-                        final double distanceLeft = nextAgent.getPositionOnLane() - thisAgent.getPositionOnLane() - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
-                        if (nextAgent.isOnLane() && distanceLeft <= 0) {
-                            // collision!
-                            LOG.warn(String.format("Collision between agents %d and %d (distance left: %f)", thisAgent.getId(), nextAgent.getId(), distanceLeft));
-                            thisAgent.collide();
-                            nextAgent.collide();
-                            thisAgent.setPositionOnLane(thisAgent.getPositionOnLane() + distanceLeft);
+                
+                allAgents.add(thisAgent);
+                
+                if (App.getInstance().getSimulation().isAllowCollisions()) {
+                    // check for collision with next, if there is a next and
+                    // thisAgent was fully moved
+                    if (thisAgent.isOnLane() && oldAgents.size() > 0) {
+                        final Entry<Double, Set<Agent>> nextEntry = oldAgents.firstEntry();
+                        for (final Agent nextAgent : nextEntry.getValue()) {
+                            final double distanceLeft = nextAgent.getPositionOnLane() - thisAgent.getPositionOnLane() - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
+                            if (nextAgent.isOnLane() && distanceLeft <= 0) {
+                                // collision!
+                                LOG.warn(String.format("Collision between agents %d and %d (distance left: %f)", thisAgent.getId(), nextAgent.getId(), distanceLeft));
+                                thisAgent.collide();
+                                nextAgent.collide();
+                                thisAgent.setPositionOnLane(thisAgent.getPositionOnLane() + distanceLeft);
+                            }
                         }
                     }
                 }
+                
                 // add this agent again
                 if (thisAgent.isEdgeLeaveCandidate()) {
                     addEdgeLeaveCandidate(thisAgent);
@@ -341,5 +368,10 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
                 }
             }
         }
+        
+        // collect some statistics informations
+        timeMeanSpeed = Statistics.getTimeMeanSpeed(allAgents);
+        spaceMeanSpeed = Statistics.getSpaceMeanSpeed(allAgents);
+        density = Statistics.getDensity(allAgents.size(), getLength());
     }
 }

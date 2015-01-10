@@ -92,6 +92,10 @@ public class Simulation {
      * Interpolate the wall clock state.
      */
     private final AtomicBoolean                            interpolateWallClockSimulationState = new AtomicBoolean(true);
+    /**
+     * Allow collisions.
+     */
+    private boolean                                        allowCollisions                     = false;
     
     public Simulation(final Net simulateNet) {
         this.simulateNet = simulateNet;
@@ -210,6 +214,14 @@ public class Simulation {
         
         simulationStates.put(netCopy.getSimulationTime(), new SaveState(net));
         LOG.debug("simulationStates.size:" + simulationStates.size());
+    }
+    
+    public void setAllowCollisions(boolean allowCollisions) {
+        this.allowCollisions = allowCollisions;
+    }
+    
+    public boolean isAllowCollisions() {
+        return allowCollisions;
     }
     
     /**

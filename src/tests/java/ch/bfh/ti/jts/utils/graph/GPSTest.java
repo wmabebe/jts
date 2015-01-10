@@ -11,7 +11,7 @@ import ch.bfh.ti.jts.data.Edge;
 import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Net;
-import ch.bfh.ti.jts.gui.data.PolyShape;
+import ch.bfh.ti.jts.gui.PolyShape;
 
 public class GPSTest {
 

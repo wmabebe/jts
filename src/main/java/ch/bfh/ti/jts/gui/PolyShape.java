@@ -1,4 +1,4 @@
-package ch.bfh.ti.jts.gui.data;
+package ch.bfh.ti.jts.gui;
 
 import java.awt.Shape;
 import java.awt.geom.Path2D;
@@ -15,6 +15,7 @@ public class PolyShape implements Serializable {
     
     private static final long   serialVersionUID   = 1L;
     private static final String SHAPE_REGEX_STRING = "^[-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+)([ ][-]?[0-9]+([.][0-9]+)[,][-]?[0-9]+([.][0-9]+))*$";
+    
     private static List<Point2D> buildPoints(final String shapeString) {
         if (shapeString == null) {
             throw new ArgumentNullException("shapeString");
@@ -32,7 +33,9 @@ public class PolyShape implements Serializable {
             if (coordinates.length != 2) {
                 throw new IllegalArgumentException("invalid coordinates");
             }
-            final Point2D newPoint = new Point2D.Double(Double.valueOf(coordinates[0]), Double.valueOf(coordinates[1]));
+            // invert y coordinates (different origin in C++ and Java)!
+            final Point2D newPoint = new Point2D.Double(Double.valueOf(coordinates[0]), -Double.valueOf(coordinates[1]));
+            
             pointlist.add(newPoint);
         }
         return pointlist;

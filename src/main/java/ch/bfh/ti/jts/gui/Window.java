@@ -81,14 +81,7 @@ public class Window {
                 }
                 // center on screen
                 g2d.transform(AffineTransform.getTranslateInstance(windoww / 2, windowh / 2));
-                // affine transformation y = -y. We've to do this
-                // because
-                // the coordinates imported expect a origin in the
-                // left bottom corner. But java does stuff different.
-                // Therefore the origin is in the left upper corner. As
-                // a result all the agents are driving on the wrong side.
-                g2d.transform(AffineTransform.getScaleInstance(1, -1));
-                
+
                 try {
                     // save inverse transformation to get world coordinates from
                     // screen coordinates later
