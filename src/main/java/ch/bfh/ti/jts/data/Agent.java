@@ -1,5 +1,7 @@
 package ch.bfh.ti.jts.data;
 
+import static ch.bfh.ti.jts.utils.Helpers.getHeatColor;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -8,6 +10,9 @@ import java.awt.geom.Point2D;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.Main;
@@ -19,7 +24,6 @@ import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.Config;
 import ch.bfh.ti.jts.utils.Helpers;
-import static ch.bfh.ti.jts.utils.Helpers.getHeatColor;
 
 /**
  * Abstract agents which are the moving objects in the simulation (cars i.e.).
@@ -30,13 +34,14 @@ import static ch.bfh.ti.jts.utils.Helpers.getHeatColor;
 public abstract class Agent extends Element implements Thinkable, Simulatable, Renderable {
     
     private static final long    serialVersionUID               = 1L;
+    private static final Logger  log                            = LogManager.getLogger(Agent.class);
     private static final Color[] colors                         = new Color[] { Color.WHITE, new Color(200, 200, 200), Color.GRAY, Color.LIGHT_GRAY, Color.BLUE, Color.RED, new Color(185, 122, 87),
             new Color(0, 128, 0)                               };
-    
+    public final static boolean  CHANGE_LANE_ANIMATED           = Config.getInstance().getBool("agent.langechang.animation", true);
     /**
      * Duration [s] of change line animation.
      */
-    public final static double   CHANGE_LINE_ANIMATION_DURATION = Config.getInstance().getDouble("agent.lanechange.animation.duration", 1.0, 0.0, 60.0);
+    public final static double   CHANGE_LANE_ANIMATION_DURATION = Config.getInstance().getDouble("agent.lanechange.animation.duration", 0.3, 0.01, 20.0);
     /**
      * Decision object.
      */
@@ -76,7 +81,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     /**
      * Color.
      */
-    private Color                color;
+    private final Color          color;
     
     public Agent() {
         super("Agent");
@@ -265,15 +270,17 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     
     @Override
     public void render(final Graphics2D g, final NavigableMap<Double, Net> simulationStates) {
-        final Point2D position = getPosition();
-        final double x = position.getX();
-        final double y = position.getY();
-        double xChangeLaneShift = 0;
-        double yChangeLaneShift = 0;
-        g.translate(x, y);
-        final double wallClockTime = App.getInstance().getSimulation().getWallClockTime();
-        // check old simulation states
-        Optional<Element.ElementInTime> lastAgentStateBeforeLaneChange = simulationStates.headMap(wallClockTime).values().stream().map(oldNet -> {
+        if (CHANGE_LANE_ANIMATED) {
+            final Point2D position = getPosition();
+            final double x = position.getX();
+            final double y = position.getY();
+            double xChangeLaneShift = 0;
+            double yChangeLaneShift = 0;
+            // translate to agent
+            g.translate(x, y);
+            final double wallClockTime = App.getInstance().getSimulation().getWallClockTime();
+            // check old simulation states
+            Optional<Element.ElementInTime> lastAgentStateBeforeLaneChange = simulationStates.headMap(wallClockTime).values().stream().map(oldNet -> {
             return new Element.ElementInTime(oldNet.getSimulationTime(), oldNet.getElement(getId()));
         }).filter(oldAgentInTime -> {
             final Agent oldAgent = (Agent) oldAgentInTime.getElement();
@@ -290,28 +297,49 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
                              )
                     );
             // @formatter:on
-                }).sorted().findFirst();
-        if (lastAgentStateBeforeLaneChange.isPresent()) {
-            final double lastTimeBeforeChange = lastAgentStateBeforeLaneChange.get().getTime();
-            final Agent lastAgentStateBeforeChange = (Agent) lastAgentStateBeforeLaneChange.get().getElement();
-            final double lastLaneChangeRelativeTime = wallClockTime - lastTimeBeforeChange;
-            if (lastLaneChangeRelativeTime < CHANGE_LINE_ANIMATION_DURATION) {
-                final double changeLaneFactor = 1 - lastLaneChangeRelativeTime / CHANGE_LINE_ANIMATION_DURATION;
-                xChangeLaneShift = changeLaneFactor * (lastAgentStateBeforeChange.getPosition().getX() - getPosition().getX());
-                yChangeLaneShift = changeLaneFactor * (lastAgentStateBeforeChange.getPosition().getY() - getPosition().getY());
-                if (Main.DEBUG) {
-                    Color c = g.getColor();
-                    g.setColor(Color.GREEN);
-                    g.setStroke(new BasicStroke(.5f));
-                    g.drawLine(0, 0, (int) xChangeLaneShift, (int) yChangeLaneShift);
-                    g.setColor(c);
+                    }).sorted().findFirst();
+            if (lastAgentStateBeforeLaneChange.isPresent()) {
+                final double lastTimeBeforeChange = lastAgentStateBeforeLaneChange.get().getTime();
+                final Agent lastAgentStateBeforeChange = (Agent) lastAgentStateBeforeLaneChange.get().getElement();
+                final double lastLaneChangeRelativeTime = wallClockTime - lastTimeBeforeChange;
+                final double changeLaneAnimationDurationLeft = CHANGE_LANE_ANIMATION_DURATION - lastLaneChangeRelativeTime;
+                if (changeLaneAnimationDurationLeft > 0) {
+                    final double extrapolatedRelativePosition = getRelativeLanePosition() + (getVelocity() * changeLaneAnimationDurationLeft) / getLane().getLength();
+                    // only animate lane change if change is fully on this lane
+                    if (extrapolatedRelativePosition >= 0 && extrapolatedRelativePosition <= 1) {
+                        final Point2D extrapolatedPosition = getLane().getPolyShape().getRelativePosition(extrapolatedRelativePosition);
+                        final double changeLaneFactor = 1 - changeLaneAnimationDurationLeft / CHANGE_LANE_ANIMATION_DURATION;
+                        final Point2D changeLanePosition = new Point2D.Double(changeLaneFactor * (extrapolatedPosition.getX() - lastAgentStateBeforeChange.getPosition().getX())
+                                + lastAgentStateBeforeChange.getPosition().getX(), changeLaneFactor * (extrapolatedPosition.getY() - lastAgentStateBeforeChange.getPosition().getY())
+                                + lastAgentStateBeforeChange.getPosition().getY());
+                        xChangeLaneShift = changeLanePosition.getX() - x;
+                        yChangeLaneShift = changeLanePosition.getY() - y;
+                        if (Main.DEBUG) {
+                            Color c = g.getColor();
+                            g.setColor(Color.GREEN);
+                            g.setStroke(new BasicStroke(.5f));
+                            g.translate(-x, -y);
+                            log.debug("lastAgentBeforeChangePosition: " + lastAgentStateBeforeChange.getPosition());
+                            g.drawOval((int) extrapolatedPosition.getX() - 2, (int) extrapolatedPosition.getY() - 2, 4, 4);
+                            g.drawOval((int) lastAgentStateBeforeChange.getPosition().getX() - 2, (int) lastAgentStateBeforeChange.getPosition().getY() - 2, 4, 4);
+                            g.drawLine((int) lastAgentStateBeforeChange.getPosition().getX(), (int) lastAgentStateBeforeChange.getPosition().getY(), (int) extrapolatedPosition.getX(),
+                                    (int) extrapolatedPosition.getY());
+                            g.setColor(Color.RED);
+                            g.drawLine((int) lastAgentStateBeforeChange.getPosition().getX(), (int) lastAgentStateBeforeChange.getPosition().getY(), (int) changeLanePosition.getX(),
+                                    (int) changeLanePosition.getY());
+                            g.translate(x, y);
+                            g.setColor(c);
+                        }
+                        g.translate(xChangeLaneShift, yChangeLaneShift);
+                    }
                 }
-                // g.translate(xChangeLaneShift, yChangeLaneShift);
             }
+            g.translate(-x, -y);
+            Renderable.super.render(g, simulationStates);
+            g.translate(-xChangeLaneShift, -yChangeLaneShift);
+        } else {
+            Renderable.super.render(g, simulationStates);
         }
-        g.translate(-x, -y);
-        Renderable.super.render(g, simulationStates);
-        // g.translate(-xChangeLaneShift, -yChangeLaneShift);
     }
     
     public void setAcceleration(final double acceleration) {

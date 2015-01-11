@@ -54,10 +54,10 @@
 		<route edges="e1 e0"/>
 	</vehicle>
 -->
-	<flow type="car" frequency="1.0" departSpeed="40.0" arrivalSpeed="0">
+	<flow type="car" frequency="1" departSpeed="40.0" arrivalSpeed="0">
 		<route junctions="j0 j1"/>
 	</flow>
-	<flow type="car" frequency="1.0" departSpeed="40.0" arrivalSpeed="0">
+	<flow type="car" frequency="1" departSpeed="40.0" arrivalSpeed="0">
 		<route junctions="j1 j0"/>
 	</flow>	
 </routes>

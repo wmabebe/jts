@@ -20,10 +20,10 @@ public class Main {
     /**
      * Debug mode
      */
-    public static boolean DEBUG = false;
+    public static final boolean DEBUG = Config.getInstance().getValue("app.debug", false);
     
     public static void main(final String[] args) {
-
+        
         try {
             // set look and feel to native
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -33,7 +33,6 @@ public class Main {
         
         // load configuration
         String net = Config.getInstance().getValue("net.name.default", "default");
-        DEBUG = Config.getInstance().getValue("app.debug", false);
         
         // start app
         final App app = App.getInstance();

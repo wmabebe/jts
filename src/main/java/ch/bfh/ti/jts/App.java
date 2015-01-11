@@ -33,11 +33,11 @@ public class App implements Runnable {
     /**
      * Format string used for net loading.
      */
-    private static String        NET_LOAD_FORMAT    = Config.getInstance().getValueNullable("path.net");
+    private static String        NET_LOAD_FORMAT    = Config.getInstance().getValue("path.net", "src/main/resources/%s.net.xml");
     /**
      * Format string used for routes loading.
      */
-    private static final String  ROUTES_LOAD_FORMAT = Config.getInstance().getValueNullable("path.routes");
+    private static final String  ROUTES_LOAD_FORMAT = Config.getInstance().getValue("path.routes", "src/main/resources/%s.rou.xml");
     /**
      * Commands the simulation should execute.
      */

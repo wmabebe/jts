@@ -19,8 +19,8 @@
         <Logger name="ch.bfh.ti.jts.data.Edge" level="warn"/>
         <Logger name="ch.bfh.ti.jts.data.Junction" level="warn"/>
         <Logger name="ch.bfh.ti.jts.data.Lane" level="warn"/>
-        <Logger name="ch.bfh.ti.jts.data.Agent" level="warn"/>
-        <Logger name="ch.bfh.ti.jts.utils.Config" level="warn"/>        
+        <Logger name="ch.bfh.ti.jts.data.Agent" level="debug"/>
+        <Logger name="ch.bfh.ti.jts.utils.Config" level="warn"/>
         <Root level="debug">
             <AppenderRef ref="STDOUT"/>
         </Root>

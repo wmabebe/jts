@@ -30,10 +30,10 @@
 	<vType id="car" accel="4.0" decel="8.0" sigma="0.0" length="5" minGap="2.5" maxSpeed="90" agent="Realistic"/>
 
 	<vehicle id="v0" type="car" depart="0" departPos="0" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e0 e0"/>
+		<route edges="e0 e1"/>
 	</vehicle>
 	<vehicle id="v0" type="car" depart="0" departPos="10" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
-		<route edges="e1 e1"/>
+		<route edges="e1 e0"/>
 	</vehicle>
 	<!--
 	<vehicle id="v0" type="car" depart="0" departPos="20" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">

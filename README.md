@@ -198,6 +198,9 @@ winki
 
 Enteee
 
+* Advanced langechange [done]
+* Config stuff review [done]
+
 winki
 * Record statistics data (space mean speed, time mean speed, density) [done]
 * Comments, refactoring [done]
