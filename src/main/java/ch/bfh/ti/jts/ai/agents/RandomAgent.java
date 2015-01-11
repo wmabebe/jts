@@ -30,7 +30,7 @@ public class RandomAgent extends Agent {
     @Override
     public void think() {
         getDecision().setAcceleration(getRandomAcceleration());
-        getDecision().setLaneChangeDirection(getRandomLaneChange());
+        getDecision().setLaneChange(getRandomLaneChange());
         final Junction nextJunction = getLane().getEdge().getEnd();
         final List<Edge> nextEdges = new LinkedList<Edge>(nextJunction.getOutgoingEdges());
         if (nextEdges.size() > 0) {

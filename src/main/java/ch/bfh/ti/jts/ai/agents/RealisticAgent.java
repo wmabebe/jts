@@ -9,6 +9,7 @@ import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Lane;
 import ch.bfh.ti.jts.data.Vehicle;
 import ch.bfh.ti.jts.simulation.Simulation;
+import ch.bfh.ti.jts.utils.Config;
 import ch.bfh.ti.jts.utils.Helpers;
 
 /**
@@ -19,38 +20,38 @@ import ch.bfh.ti.jts.utils.Helpers;
  */
 public class RealisticAgent extends RandomAgent {
     
-    private static final long serialVersionUID  = 1L;
+    private static final long serialVersionUID = 1L;
     
     /**
      * Time in seconds to the next decision.
      */
-    private final double      timeStep          = Simulation.SIMULATION_STEP_DURATION;
+    private final double      timeStep         = Simulation.SIMULATION_STEP_DURATION;
     /**
      * Distance the agent try to hold to the next agent next to him.
      */
-    private final double      secureDistance    = 5.0;
+    private final double      secureDistance   = Config.getInstance().getDouble("agent.realistic.securedistance", 5.0, 0.0, 100.0);
+    /**
+     * Chance by which a agent will slow down from the maximum possible
+     * velocity.
+     */
+    private final double      niggleChance     = Config.getInstance().getDouble("agent.realistic.nigglechance", 0.3, 0.0, 1.0);
+    /**
+     * Factor how much the agent will niggle maximally. 0 means no slow down. 1
+     * means slow maximally in the worst case.
+     */
+    private final double      niggleFactor     = Config.getInstance().getDouble("agent.realistic.nigglefactor", 0.6, 0.0, 1.0);
     /**
      * Factor how patient an agent is. Value from 0 (no patience, wants to
      * overtake other agent as soon as possible) to 1 (never wants to overtake
      * other agents).
      */
-    private final double      patienceFactor    = 0.3;
+    private final double      patienceFactor   = Config.getInstance().getDouble("agent.realistic.patiencefactor", 0.3, 0.0, 1.0);
     /**
      * This counter is increased every simulation step when an agent has to slow
      * down because of another agent. It is decreased when the agent in not
      * hindered by another agent.
      */
-    private int               impatienceCounter = 0;
-    /**
-     * Chance by which a agent will slow down from the maximum possible
-     * velocity.
-     */
-    private final double      niggleChance      = 0.3;
-    /**
-     * Factor how much the agent will niggle maximally. 0 means no slow down. 1
-     * means slow maximally in the worst case.
-     */
-    private final double      niggleFactor      = 0.6;
+    private int               impatienceCounter;
     /**
      * Random object.
      */
@@ -112,7 +113,6 @@ public class RealisticAgent extends RandomAgent {
      * agent will not wait. For everything between 0 and 1, the agent will after
      * the formula 300^patienceFactor.
      */
-    @SuppressWarnings("unused")
     private double getPatientTime() {
         assert patienceFactor >= 0.0;
         assert patienceFactor <= 1.0;
@@ -262,7 +262,7 @@ public class RealisticAgent extends RandomAgent {
                 direction = LaneChange.NONE;
             }
         }
-        getDecision().setLaneChangeDirection(direction);
+        getDecision().setLaneChange(direction);
         
         getDecision().setTurning(null); // no direct switch. use gps...
         Junction destination = getSpawnInfo().getEndJunction();

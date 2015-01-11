@@ -2,12 +2,12 @@ package ch.bfh.ti.jts.data;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.NavigableMap;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.Main;
@@ -17,7 +17,9 @@ import ch.bfh.ti.jts.ai.Thinkable;
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
+import ch.bfh.ti.jts.utils.Config;
 import ch.bfh.ti.jts.utils.Helpers;
+import static ch.bfh.ti.jts.utils.Helpers.getHeatColor;
 
 /**
  * Abstract agents which are the moving objects in the simulation (cars i.e.).
@@ -27,44 +29,58 @@ import ch.bfh.ti.jts.utils.Helpers;
  */
 public abstract class Agent extends Element implements Thinkable, Simulatable, Renderable {
     
-    private static final long   serialVersionUID               = 1L;
+    private static final long    serialVersionUID               = 1L;
+    private static final Color[] colors                         = new Color[] { Color.WHITE, new Color(200, 200, 200), Color.GRAY, Color.LIGHT_GRAY, Color.BLUE, Color.RED, new Color(185, 122, 87),
+            new Color(0, 128, 0)                               };
     
-    /**
-     * The hue of the agent when driving with maximum velocity. Slower is in the
-     * range [0 , AGENT_MAX_VELOCITY_COLOR]. 0.33 : Green
-     */
-    public final static double  AGENT_MAX_VELOCITY_HUE         = 0.33;
     /**
      * Duration [s] of change line animation.
      */
-    public final static double  CHANGE_LINE_ANIMATION_DURATION = 1;
-    private final Decision      decision                       = new Decision();
-    private Lane                lane;
+    public final static double   CHANGE_LINE_ANIMATION_DURATION = Config.getInstance().getDouble("agent.lanechange.animation.duration", 1.0, 0.0, 60.0);
+    /**
+     * Decision object.
+     */
+    private final Decision       decision                       = new Decision();
+    /**
+     * Current lane.
+     */
+    private Lane                 lane;
     /**
      * The velocity of an agent in m/s
      */
-    private double              velocity                       = 0;
+    private double               velocity;
     /**
      * The acceleration of a agent in m/s^2
      */
-    private double              acceleration                   = 0;
+    private double               acceleration;
     /**
      * Distance to drive in m
      */
-    private double              lanePosition                   = 0;
+    private double               lanePosition;
     /**
      * Vehicle of this agent
      */
-    private Vehicle             vehicle;
+    private Vehicle              vehicle;
     /**
      * Optional spawning information of this agent. Can be null.
      */
-    private SpawnInfo           spawnInfo;
-    
-    private boolean             isRemoveCandidate              = false;
+    private SpawnInfo            spawnInfo;
+    /**
+     * Remove agent?
+     */
+    private boolean              isRemoveCandidate;
+    /**
+     * How many times did the agent collide?
+     */
+    private int                  collisionCount;
+    /**
+     * Color.
+     */
+    private Color                color;
     
     public Agent() {
         super("Agent");
+        this.color = getRandomColor();
     }
     
     /**
@@ -72,21 +88,36 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      */
     public void collide() {
         setVelocity(0.0);
+        collisionCount++;
     }
     
     public double getAcceleration() {
         return acceleration;
     }
     
+    public int getCollisionCount() {
+        return collisionCount;
+    }
+    
+    private Color getRandomColor() {
+        int index = ThreadLocalRandom.current().nextInt(colors.length);
+        return colors[index];
+    }
+    
     /**
-     * Gets the color of the agent by his velocity.
+     * Gets the color of the agent. Mode is configurable.
      *
      * @return color
      */
     private Color getColor() {
-        double hue = AGENT_MAX_VELOCITY_HUE * (getVelocity() / vehicle.getMaxVelocity());
-        hue = Helpers.clamp(hue, 0.0, 1.0);
-        return Color.getHSBColor((float) hue, 1.0f, 1.0f);
+        String mode = Config.getInstance().getEnum("agent.render.colormode", new String[] { "normal", "velocity" });
+        if ("normal".equals(mode)) {
+            return color;
+        }
+        if ("velocity".equals(mode)) {
+            return getHeatColor(getVelocity(), vehicle.getMinVelocity(), vehicle.getMaxVelocity());
+        }
+        throw new RuntimeException("illegal color mode");
     }
     
     @Override
@@ -189,10 +220,10 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         //@formatter:off
         return  getVelocity() > 0
                 && ( 
-                        getDecision().getLaneChangeDirection() == LaneChange.RIGHT
+                        getDecision().getLaneChange() == LaneChange.RIGHT
                         && getLane().getRightLane().isPresent() 
                     ) || (
-                        getDecision().getLaneChangeDirection() == LaneChange.LEFT
+                        getDecision().getLaneChange() == LaneChange.LEFT
                         && getLane().getLeftLane().isPresent()
                    );
         //@formatter:on
@@ -225,11 +256,9 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         g.translate(x, y);
         final double orientation = getLane().getPolyShape().getRelativeOrientation(getRelativeLanePosition());
         g.fill(AffineTransform.getRotateInstance(orientation).createTransformedShape(vehicle.getShape()));
-        if (Main.DEBUG) {
-            g.setFont(new Font("sans-serif", Font.PLAIN, 4));
-            g.scale(1, -1);
-            g.drawString("Agent " + getId(), 5, 1);
-            g.scale(1, -1);
+        if (Config.getInstance().getBool("agent.render.infos", false)) {
+            g.setFont(App.FONT);
+            g.drawString("Agent " + getId(), -9, 5);
         }
         g.translate(-x, -y);
     }
@@ -306,7 +335,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         setLanePosition(getLanePosition() - lane.getLength());
         lane = nextEdgeLane;
         if (getLanePosition() > getLane().getLength()) {
-            throw new RuntimeException("Position is greater than the length of the lane");
+            throw new RuntimeException("position is greater than the length of the lane");
         }
     }
     

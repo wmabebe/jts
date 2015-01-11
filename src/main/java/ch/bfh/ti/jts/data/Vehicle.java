@@ -23,36 +23,39 @@ public class Vehicle implements Serializable {
         path.closePath();
         return path;
     }
+    
     /**
      * Minimal acceleration (inclusive) [m/s^2]
      */
-    private final double       minAcceleration;
+    private final double         minAcceleration;
     /**
      * Max acceleration (inclusive) [m/s^^]
      */
-    private final double       maxAcceleration;
+    private final double         maxAcceleration;
     /**
      * Minimal velocity (inclusive) [m/s], 0 := agent can't reverse.
      */
-    private final double       minVelocity;
+    private final double         minVelocity;
     /**
      * Max velocity (inclusive) [m/s]
      */
-    private final double       maxVelocity;
+    private final double         maxVelocity;
     /**
      * Length of the vehicle [m]
      */
-    private final double       length;
+    private final double         length;
     /**
      * Width of the vehicle [m]
      */
-    private final double       width = 1.7;
+    private final double         width  = 1.7;
     /**
      * String representing the agent class (without suffix "Agent").
      */
-    private final String       agent;
-    
-    private final static Shape SHAPE = buildShape();
+    private final String         agent;
+    /**
+     * Shape.
+     */
+    private final static Shape   SHAPE  = buildShape();
     
     public Vehicle() {
         this(-5, 5, 0, 33.3, 3, null);
@@ -65,7 +68,6 @@ public class Vehicle implements Serializable {
         if (minAcceleration > maxAcceleration || minVelocity > maxVelocity) {
             throw new IllegalArgumentException("min > max");
         }
-        
         this.minAcceleration = minAcceleration;
         this.maxAcceleration = maxAcceleration;
         this.minVelocity = minVelocity;

@@ -2,7 +2,6 @@ package ch.bfh.ti.jts.data;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.util.AbstractMap.SimpleEntry;
@@ -27,7 +26,8 @@ import ch.bfh.ti.jts.gui.PolyShape;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.simulation.Statistics;
-import ch.bfh.ti.jts.utils.Helpers;
+import ch.bfh.ti.jts.utils.Config;
+import static ch.bfh.ti.jts.utils.Helpers.getHeatColor;
 
 /**
  * Lanes are the container within agents can move.
@@ -59,9 +59,9 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
      */
     final Set<Agent>                               edgeLeaveCandidates;
     
-    private double                                 spaceMeanSpeed   = 0;
-    private double                                 timeMeanSpeed    = 0;
-    private double                                 density          = 0;
+    private double                                 spaceMeanSpeed;
+    private double                                 timeMeanSpeed;
+    private double                                 density;
     
     public Lane(final String name, final Edge edge, final int index, final double speed, final double length, final PolyShape polyShape) {
         super(name);
@@ -134,7 +134,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
     @Override
     public Point2D getPosition() {
         Point2D position = getEdge().getPosition();
-        return new Point2D.Double(position.getX(), position.getY() + 10 * getIndex());
+        return new Point2D.Double(position.getX(), position.getY() - 15 - 5 * getIndex());
     }
     
     public Set<Agent> getEdgeLeaveCandidates() {
@@ -195,7 +195,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
             }
         }
         laneChangeCandidates.forEach(agent -> {
-            switch (agent.getDecision().getLaneChangeDirection()) {
+            switch (agent.getDecision().getLaneChange()) {
                 case RIGHT :
                     changeAgents.put(agent, getRightLane());
                 break;
@@ -318,21 +318,34 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         
     }
     
+    private Color getColor() {
+        String mode = Config.getInstance().getEnum("lane.render.colormode", new String[] { "normal", "density", "timemeanspeed", "spacemeanspeed" });
+        if ("normal".equals(mode)) {
+            return Color.BLACK;
+        }
+        if ("density".equals(mode)) {
+            return getHeatColor(density, 0.0, 0.14);
+        }
+        if ("timemeanspeed".equals(mode)) {
+            return getHeatColor(timeMeanSpeed, 0.0, 33.3);
+        }
+        if ("spacemeanspeed".equals(mode)) {
+            return getHeatColor(spaceMeanSpeed, 0.0, 33.3);
+        }
+        throw new RuntimeException("illegal color mode");
+    }
+    
     @Override
     public void render(final Graphics2D g) {
-        float h = 0.0f;
-        float s = (float) Helpers.clamp(spaceMeanSpeed / 80.0, 0, 1);
-        float b = 0.8f - (float) Helpers.clamp(density * 5.0, 0, 0.8);
-        Color col = Color.getHSBColor(h, s, b);
-        
         g.setStroke(new BasicStroke(3));
-        g.setColor(col);
+        g.setColor(getColor());
         g.draw(polyShape.getShape());
         
-        g.setFont(new Font("sans-serif", Font.PLAIN, 6));
-        g.setColor(Color.BLACK);
-        String text = (String.format("Lane %s: v_sms = %.2f, v_tms = %.2f, d = %.2f", getName(), spaceMeanSpeed, timeMeanSpeed, density));
-        g.drawString(text, (int) getPosition().getX(), (int) getPosition().getY());
+        if (Config.getInstance().getBool("lane.render.infos", false)) {
+            g.setFont(App.FONT);
+            g.setColor(getColor());
+            g.drawString(this.toString(), (int) getPosition().getX(), (int) getPosition().getY());
+        }
     }
     
     @Override
@@ -380,5 +393,10 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         timeMeanSpeed = Statistics.getTimeMeanSpeed(allAgents);
         spaceMeanSpeed = Statistics.getSpaceMeanSpeed(allAgents);
         density = Statistics.getDensity(allAgents.size(), getLength());
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("Lane{ name: %s, density: %.2f, v_sms: %.2f, v_tms: %.2f }", getName(), density, spaceMeanSpeed, timeMeanSpeed);
     }
 }

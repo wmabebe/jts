@@ -20,6 +20,6 @@ public class IdleAgent extends RandomAgent {
     public void think() {
         super.think();
         getDecision().setAcceleration(0);
-        getDecision().setLaneChangeDirection(LaneChange.NONE);
+        getDecision().setLaneChange(LaneChange.NONE);
     }
 }

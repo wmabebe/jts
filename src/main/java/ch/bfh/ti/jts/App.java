@@ -1,5 +1,6 @@
 package ch.bfh.ti.jts;
 
+import java.awt.Font;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -17,6 +18,7 @@ import ch.bfh.ti.jts.gui.console.commands.Command;
 import ch.bfh.ti.jts.importer.NetImporter;
 import ch.bfh.ti.jts.importer.RoutesImporter;
 import ch.bfh.ti.jts.simulation.Simulation;
+import ch.bfh.ti.jts.utils.Config;
 
 /**
  * Runnable application class.
@@ -26,14 +28,16 @@ import ch.bfh.ti.jts.simulation.Simulation;
  */
 public class App implements Runnable {
     
+    public static final Font     FONT               = new Font(Config.getInstance().getValue("app.font.familiy", "sans-serif"), Font.PLAIN, Config.getInstance().getInt("app.font.size", 4, 1, 100));
+    
     /**
      * Format string used for net loading.
      */
-    private static final String  NET_LOAD_FORMAT    = "src/main/resources/%s.net.xml";
+    private static String        NET_LOAD_FORMAT    = Config.getInstance().getValueNullable("path.net");
     /**
      * Format string used for routes loading.
      */
-    private static final String  ROUTES_LOAD_FORMAT = "src/main/resources/%s.rou.xml";
+    private static final String  ROUTES_LOAD_FORMAT = Config.getInstance().getValueNullable("path.routes");
     /**
      * Commands the simulation should execute.
      */
@@ -78,7 +82,7 @@ public class App implements Runnable {
     
     private void init() {
         if (simulation == null) {
-            throw new RuntimeException("Simulation not loaded");
+            throw new RuntimeException("simulation not loaded");
         }
         Window.getInstance().setVisible(true);
     }
@@ -129,7 +133,8 @@ public class App implements Runnable {
         final Net wallClockSimulationState = App.getInstance().getSimulation().getWallCLockSimulationState();
         Collection<Class<?>> typeFilter = new LinkedList<Class<?>>();
         typeFilter.add(Agent.class); // only search agents
-        Element element = wallClockSimulationState.getElementByCoordinates(worldCoordinates, 30, typeFilter);
+        double clickRadius = Config.getInstance().getDouble("click.radius", 30.0, 0.0, 1000.0);
+        Element element = wallClockSimulationState.getElementByCoordinates(worldCoordinates, clickRadius, typeFilter);
         if (element != null) {
             final Console console = Window.getInstance().getConsole();
             console.stringTyped(String.format("%d", element.getId()));

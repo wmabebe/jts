@@ -1,5 +1,6 @@
 package ch.bfh.ti.jts.utils;
 
+import java.awt.Color;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
@@ -90,5 +91,37 @@ public class Helpers {
         Point2D l2 = line.getP2();
         return Math.abs((l2.getX() - l1.getX()) * (l1.getY() - point.getY()) - (l1.getX() - point.getX()) * (l2.getY() - l1.getY()))
                 / Math.sqrt(Math.pow(l2.getX() - l1.getX(), 2) + Math.pow(l2.getY() - l1.getY(), 2));
+    }
+    
+    /**
+     * Gets the heat color of a value in a range of min (green) to max (red).
+     * 
+     * @param value
+     *            value
+     * @param minValue
+     *            minimum value
+     * @param maxValue
+     *            maximum value
+     * @return heat color
+     */
+    @SuppressWarnings("unused")
+    public static Color getHeatColor(double value, final double minValue, final double maxValue) {
+        final double colorRangeMin = 0.33; // green
+        final double colorRangeMax = 0.0; // red
+        value = clamp(value, minValue, maxValue);
+        value = (value - minValue) / (maxValue - minValue);        
+        if (colorRangeMin <= colorRangeMax) {
+            value = colorRangeMin + value * (colorRangeMax - colorRangeMin);
+        } else {
+            value = colorRangeMin - value * (colorRangeMin - colorRangeMax);
+        }
+        return Color.getHSBColor((float) value, 1.0f, 1.0f);
+    }
+    
+    /**
+     * @see Helpers#getHeatColor(double, double, double)
+     */
+    public static Color getHeatColor(final double value) {
+        return getHeatColor(value, 0.0, 1.0);
     }
 }

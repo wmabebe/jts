@@ -1,10 +1,14 @@
 package ch.bfh.ti.jts.utils;
 
+import static ch.bfh.ti.jts.utils.Helpers.clamp;
 import static ch.bfh.ti.jts.utils.Helpers.convert;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -98,5 +102,120 @@ public class Config {
      */
     public String getValueNullable(final String key) {
         return getValueNullable(key, String.class);
+    }
+    
+    /**
+     * Returns an config value from type double.
+     * 
+     * @param key
+     *            property key
+     * @param defaultValue
+     *            default value
+     * @param minValue
+     *            minimum value
+     * @param maxValue
+     *            maximumn value
+     * @return double value
+     */
+    public double getDouble(final String key, final double defaultValue, final double minValue, final double maxValue) {
+        double output = defaultValue;
+        String value = properties.getProperty(key);
+        if (value != null) {
+            try {
+                output = Double.parseDouble(value);
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
+        return clamp(output, minValue, maxValue);
+    }
+    
+    /**
+     * @see Config#getDouble(String, double, double, double)
+     */
+    public double getDouble(final String key, final int defaultValue) {
+        return getDouble(key, defaultValue, Double.MIN_VALUE, Double.MAX_VALUE);
+    }
+    
+    /**
+     * Returns an config value from type integer.
+     * 
+     * @param key
+     *            property key
+     * @param defaultValue
+     *            default value
+     * @param minValue
+     *            minimum value
+     * @param maxValue
+     *            maximumn value
+     * @return integer value
+     */
+    public int getInt(final String key, final int defaultValue, final int minValue, final int maxValue) {
+        int output = defaultValue;
+        String value = properties.getProperty(key);
+        if (value != null) {
+            try {
+                output = Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
+        return clamp(output, minValue, maxValue);
+    }
+    
+    /**
+     * @see Config#getInt(String, int, int, int)
+     */
+    public int getInt(final String key, final int defaultValue) {
+        return getInt(key, defaultValue, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+    
+    /**
+     * Returns a config value from type boolean.
+     * 
+     * @param key
+     *            property key
+     * @param defaultValue
+     *            default value
+     * @return boolean value
+     */
+    public boolean getBool(final String key, final boolean defaultValue) {
+        boolean output = defaultValue;
+        String value = properties.getProperty(key);
+        if (value != null) {
+            try {
+                output = Boolean.parseBoolean(value);
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
+        return output;
+    }
+    
+    /**
+     * Returns a config value out of an enumeration of possible values. Default
+     * is the first value in the option list.
+     * 
+     * @param key
+     *            property key
+     * @param options
+     *            possible values
+     * @return enum value
+     */
+    public String getEnum(final String key, final String[] options) {
+        if (options == null) {
+            throw new ArgumentNullException("options");
+        }
+        if (options.length == 0) {
+            throw new IllegalArgumentException("no options");
+        }
+        String value = properties.getProperty(key);
+        if (value != null) {
+            Set<String> lookup = new HashSet<String>(Arrays.asList(options));
+            if (lookup.contains(value)) {
+                return value;
+            }
+        }
+        return options[0];
     }
 }

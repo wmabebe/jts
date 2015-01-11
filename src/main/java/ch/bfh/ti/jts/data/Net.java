@@ -20,6 +20,7 @@ import ch.bfh.ti.jts.ai.agents.IdleAgent;
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
+import ch.bfh.ti.jts.utils.Config;
 import ch.bfh.ti.jts.utils.Helpers;
 import ch.bfh.ti.jts.utils.graph.GPS;
 import ch.bfh.ti.jts.utils.layers.Layers;
@@ -39,7 +40,7 @@ public class Net extends Element implements Serializable, Simulatable {
      * Factor by which the spawning should take place. 1 means real time speed.
      * 1440 = 1 day in one minute
      */
-    private final double                   SPAWN_TIME_FACTOR = 1440;
+    private final double                   SPAWN_TIME_FACTOR = Config.getInstance().getDouble("net.spawning.timefactor", 1440.0, 0.0000000001, 10000000000.0);
     private final Set<Element>             elements          = new HashSet<>();
     private final Layers<Renderable>       renderables       = new Layers<>();
     private final Set<Thinkable>           thinkables        = new HashSet<>();
@@ -48,7 +49,7 @@ public class Net extends Element implements Serializable, Simulatable {
     /**
      * Absolute time at simulated [s].
      */
-    private double                         simulationTime    = 0;
+    private double                         simulationTime;
     
     public Net() {
         super("Net");

@@ -62,7 +62,7 @@ public abstract class Importer<T> {
                 }
             }
         } catch (final Exception ex) {
-            throw new RuntimeException("Conversion failed", ex);
+            throw new RuntimeException("conversion failed", ex);
         }
         return output;
     }
@@ -79,7 +79,7 @@ public abstract class Importer<T> {
             document = documentBuilder.parse(path);
             data = extractData(document);
         } catch (final Exception ex) {
-            throw new RuntimeException("Document parsing failed", ex);
+            throw new RuntimeException("document parsing failed", ex);
         }
         return data;
     }

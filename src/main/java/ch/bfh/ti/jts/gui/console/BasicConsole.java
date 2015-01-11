@@ -7,6 +7,8 @@ import java.awt.event.KeyEvent;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import ch.bfh.ti.jts.utils.Config;
+
 /**
  * Basic console that manages text input.
  *
@@ -30,7 +32,7 @@ public abstract class BasicConsole implements Console {
     private final StringBuffer  buffer            = new StringBuffer();
     
     public BasicConsole() {
-        font = new Font("Courier New", Font.PLAIN, 14);
+        font = new Font(Config.getInstance().getValue("console.font.family", "Courier New"), Font.PLAIN, Config.getInstance().getInt("console.font.size", 4, 1, 100));
     }
     
     @Override

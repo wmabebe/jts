@@ -152,7 +152,7 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
                     
                     // 1. next edge lane?
                     Decision decision = agent.getDecision();
-                    Lane nextEdgeLane = decision.getNextEdgeLane();
+                    Lane nextEdgeLane = decision.getTurning();
                     if (nextEdgeLane != null) {
                         // agent wants to switch on a specified lane
                         if (agent.getLane().isValidOutgoingLane(nextEdgeLane)) {

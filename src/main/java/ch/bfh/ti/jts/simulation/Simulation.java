@@ -16,6 +16,7 @@ import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.gui.Window;
 import ch.bfh.ti.jts.gui.console.Console;
 import ch.bfh.ti.jts.gui.console.commands.Command;
+import ch.bfh.ti.jts.utils.Config;
 import ch.bfh.ti.jts.utils.deepcopy.DeepCopy;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
@@ -27,33 +28,14 @@ import ch.bfh.ti.jts.utils.layers.Layers;
  */
 public class Simulation {
     
-    private static final Logger log                              = LogManager.getLogger(Simulation.class);
+    private static final Logger log = LogManager.getLogger(Simulation.class);
     
     /**
-     * The 'virtual' duration of one simulation step in seconds. INFO: static
-     * here because agent is missing a reference to the simulation object.
+     * SaveState holds the simulation data.
+     * 
+     * @author Enteee
+     * @author winki
      */
-    public final static double  SIMULATION_STEP_DURATION         = 1;
-    /**
-     * A factor which accelerates wallclock time. For faster rendering progress.
-     * 1 := WallclockTime = PhysicalTime
-     */
-    private static final double WALL_CLOCK_ACCELERATION_FACTOR   = 1;
-    /**
-     * Minimum gap between wall clock time and simulation time before stopping
-     * [s].
-     */
-    private static final double MIN_SIMULATION_WALL_CLOCK_GAP    = 20;
-    
-    /**
-     * Keep the last {@link Net} for this amount of time in [s];
-     */
-    private static final double SIMULATION_HISTORY_KEEP_WINDOW   = 10;
-    /**
-     * Size of the floating average for tick duration.
-     */
-    private static final int    FLOAT_AVERAGE_TICK_DURATION_SIZE = 20;
-    
     private class SaveState {
         
         private final Net saveState;
@@ -71,13 +53,31 @@ public class Simulation {
         private Net getInterpolateState() {
             return interpolateState;
         }
-        
     }
     
     /**
-     * The @{link Net} to simulate.
+     * The 'virtual' duration of one simulation step in seconds. INFO: static
+     * here because agent is missing a reference to the simulation object.
      */
-    final Net                                              simulateNet;
+    public final static double                             SIMULATION_STEP_DURATION            = Config.getInstance().getDouble("simulation.step.duration", 1.0, 0.0, 3600.0);
+    /**
+     * A factor which accelerates wallclock time. For faster rendering progress.
+     * 1 := WallclockTime = PhysicalTime
+     */
+    private static final double                            WALL_CLOCK_ACCELERATION_FACTOR      = Config.getInstance().getDouble("simulation.wallclock.factor", 1.0, 0.0000000001, 10000000000.0);
+    /**
+     * Minimum gap between wall clock time and simulation time before stopping
+     * [s].
+     */
+    private static final double                            MIN_SIMULATION_WALL_CLOCK_GAP       = Config.getInstance().getDouble("simulation.wallclock.gap", 20.0, 0.0, 3600.0);
+    /**
+     * Keep the last {@link Net} for this amount of time in [s];
+     */
+    private static final double                            SIMULATION_HISTORY_KEEP_WINDOW      = Config.getInstance().getDouble("simulation.history.time", 10.0, 0.0, 3600.0);
+    /**
+     * Size of the floating average for tick duration.
+     */
+    private static final int                               FLOAT_AVERAGE_TICK_DURATION_SIZE    = Config.getInstance().getInt("simulation.tick.averagetime", 20, 0, 1000);
     /**
      * Start wallclock time of the simulation [s].
      */
@@ -93,11 +93,15 @@ public class Simulation {
     /**
      * Interpolate the wall clock state.
      */
-    private final AtomicBoolean                            interpolateWallClockSimulationState = new AtomicBoolean(true);
+    private final AtomicBoolean                            interpolateWallClockSimulationState = new AtomicBoolean(Config.getInstance().getValue("simulation.wallclock.interpolate", true));
     /**
      * Allow collisions.
      */
-    private boolean                                        allowCollisions                     = false;
+    private boolean                                        allowCollisions                     = Config.getInstance().getValue("simulation.collisions", true);
+    /**
+     * The @{link Net} to simulate.
+     */
+    final Net                                              simulateNet;
     
     public Simulation(final Net simulateNet) {
         this.simulateNet = simulateNet;
@@ -256,7 +260,5 @@ public class Simulation {
                 }
             }
         }
-        
     }
-    
 }

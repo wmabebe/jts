@@ -32,8 +32,8 @@ public class Main {
         }
         
         // load configuration
-        String net = Config.getInstance().getValue("net", "default");
-        DEBUG = Config.getInstance().getValue("debug", false);
+        String net = Config.getInstance().getValue("net.name.default", "default");
+        DEBUG = Config.getInstance().getValue("app.debug", false);
         
         // start app
         final App app = App.getInstance();

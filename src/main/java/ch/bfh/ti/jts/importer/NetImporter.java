@@ -105,13 +105,8 @@ public class NetImporter extends Importer<Net> {
         }
         final String id = getAttribute(node, "id", String.class);
         final double x = getAttribute(node, "x", Double.class);
-        final double y = -getAttribute(node, "y", Double.class); // invert y
-                                                                 // coordinates
-                                                                 // (different
-                                                                 // origin in
-                                                                 // C++ and
-                                                                 // Java)!
-        
+        // invert y coordinates (different origin in C++ and Java)!
+        final double y = -getAttribute(node, "y", Double.class);        
         final PolyShape polyShape = new PolyShape(getAttribute(node, "shape", String.class));
         final Shape shape = polyShape.getShape();
         final Junction junction = new Junction(id, x, y, shape);

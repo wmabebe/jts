@@ -14,20 +14,26 @@ import ch.bfh.ti.jts.data.Lane;
 public class Decision implements Serializable {
     
     private static final long serialVersionUID = 1L;
-
-    private double     acceleration = 0.0;
-    private LaneChange laneChange   = LaneChange.NONE;
     
+    /**
+     * Acceleration for the next simulation step.
+     */
+    private double            acceleration;
+    /**
+     * Decision to switch to another lane.
+     */
+    private LaneChange        laneChange;
     /**
      * Short-term decision. Can be null.
      */
-    private Lane       turning      = null;
+    private Lane              turning;
     /**
      * Long-term decision. Used with GPS. Can be null.
      */
-    private Junction   destination  = null;
+    private Junction          destination;
     
     public Decision() {
+        acceleration = 0.0;
         laneChange = LaneChange.NONE;
     }
     
@@ -35,11 +41,11 @@ public class Decision implements Serializable {
         return acceleration;
     }
     
-    public LaneChange getLaneChangeDirection() {
+    public LaneChange getLaneChange() {
         return laneChange;
     }
     
-    public Lane getNextEdgeLane() {
+    public Lane getTurning() {
         return turning;
     }
     
@@ -47,8 +53,8 @@ public class Decision implements Serializable {
         this.acceleration = acceleration;
     }
     
-    public void setLaneChangeDirection(final LaneChange laneChangeDirection) {
-        this.laneChange = laneChangeDirection;
+    public void setLaneChange(final LaneChange laneChange) {
+        this.laneChange = laneChange;
     }
     
     public void setTurning(final Lane turning) {
