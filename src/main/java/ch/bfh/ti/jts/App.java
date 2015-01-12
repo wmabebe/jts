@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Element;
+import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.SpawnInfo;
 import ch.bfh.ti.jts.exceptions.ArgumentNullException;
@@ -138,6 +139,21 @@ public class App implements Runnable {
         if (element != null) {
             final Console console = Window.getInstance().getConsole();
             console.stringTyped(String.format("%d", element.getId()));
+        }
+    }
+    
+    public void addJunctionNameToConsole(final Point worldCoordinates) {
+        if (worldCoordinates == null)
+            throw new ArgumentNullException("worldCoordinates");
+        
+        final Net wallClockSimulationState = App.getInstance().getSimulation().getWallCLockSimulationState();
+        Collection<Class<?>> typeFilter = new LinkedList<Class<?>>();
+        typeFilter.add(Junction.class); // only search junctions
+        double clickRadius = Config.getInstance().getDouble("click.radius", 30.0, 0.0, 1000.0);
+        Element element = wallClockSimulationState.getElementByCoordinates(worldCoordinates, clickRadius, typeFilter);
+        if (element != null) {
+            final Console console = Window.getInstance().getConsole();
+            console.stringTyped(element.getName());
         }
     }
 }

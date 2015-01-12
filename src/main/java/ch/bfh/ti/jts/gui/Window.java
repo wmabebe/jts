@@ -176,6 +176,15 @@ public class Window {
                 
                 App.getInstance().addIdToConsole(realPoint);
             }
+            if (e.isShiftDown()) {
+                Point screenPoint = e.getPoint();
+                
+                // get world coordinates from screen coordinates
+                final Point realPoint = new Point();
+                screenToWorldTransform.transform(screenPoint, realPoint);
+                
+                App.getInstance().addJunctionNameToConsole(realPoint);
+            }
         }
         
         @Override

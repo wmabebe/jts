@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 01/12/15 20:44:58 by SUMO activitygen Version 0.22.0
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/activitygenConfiguration.xsd">
+
+    <input>
+        <net-file value="map.net.xml"/>
+        <stat-file value="map.stat.xml"/>
+    </input>
+
+    <output>
+        <output-file value="map.rou.xml"/>
+    </output>
+
+    <time>
+        <duration-d value="1"/>
+    </time>
+
+    <random_number>
+        <random value="true"/>
+    </random_number>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+	
+	<vType id="car" accel="4.0" decel="20.0" sigma="0.0" length="5" minGap="2.5" maxSpeed="90" agent="Realistic"/>
+	
+	<flow type="car" frequency="0.5" departSpeed="50.0" arrivalSpeed="0">
+		<route junctions="611657732 603824422"/>
+	</flow>
+	<flow type="car" frequency="0.5" departSpeed="50.0" arrivalSpeed="0">
+		<route junctions="603824422 611657732"/>
+	</flow>
+	
+	<flow type="car" frequency="0.5" departSpeed="50.0" arrivalSpeed="0">
+		<route junctions="32462861 32462570"/>
+	</flow>
+	<flow type="car" frequency="0.5" departSpeed="50.0" arrivalSpeed="0">
+		<route junctions="32462570 32462861"/>
+	</flow>
+
+</routes>

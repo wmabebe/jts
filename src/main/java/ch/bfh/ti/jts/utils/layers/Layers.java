@@ -56,12 +56,15 @@ public class Layers<T> implements Serializable {
     public void removeAgents() {
         // TODO: why are the agents in the Net layer?
         final int layer = Simulatable.KNOWN_CLASSES.get(Net.class);
-        layers.get(layer).removeIf(x -> {
-            if (x != null && x instanceof Agent) {
-                final Agent a = (Agent) x;
-                return a.isRemoveCandidate();
-            }
-            return false;
-        });
+        Collection<?> col = layers.get(layer);
+        if (col != null) {
+            col.removeIf(x -> {
+                if (x != null && x instanceof Agent) {
+                    final Agent a = (Agent) x;
+                    return a.isRemoveCandidate();
+                }
+                return false;
+            });
+        }
     }
 }

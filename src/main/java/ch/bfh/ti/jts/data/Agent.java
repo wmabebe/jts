@@ -9,10 +9,6 @@ import java.awt.geom.Point2D;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.Main;
 import ch.bfh.ti.jts.ai.Decision;
@@ -33,7 +29,6 @@ import ch.bfh.ti.jts.utils.Helpers;
 public abstract class Agent extends Element implements Thinkable, Simulatable, Renderable {
     
     private static final long    serialVersionUID                    = 1L;
-    private static final Logger  log                                 = LogManager.getLogger(Agent.class);
     private static final Color[] colors                              = new Color[] { Color.WHITE, new Color(200, 200, 200), Color.GRAY, Color.LIGHT_GRAY, Color.BLUE, Color.RED,
             new Color(185, 122, 87), new Color(0, 128, 0)           };
     public final static boolean  CHANGE_LANE_ANIMATED                = Config.getInstance().getBool("agent.langechang.animation", true);
