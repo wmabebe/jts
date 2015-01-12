@@ -27,11 +27,18 @@
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo-sim.org/xsd/routes_file.xsd">
 	
-	<vType id="car" accel="4.0" decel="20.0" sigma="0.0" length="5" minGap="2.5" maxSpeed="90" agent="Realistic"/>
-<!--
+    <vType id="car" accel="4.0" decel="20.0" sigma="0.0" length="5" minGap="2.5" maxSpeed="90" agent="Realistic"/>
+    <vType id="obstacle" accel="0" decel="0" sigma="0.0" length="5" minGap="2.5" maxSpeed="90" agent="Idle"/>
+    
+    <vehicle type="obstacle" depart="0" departPos="300" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
+        <route edges="e0 e1"/>
+    </vehicle>
+    <!--
 	<vehicle type="car" depart="0" departPos="0" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
 		<route edges="e0 e1"/>
 	</vehicle>
+	-->
+	<!--
 	<vehicle type="car" depart="0" departPos="100" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
 		<route edges="e0 e1"/>
 	</vehicle>
@@ -53,7 +60,7 @@
 	<vehicle type="car" depart="0" departPos="300" arrivalPos="0.0" departSpeed="0" arrivalSpeed="0">
 		<route edges="e1 e0"/>
 	</vehicle>
--->
+	   -->
 	<flow type="car" frequency="1" departSpeed="40.0" arrivalSpeed="0">
 		<route junctions="j0 j1"/>
 	</flow>

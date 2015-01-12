@@ -78,14 +78,16 @@ public class Window {
                 if (Main.DEBUG) {
                     g2d.setColor(Color.GREEN);
                     g2d.drawLine(0, 0, (int) offset.getX(), (int) offset.getY());
-                    g2d.drawOval((int) zoomCenter.getX() - 10, (int) zoomCenter.getY() - 10, 20, 20);
+                    g2d.drawLine((int) zoomCenter.getX() - 10, (int) zoomCenter.getY(), (int) zoomCenter.getX() + 10, (int) zoomCenter.getY());
+                    g2d.drawLine((int) zoomCenter.getX(), (int) zoomCenter.getY() - 10, (int) zoomCenter.getX(), (int) zoomCenter.getY() + 10);
                 }
                 g2d.setTransform(t);
                 if (Main.DEBUG) {
                     g2d.setColor(Color.RED);
                     g2d.drawLine(-20, 0, 20, 0);
                     g2d.drawLine(0, -20, 0, 20);
-                    g2d.drawOval((int) zoomCenter.getX() - 10, (int) zoomCenter.getY() - 10, 20, 20);
+                    g2d.drawLine((int) zoomCenter.getX() - 10, (int) zoomCenter.getY(), (int) zoomCenter.getX() + 10, (int) zoomCenter.getY());
+                    g2d.drawLine((int) zoomCenter.getX(), (int) zoomCenter.getY() - 10, (int) zoomCenter.getX(), (int) zoomCenter.getY() + 10);
                 }
                 // center on screen
                 g2d.transform(AffineTransform.getTranslateInstance(windoww / 2, windowh / 2));

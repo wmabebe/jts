@@ -1,5 +1,7 @@
 package ch.bfh.ti.jts.data;
 
+import static ch.bfh.ti.jts.utils.Helpers.getHeatColor;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -27,7 +29,6 @@ import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.simulation.Statistics;
 import ch.bfh.ti.jts.utils.Config;
-import static ch.bfh.ti.jts.utils.Helpers.getHeatColor;
 
 /**
  * Lanes are the container within agents can move.
@@ -37,8 +38,9 @@ import static ch.bfh.ti.jts.utils.Helpers.getHeatColor;
  */
 public class Lane extends Element implements SpawnLocation, Simulatable, Renderable {
     
-    private static final long                      serialVersionUID = 1L;
-    private static final Logger                    log              = LogManager.getLogger(Lane.class);
+    private static final long                      serialVersionUID  = 1L;
+    private static final Logger                    log               = LogManager.getLogger(Lane.class);
+    public final static boolean                    LANE_RENDER_INFOS = Config.getInstance().getBool("lane.render.infos", false);
     
     private final Edge                             edge;
     private final int                              index;
@@ -341,7 +343,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         g.setColor(getColor());
         g.draw(polyShape.getShape());
         
-        if (Config.getInstance().getBool("lane.render.infos", false)) {
+        if (LANE_RENDER_INFOS) {
             g.setFont(App.FONT);
             g.setColor(getColor());
             g.drawString(this.toString(), (int) getPosition().getX(), (int) getPosition().getY());
@@ -371,7 +373,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
                             final double distanceLeft = nextAgent.getLanePosition() - thisAgent.getLanePosition() - thisAgent.getVehicle().getLength() / 2 - nextAgent.getVehicle().getLength() / 2;
                             if (nextAgent.isOnLane() && distanceLeft <= 0) {
                                 // collision!
-                                log.warn(String.format("Collision between agents %d and %d (distance left: %f)", thisAgent.getId(), nextAgent.getId(), distanceLeft));
+                                log.debug(String.format("Collision between agents %d and %d (distance left: %f)", thisAgent.getId(), nextAgent.getId(), distanceLeft));
                                 thisAgent.collide();
                                 nextAgent.collide();
                                 thisAgent.setLanePosition(thisAgent.getLanePosition() + distanceLeft);

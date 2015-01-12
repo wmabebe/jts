@@ -29,10 +29,10 @@
 	
 	<vType id="car" accel="4.0" decel="20.0" sigma="0.0" length="5" minGap="2.5" maxSpeed="90" agent="Realistic"/>
 
-	<flow type="car" frequency="1.0" departSpeed="50.0" arrivalSpeed="0">
+	<flow type="car" frequency="0.5" departSpeed="50.0" arrivalSpeed="0">
 		<route junctions="j0 j3"/>
 	</flow>
-	<flow type="car" frequency="0.5" departSpeed="20.0" arrivalSpeed="0">
+	<flow type="car" frequency="0.2" departSpeed="20.0" arrivalSpeed="0">
 		<route junctions="jx j3"/>
 	</flow>
 	

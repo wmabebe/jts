@@ -5,7 +5,6 @@ import static ch.bfh.ti.jts.utils.Helpers.getHeatColor;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.NavigableMap;
 import java.util.Optional;
@@ -33,19 +32,23 @@ import ch.bfh.ti.jts.utils.Helpers;
  */
 public abstract class Agent extends Element implements Thinkable, Simulatable, Renderable {
     
-    private static final long    serialVersionUID               = 1L;
-    private static final Logger  log                            = LogManager.getLogger(Agent.class);
-    private static final Color[] colors                         = new Color[] { Color.WHITE, new Color(200, 200, 200), Color.GRAY, Color.LIGHT_GRAY, Color.BLUE, Color.RED, new Color(185, 122, 87),
-            new Color(0, 128, 0)                               };
-    public final static boolean  CHANGE_LANE_ANIMATED           = Config.getInstance().getBool("agent.langechang.animation", true);
+    private static final long    serialVersionUID                    = 1L;
+    private static final Logger  log                                 = LogManager.getLogger(Agent.class);
+    private static final Color[] colors                              = new Color[] { Color.WHITE, new Color(200, 200, 200), Color.GRAY, Color.LIGHT_GRAY, Color.BLUE, Color.RED,
+            new Color(185, 122, 87), new Color(0, 128, 0)           };
+    public final static boolean  CHANGE_LANE_ANIMATED                = Config.getInstance().getBool("agent.langechang.animation", true);
     /**
      * Duration [s] of change line animation.
      */
-    public final static double   CHANGE_LANE_ANIMATION_DURATION = Config.getInstance().getDouble("agent.lanechange.animation.duration", 0.3, 0.01, 20.0);
+    public final static double   CHANGE_LANE_ANIMATION_DURATION      = Config.getInstance().getDouble("agent.lanechange.animation.duration", 0.3, 0.01, 20.0);
+    /**
+     * Length of the debug acceleration indicator
+     */
+    public final static double   ACCELERATION_DEBUG_INDICATOR_LENGTH = Config.getInstance().getDouble("agent.acceleration.debug.indicator.lenght", 5, 1, 100);
     /**
      * Decision object.
      */
-    private final Decision       decision                       = new Decision();
+    private final Decision       decision                            = new Decision();
     /**
      * Current lane.
      */
@@ -256,15 +259,33 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         final Point2D position = getPosition();
         final double x = position.getX();
         final double y = position.getY();
+        final double orientation = getLane().getPolyShape().getRelativeOrientation(getRelativeLanePosition());
         g.setStroke(new BasicStroke(1));
         g.setColor(getColor());
         g.translate(x, y);
-        final double orientation = getLane().getPolyShape().getRelativeOrientation(getRelativeLanePosition());
-        g.fill(AffineTransform.getRotateInstance(orientation).createTransformedShape(vehicle.getShape()));
+        g.rotate(orientation);
+        g.fill(vehicle.getShape());
         if (Config.getInstance().getBool("agent.render.infos", false)) {
             g.setFont(App.FONT);
             g.drawString("Agent " + getId(), -9, 5);
         }
+        if (Main.DEBUG) {
+            final Color c = g.getColor();
+            g.setColor(Color.RED);
+            final double acceleration = getAcceleration();
+            int accelerationIndicatorLength = 0;
+            if (acceleration > 0) {
+                accelerationIndicatorLength = (int) ((acceleration / getVehicle().getMaxAcceleration()) * ACCELERATION_DEBUG_INDICATOR_LENGTH);
+            } else {
+                accelerationIndicatorLength = (int) -((acceleration / getVehicle().getMinAcceleration()) * ACCELERATION_DEBUG_INDICATOR_LENGTH);
+            }
+            g.setStroke(new BasicStroke(.5f));
+            g.drawLine(0, 0, accelerationIndicatorLength, 0);
+            g.drawOval((int) -ACCELERATION_DEBUG_INDICATOR_LENGTH, (int) -ACCELERATION_DEBUG_INDICATOR_LENGTH, (int) ACCELERATION_DEBUG_INDICATOR_LENGTH * 2,
+                    (int) ACCELERATION_DEBUG_INDICATOR_LENGTH * 2);
+            g.setColor(c);
+        }
+        g.rotate(-orientation);
         g.translate(-x, -y);
     }
     
@@ -315,11 +336,9 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
                         xChangeLaneShift = changeLanePosition.getX() - x;
                         yChangeLaneShift = changeLanePosition.getY() - y;
                         if (Main.DEBUG) {
-                            Color c = g.getColor();
                             g.setColor(Color.GREEN);
                             g.setStroke(new BasicStroke(.5f));
                             g.translate(-x, -y);
-                            log.debug("lastAgentBeforeChangePosition: " + lastAgentStateBeforeChange.getPosition());
                             g.drawOval((int) extrapolatedPosition.getX() - 2, (int) extrapolatedPosition.getY() - 2, 4, 4);
                             g.drawOval((int) lastAgentStateBeforeChange.getPosition().getX() - 2, (int) lastAgentStateBeforeChange.getPosition().getY() - 2, 4, 4);
                             g.drawLine((int) lastAgentStateBeforeChange.getPosition().getX(), (int) lastAgentStateBeforeChange.getPosition().getY(), (int) extrapolatedPosition.getX(),
@@ -328,7 +347,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
                             g.drawLine((int) lastAgentStateBeforeChange.getPosition().getX(), (int) lastAgentStateBeforeChange.getPosition().getY(), (int) changeLanePosition.getX(),
                                     (int) changeLanePosition.getY());
                             g.translate(x, y);
-                            g.setColor(c);
                         }
                         g.translate(xChangeLaneShift, yChangeLaneShift);
                     }

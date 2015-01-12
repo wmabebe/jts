@@ -59,7 +59,7 @@ public class Simulation {
      * The 'virtual' duration of one simulation step in seconds. INFO: static
      * here because agent is missing a reference to the simulation object.
      */
-    public final static double                             SIMULATION_STEP_DURATION            = Config.getInstance().getDouble("simulation.step.duration", 1.0, 0.0, 3600.0);
+    public final static double                             SIMULATION_STEP_DURATION            = Config.getInstance().getDouble("simulation.step.duration", 0.5, 0.0, 3600.0);
     /**
      * A factor which accelerates wallclock time. For faster rendering progress.
      * 1 := WallclockTime = PhysicalTime
@@ -115,6 +115,9 @@ public class Simulation {
     }
     
     /**
+     * blocks if there is no simulation state or wall clock is ahead of
+     * simulation
+     * 
      * @return the simulation state closest to the wall clock time.
      */
     public Net getWallCLockSimulationState() {
