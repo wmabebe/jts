@@ -106,18 +106,6 @@ public class Net extends Element implements Serializable, Simulatable {
         return new IdleAgent();
     }
     
-    private void checkGoalReached() {
-        List<Agent> agents = getElementStream(Agent.class).map(x -> (Agent) x).collect(Collectors.toList());
-        for (Agent agent : agents) {
-            SpawnInfo spawnInfo = agent.getSpawnInfo();
-            if (spawnInfo != null) {
-                // if (spawnInfo.getEnd().equals(get));
-            } else {
-                log.warn(String.format("Agent %d has no spawn info", getId()));
-            }
-        }
-    }
-    
     private void doSpawning() {
         
         final List<Route> routes = getRoutes().stream().sequential().filter(x -> x instanceof Route).filter(x -> x.getDepartureTime() < getSimulationTime() * SPAWN_TIME_FACTOR).map(x -> (Route) x)
@@ -226,7 +214,6 @@ public class Net extends Element implements Serializable, Simulatable {
     @Override
     public void simulate(final double duration) {
         simulationTime += duration;
-        checkGoalReached();
         doSpawning();
         doDespawning();
     }

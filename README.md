@@ -1,13 +1,13 @@
 # Java Traffic Simulator (jts)
 
-*Java Traffic Simulator* is a traffic flow microsimulation written in Java.
+*Java Traffic Simulator (jts)* is an agent based micro simulation on real transport networks. Designt for easy use. The project is relaized as part of the module: Project 1 at Bern University of Applied Sciences.
 
 This project is currently under heavy developement.
 
 ## Features
 
 * Easy but highly configurable with java properties
-* Simulatio of elements:
+* Simulation of elements:
  * Agents; moving parts of the simulation
  * Lanes; where agents are moving on
  * Edge; bundling lanes together.
@@ -19,15 +19,20 @@ This project is currently under heavy developement.
 * Simulation interpolation for smooth drawing
 * GPS implementation with dijekstra
 
+## Table of contents
+
+* auto-gen TOC:
+{:toc}
+
 ## System context
 
 ![alt text][system_context]
 
 ## Documentation
 
-### Pseudo code
+### Code logic
 
-* App 
+#### App 
 
 ```java
 // load configuration
@@ -49,7 +54,7 @@ loop {
 	}
 	// simulate all the layers
 	foreach( layer : layers ){
-		foreach( simulatable : layer ){
+		foreach in parallel( simulatable : layer ){
 			simulatable.simulate()
 		}
 	}
@@ -57,22 +62,43 @@ loop {
 end();
 ```
 
-* simulatables
- * layer 0: agent
-  1. apply agent decision
-  2. update agent pysics
- * layer 1: lane
-  1. update position of agents in lane datastructure
-  2. do collisions of agent on lane
- * layer2: edge
-  1. switch agents between lanes on this edge
- * layer3: junction
-  1. agent despawning
-  2. reroute agents between edges
+#### Simulatables
+
+* Every simulatabe (s) with layer (l) is only allowed to change element states of simulatables (s2) if s2.l < s.l or s2 == s
+
+##### layer 0
+
+* agent
+ 1. apply agent decision
+ 2. update agent pysics
+
+##### layer 1
+
+* lane
+ 1. update position of agents in lane datastructure
+ 2. do collisions of agent on lane
+
+##### layer 2
+
+* edge
+ 1. switch agents between lanes on this edge
+
+##### layer 3
+
+* junction
+ 1. select agent for despawning
+ 2. reroute agents between edges
+
+##### layer 4
+
+* net
+ 1. agent spawning
+ 2. agent despawning
 
 ## Code Highlights
 
 * Simulation engine which is easely extensible with new elements
+** New simulatables can overwrite getSimulationLayer()
 
 ```java
 public interface Simulatable {
