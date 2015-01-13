@@ -21,8 +21,49 @@ This project is currently under heavy developement.
 
 ## Table of contents
 
-* auto-gen TOC:
-{:toc}
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Java Traffic Simulator (jts)](#java-traffic-simulator-jts)
+  - [Features](#features)
+  - [Table of contents](#table-of-contents)
+  - [System context](#system-context)
+  - [Documentation](#documentation)
+    - [Code logic](#code-logic)
+      - [App](#app)
+      - [Simulatables](#simulatables)
+        - [layer 0](#layer-0)
+        - [layer 1](#layer-1)
+        - [layer 2](#layer-2)
+        - [layer 3](#layer-3)
+        - [layer 4](#layer-4)
+  - [Code Highlights](#code-highlights)
+  - [Planning](#planning)
+    - [Planned features](#planned-features)
+    - [Journal](#journal)
+      - [Calendar week 39](#calendar-week-39)
+      - [Calendar week 40](#calendar-week-40)
+      - [Calendar week 41](#calendar-week-41)
+      - [Calendar week 42](#calendar-week-42)
+      - [Calendar week 43](#calendar-week-43)
+      - [Calendar week 44](#calendar-week-44)
+    - [Calendar week 45](#calendar-week-45)
+    - [Calendar week 46](#calendar-week-46)
+    - [Calendar week 47](#calendar-week-47)
+    - [Calendar week 48](#calendar-week-48)
+    - [Calendar week 49](#calendar-week-49)
+    - [Calendar week 50](#calendar-week-50)
+    - [Calendar week 51](#calendar-week-51)
+    - [Calendar week 52](#calendar-week-52)
+    - [Calendar week 2](#calendar-week-2)
+  - [Open issues](#open-issues)
+    - [Planned](#planned)
+    - [Backlog](#backlog)
+  - [Resources](#resources)
+  - [Licence](#licence)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## System context
 
