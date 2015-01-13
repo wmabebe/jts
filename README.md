@@ -142,7 +142,7 @@ end();
 
 ## Code highlights
 
-* Simulation engine which is easily extensible with new elements : [Simulatable.java](Simulatable.java)
+* Simulation engine which is easily extensible with new elements : [Simulatable.java](src/main/java/ch/bfh/ti/jts/simulation/Simulatable.java)
 
 ```java
 /**
