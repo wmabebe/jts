@@ -123,7 +123,6 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
     
     @Override
     public void simulate(final double duration) {
-        // despawn();
         switchLane();
     }
     

@@ -6,37 +6,69 @@ This project is currently under heavy developement.
 
 ## Features
 
+* Easy but highly configurable with java properties
 * Simulatio of elements:
  * Agents; moving parts of the simulation
  * Lanes; where agents are moving on
  * Edge; bundling lanes together.
  * Junctions; connecting edges
  * Networks; holding elements
+* Import of open street map data
 * Layered/parallelized simulation
-* 
+* Independent simulation and drawing
+* Simulation interpolation for smooth drawing
+* GPS implementation with dijekstra
+
+## System context
+
+![alt text][system_context]
 
 ## Documentation
 
-### Simulation cycle (pseudo code)
+### Pseudo code
 
-```
+* App 
+
+```java
+// load configuration
 initialization();
-load_map();
-build_net();
+// load net from xml files
+loadNet();
+// load agent routes & traffic flows
+loadRoutes();
+// app run
+showWindow();
 loop {
-	check_remove_agents();
-	spawn_agents();
-	think();
-	calculate_agents_drive_distance();
-	while (any_agent_has_to_drive()) {
-		check_switch_lane();
-		check_leave_lane();
-		redirect_agents();
-		check_collisions();
+	// remove agents which reached their target
+	checkRemoveAgents();
+	// spawn new agents according to routs & flows
+	spawnAgents();
+	// give the thinkables some time to make decisions
+	foreach( thinkable : elements) {
+		thinkable.think();
+	}
+	// simulate all the layers
+	foreach( layer : layers ){
+		foreach( simulatable : layer ){
+			simulatable.simulate()
+		}
 	}
 }
 end();
 ```
+
+* simulatables
+ * layer 0: agent
+  1. apply agent decision
+  2. update agent pysics
+ * layer 1: lane
+  1. update position of agents in lane datastructure
+  2. do collisions of agent on lane
+ * layer2: edge
+  1. switch agents between lanes on this edge
+ * layer3: junction
+  1. agent despawning
+  2. reroute agents between edges
 
 ## Code Highlights
 
@@ -44,9 +76,6 @@ end();
 
 ```java
 public interface Simulatable {
-    /**
-     * Known classes to layer mappings
-     */
     static Map<Class<?>, Integer> KNOWN_CLASSES = new HashMap<Class<?>, Integer>() {
                                                     
                                                     private static final long serialVersionUID = 1L;
@@ -139,139 +168,139 @@ Enteee
   - [x] loop through decisions -> simulate every decision (serial), without lane switching 
 
 winki
-* Spawn agents [done]
-* Dummy AI [done]
-* Move agents [done]
+- [x] Spawn agents 
+- [x] Dummy AI 
+- [x] Move agents 
 
 #### Calendar week 42
 
 Enteee
-* Zooming [done]
-* Collisions [done]
-* Lane switching [done]
+- [x] Zooming 
+- [x] Collisions 
+- [x] Lane switching 
 
 winki
-* Render agents on polygons [done]
-* Orientation of agents visible [done]
+- [x] Render agents on polygons 
+- [x] Orientation of agents visible 
 
 #### Calendar week 43
 
 Enteee
-* GPS-helper [done]
+- [x] GPS-helper 
 
 winki
-* Import of route-files [done]
-* Spawning of agents based on activities [done]
+- [x] Import of route-files 
+- [x] Spawning of agents based on activities 
 
 #### Calendar week 44
 
 Enteee
-* Commands to element redirection [done]
+- [x] Commands to element redirection 
 
 winki
-* Embedded console, thread-safe [done]
-* Spawn and time commands for console [done]
+- [x] Embedded console, thread-safe 
+- [x] Spawn and time commands for console 
 
 ### Calendar week 45
 
 Enteee
-* GPS unit tests [done]
-* Smarter agent, empty [done]
+- [x] GPS unit tests 
+- [x] Smarter agent, empty 
 
 winki
 
 ### Calendar week 46
 
 Enteee
-* Draw simulation decoupling [done]
-* Bugfix lane set agent override [done]
+- [x] Draw simulation decoupling 
+- [x] Bugfix lane set agent override 
 
 winki
-* Simple map for developing agent [done]
-* Fix index out of bounds bug in polyshape class [done]
-* Realistic agent [done]
+- [x] Simple map for developing agent 
+- [x] Fix index out of bounds bug in polyshape class 
+- [x] Realistic agent 
 
 ### Calendar week 47
 
 Enteee
-* Draw fake laneswitch [progress]
-* Extended render interface with simulationStates [done] 
+- [x] Draw fake laneswitch 
+- [x] Extended render interface with simulationStates 
 
 winki
-* Improvement of realistic agent [done]
+- [x] Improvement of realistic agent 
 
 ### Calendar week 48
 
 Enteee
 
-* Fixed interval simulation [done]
-* Dynamic app sleeping [done]
+- [x] Fixed interval simulation 
+- [x] Dynamic app sleeping 
 
 winki
 * Bugfix in lane
-* Lane switching logic of realisitc agent [done]
-* Implementation of traffic flows [done]
-* Agent type can be configured in the routes xml file [done]
-* Despawning of agents when spawn info of type "Flow" [done]
-* Added restart command to console [done]
+- [x] Lane switching logic of realisitc agent 
+- [x] Implementation of traffic flows 
+- [x] Agent type can be configured in the routes xml file 
+- [x] Despawning of agents when spawn info of type "Flow" 
+- [x] Added restart command to console 
 
 ### Calendar week 49
 
 Enteee
-* Bugfix time conversion 10E-9 -> 1E-9 for nano [done]
-* Wall clock time in Window introduced [done]
-* Wall clock / simulation time decoupling [done] -> issue lag
-* Restart command fixing [done]
-* singleton app / window [done]
-* reflection for command finding [done]
-* toggleInterpolate command added [done]
+- [x] Bugfix time conversion 10E-9 -> 1E-9 for nano 
+- [x] Wall clock time in Window introduced 
+- [x] Wall clock / simulation time decoupling -> issue lag 
+- [x] Restart command fixing 
+- [x] singleton app / window 
+- [x] reflection for command finding 
+- [x] toggleInterpolate command added 
 
 winki
-* Added "ramp" net [done] -> error at junctions
-* Console can receive parameters from clickable GUI [done]
+- [x] Added "ramp" net -> error at junctions 
+- [x] Console can receive parameters from clickable GUI 
 
 ### Calendar week 50
 
 Enteee
 
 winki
-* Every element has a position and can be located [done]
-* RealisitcAgent uses GPS [done]
+- [x] Every element has a position and can be located 
+- [x] RealisitcAgent uses GPS 
 
 ### Calendar week 51
 
 Enteee
-* Simulation lag -> fixed with average velocity [done]
+- [x] Simulation lag -> fixed with average velocity 
 
 winki
-* Spawning and despawning only at junctions. Edges will be mapped to begin junction or end junction at importing time of the routes file [done]
-* Bugfix in RealisticAgent [done]
+- [x] Spawning and despawning only at junctions. Edges will be mapped to begin junction or end junction at importing time of the routes file 
+- [x] Bugfix in RealisticAgent 
 
 ### Calendar week 52
 
 Enteee
 
 winki
-* Bugfix (invalid relative positions) [done]
-* Agents can set turning (short-term decision) or destination (long-term decision) [done]
-* Console bugfix (command argument variables must not be final!) [done]
-* Help text for commands [done]
-* Added remove command [done]
-* Agent handling on junctions [progress]
+- [x] Bugfix (invalid relative positions) 
+- [x] Agents can set turning (short-term decision) or destination (long-term decision) 
+- [x] Console bugfix (command argument variables must not be final!) 
+- [x] Help text for commands 
+- [x] Added remove command 
+- [ ] Agent handling on junctions
 
 ### Calendar week 2
 
 Enteee
 
-* Advanced langechange [done]
-* Config stuff review [done]
-* Fixing collisions [done]
+- [x] Advanced langechange 
+- [x] Config stuff review 
+- [x] Fixing collisions 
 
 winki
-* Record statistics data (space mean speed, time mean speed, density) [done]
-* Comments, refactoring [done]
-* Configuration file [done]
-* Lane statistic values [done]
+- [x] Record statistics data (space mean speed, time mean speed, density) 
+- [x] Comments, refactoring 
+- [x] Configuration file 
+- [x] Lane statistic values 
 
 ## Open issues
 
@@ -298,6 +327,8 @@ winki
 ## Licence
 
 This software and the underlying source code is licensed under the [MIT license][license].
+
+[system_context]: https://raw.githubusercontent.com/winki/jts/master/doc/systemcontext.png "system context"
 
 [osm]:http://www.openstreetmap.ch/
 [projoutl]:https://staff.hti.bfh.ch/swp1/Projekt_1/projects.html
