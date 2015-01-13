@@ -6,12 +6,79 @@ This project is currently under heavy developement.
 
 ## Features
 
-* Simulation engine which is easely extensible
+* Simulatio of elements:
+ * Agents; moving parts of the simulation
+ * Lanes; where agents are moving on
+ * Edge; bundling lanes together.
+ * Junctions; connecting edges
+ * Networks; holding elements
+* Layered/parallelized simulation
+* 
+
+## Documentation
+
+### Simulation cycle (pseudo code)
+
+```
+initialization();
+load_map();
+build_net();
+loop {
+	check_remove_agents();
+	spawn_agents();
+	think();
+	calculate_agents_drive_distance();
+	while (any_agent_has_to_drive()) {
+		check_switch_lane();
+		check_leave_lane();
+		redirect_agents();
+		check_collisions();
+	}
+}
+end();
+```
+
+## Code Highlights
+
+* Simulation engine which is easely extensible with new elements
 
 ```java
 public interface Simulatable {
-    int getSimulationLayer();
-    void simulate(final double duration, final Decision decision);
+    /**
+     * Known classes to layer mappings
+     */
+    static Map<Class<?>, Integer> KNOWN_CLASSES = new HashMap<Class<?>, Integer>() {
+                                                    
+                                                    private static final long serialVersionUID = 1L;
+                                                    
+                                                    {
+                                                        put(Agent.class, 0);
+                                                        put(Lane.class, 1);
+                                                        put(Edge.class, 2);
+                                                        put(Junction.class, 3);
+                                                        put(Net.class, 4);
+                                                    }
+                                                };
+    
+    /**
+     * The simulation layer of the object. 0: Simulate first 1: Simulate second
+     *
+     * @return the layer
+     */
+    default int getSimulationLayer() {
+        if (!KNOWN_CLASSES.containsKey(getClass())) {
+            throw new AssertionError("invalid layer", new IndexOutOfBoundsException(getClass() + " is not a known class"));
+        }
+        return KNOWN_CLASSES.get(getClass());
+    }
+    
+    /**
+     * Called in each simulation step
+     *
+     * @param duration
+     *            duration to simulate in seconds
+     */
+    void simulate(final double duration);
 }
 ```
 
@@ -38,14 +105,12 @@ public interface Thinkable {
 * Graphical user interface with 2D output
   * Allows scrolling and zooming
 
-
 ## Planning
 
 ### Planned features
 
 * Lane changing
 * Parameterizable AI
-
 
 ### Journal
 
@@ -58,20 +123,20 @@ Enteee, winki
 #### Calendar week 40
 
 Enteee
-* Basic simulator setup [done]
+- [x] Basic simulator setup
 
 winki
-* Projekt setup [done]
-* Basic data structure [done]
-* Implement xml importer [done]
+- [x] Projekt setup 
+- [x] Basic data structure 
+- [x] Implement xml importer 
 
 #### Calendar week 41
 
 Enteee
-* Simulation (Decision objects, think, simulate)
-  * call every think method of all Intelligents (parallel) [done]
-  * fill a collection [done]
-  * loop through decisions -> simulate every decision (serial) [done, without lane switching]
+- [x] Simulation (Decision objects, think, simulate)
+  - [x] call every think method of all Intelligents (parallel) 
+  - [x] fill a collection 
+  - [x] loop through decisions -> simulate every decision (serial), without lane switching 
 
 winki
 * Spawn agents [done]
@@ -200,6 +265,7 @@ Enteee
 
 * Advanced langechange [done]
 * Config stuff review [done]
+* Fixing collisions [done]
 
 winki
 * Record statistics data (space mean speed, time mean speed, density) [done]
@@ -213,37 +279,15 @@ winki
 
 * Bugfixes
   * Transcendent agents when collision happend
-  * A lot of collisions!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 * Write project documentation
 
 ### Backlog
 
+* Agents not looking beyond edge boundaries
 * Area restricted tick method
 * Weather / daylight
 * Console command to import OpenStreetMap data
 
-## Documentation
-
-### Simulation cycle (pseudo code)
-
-```
-initialization();
-load_map();
-build_net();
-loop {
-	check_remove_agents();
-	spawn_agents();
-	think();
-	calculate_agents_drive_distance();
-	while (any_agent_has_to_drive()) {
-		check_switch_lane();
-		check_leave_lane();
-		redirect_agents();
-		check_collisions();
-	}
-}
-end();
-```
 
 ## Resources
 
@@ -254,9 +298,6 @@ end();
 ## Licence
 
 This software and the underlying source code is licensed under the [MIT license][license].
-
-
-
 
 [osm]:http://www.openstreetmap.ch/
 [projoutl]:https://staff.hti.bfh.ch/swp1/Projekt_1/projects.html
