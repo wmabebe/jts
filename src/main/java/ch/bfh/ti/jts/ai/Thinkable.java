@@ -18,8 +18,8 @@ public interface Thinkable {
     /**
      * Called in parallel for each object before simulation. The objects can
      * influence the simulation by modifying the returned object of
-     * {@link Thinkable#getDecision()}. This method should not modify any data
-     * but the object returned by {@link Thinkable#getDecision()}.
+     * {@link Thinkable#getDecision()}. Important: This method should not modify
+     * any data but the object returned by {@link Thinkable#getDecision()}.
      */
     public void think();
 }

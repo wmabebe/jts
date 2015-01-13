@@ -3,7 +3,7 @@ package ch.bfh.ti.jts.gui.console.commands;
 import com.beust.jcommander.Parameter;
 
 /**
- * Interface describing available console commands.
+ * Describing all console commands.
  *
  * @author Enteee
  * @author winki
@@ -12,6 +12,13 @@ public abstract class Command {
     
     @Parameter(names = { "-help", "-h" }, description = "Help")
     public boolean help = false;
+    
+    /**
+     * Gets the name of the command.
+     *
+     * @return name of the command
+     */
+    public abstract String getName();
     
     /**
      * Executes the command.
@@ -23,14 +30,7 @@ public abstract class Command {
     public abstract String execute(Object executor);
     
     /**
-     * Gets the name of the command.
-     *
-     * @return name of the command
-     */
-    public abstract String getName();
-    
-    /**
-     * The type of classes for which this command is intended
+     * The type of classes this command will be sent to.
      *
      * @return
      */

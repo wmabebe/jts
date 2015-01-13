@@ -35,7 +35,8 @@ public interface Simulatable {
                                                 };
     
     /**
-     * The simulation layer of the object. 0: Simulate first 1: Simulate second
+     * The simulation layer of the object. 0: Simulate first 1: Simulate second,
+     * ...
      *
      * @return the layer
      */
@@ -47,7 +48,8 @@ public interface Simulatable {
     }
     
     /**
-     * Called in each simulation step
+     * Called in each simulation step in parallel for each object of the
+     * implementing class
      *
      * @param duration
      *            duration to simulate in seconds

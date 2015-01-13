@@ -8,11 +8,11 @@ This project is currently under heavy developement.
 
 * Easy but highly configurable with java properties
 * Simulation of elements:
- * Agents; moving parts of the simulation
- * Lanes; where agents are moving on
- * Edge; bundling lanes together.
- * Junctions; connecting edges
- * Networks; holding elements
+  * Agents; moving parts of the simulation
+  * Lanes; where agents are moving on
+  * Edge; bundling lanes together.
+  * Junctions; connecting edges
+  * Networks; holding elements
 * Import of open street map data
 * Layered/parallelized simulation
 * Independent simulation and drawing
@@ -25,29 +25,26 @@ This project is currently under heavy developement.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Java Traffic Simulator (jts)](#java-traffic-simulator-jts)
-  - [Features](#features)
-  - [Table of contents](#table-of-contents)
-  - [System context](#system-context)
-  - [Documentation](#documentation)
-    - [Code logic](#code-logic)
-      - [App](#app)
-      - [Simulatables](#simulatables)
-        - [layer 0](#layer-0)
-        - [layer 1](#layer-1)
-        - [layer 2](#layer-2)
-        - [layer 3](#layer-3)
-        - [layer 4](#layer-4)
-  - [Code Highlights](#code-highlights)
-  - [Planning](#planning)
-    - [Planned features](#planned-features)
-    - [Journal](#journal)
-      - [Calendar week 39](#calendar-week-39)
-      - [Calendar week 40](#calendar-week-40)
-      - [Calendar week 41](#calendar-week-41)
-      - [Calendar week 42](#calendar-week-42)
-      - [Calendar week 43](#calendar-week-43)
-      - [Calendar week 44](#calendar-week-44)
+- [System context](#system-context)
+- [Documentation](#documentation)
+  - [Code logic](#code-logic)
+    - [App](#app)
+    - [Simulatables](#simulatables)
+      - [layer 0](#layer-0)
+      - [layer 1](#layer-1)
+      - [layer 2](#layer-2)
+      - [layer 3](#layer-3)
+      - [layer 4](#layer-4)
+- [Code Highlights](#code-highlights)
+- [Planning](#planning)
+  - [Planned features](#planned-features)
+  - [Journal](#journal)
+    - [Calendar week 39](#calendar-week-39)
+    - [Calendar week 40](#calendar-week-40)
+    - [Calendar week 41](#calendar-week-41)
+    - [Calendar week 42](#calendar-week-42)
+    - [Calendar week 43](#calendar-week-43)
+    - [Calendar week 44](#calendar-week-44)
     - [Calendar week 45](#calendar-week-45)
     - [Calendar week 46](#calendar-week-46)
     - [Calendar week 47](#calendar-week-47)
@@ -57,11 +54,11 @@ This project is currently under heavy developement.
     - [Calendar week 51](#calendar-week-51)
     - [Calendar week 52](#calendar-week-52)
     - [Calendar week 2](#calendar-week-2)
-  - [Open issues](#open-issues)
-    - [Planned](#planned)
-    - [Backlog](#backlog)
-  - [Resources](#resources)
-  - [Licence](#licence)
+- [Open issues](#open-issues)
+  - [Planned](#planned)
+  - [Backlog](#backlog)
+- [Resources](#resources)
+- [Licence](#licence)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -71,9 +68,14 @@ This project is currently under heavy developement.
 
 ## Documentation
 
-### Code logic
+### Application logic
 
-#### App 
+#### Main & App & Simulation
+
+* main()
+* Loads configuration
+* Simulates with thinking
+* Keeps map of saved simulation states
 
 ```java
 // load configuration
@@ -85,20 +87,22 @@ loadRoutes();
 // app run
 showWindow();
 loop {
-	// remove agents which reached their target
-	checkRemoveAgents();
-	// spawn new agents according to routs & flows
-	spawnAgents();
-	// give the thinkables some time to make decisions
-	foreach( thinkable : elements) {
-		thinkable.think();
-	}
-	// simulate all the layers
-	foreach( layer : layers ){
-		foreach in parallel( simulatable : layer ){
-			simulatable.simulate()
-		}
-	}
+    // remove agents which reached their target
+    checkRemoveAgents();
+    // spawn new agents according to routs & flows
+    spawnAgents();
+    // simulate all the layers
+    foreach( layer : layers ){
+        foreach in parallel( simulatable : layer ){
+            simulatable.simulate()
+        }
+    }
+    // give the thinkables some time to make decisions
+    foreach( thinkable : elements) {
+        thinkable.think();
+    }
+    // add simulation state to the list of saved states
+    addSimulationState(deepCopy(this));
 }
 end();
 ```
@@ -110,39 +114,48 @@ end();
 ##### layer 0
 
 * agent
- 1. apply agent decision
- 2. update agent pysics
+  1. apply agent decision
+  2. update agent pysics
 
 ##### layer 1
 
 * lane
- 1. update position of agents in lane datastructure
- 2. do collisions of agent on lane
+  1. update position of agents in lane datastructure
+  2. do collisions of agent on lane
 
 ##### layer 2
 
 * edge
- 1. switch agents between lanes on this edge
+  1. switch agents between lanes on this edge
 
 ##### layer 3
 
 * junction
- 1. select agent for despawning
- 2. reroute agents between edges
+  1. select agent for despawning
+  2. reroute agents between edges
 
 ##### layer 4
 
 * net
- 1. agent spawning
- 2. agent despawning
+  1. agent spawning
+  2. agent despawning
 
-## Code Highlights
+## Code highlights
 
-* Simulation engine which is easely extensible with new elements
-** New simulatables can overwrite getSimulationLayer()
+* [Simulation engine which is easily extensible with new elements](../jts/src/main/java/ch/bfh/ti/jts/simulation/Simulatable.java)
 
 ```java
+/**
+ * Interface implemented by {@link Element} which can be simulated.
+ *
+ * @author Enteee
+ * @author winki
+ */
 public interface Simulatable {
+    
+    /**
+     * Known classes to layer mappings
+     */
     static Map<Class<?>, Integer> KNOWN_CLASSES = new HashMap<Class<?>, Integer>() {
                                                     
                                                     private static final long serialVersionUID = 1L;
@@ -157,7 +170,8 @@ public interface Simulatable {
                                                 };
     
     /**
-     * The simulation layer of the object. 0: Simulate first 1: Simulate second
+     * The simulation layer of the object. 0: Simulate first 1: Simulate second,
+     * ...
      *
      * @return the layer
      */
@@ -169,7 +183,8 @@ public interface Simulatable {
     }
     
     /**
-     * Called in each simulation step
+     * Called in each simulation step in parallel for each object of the
+     * implementing class
      *
      * @param duration
      *            duration to simulate in seconds
@@ -179,20 +194,69 @@ public interface Simulatable {
 ```
 
 * Integrated console engine with commands that are easy extensible
+  * Command autodiscovery with reflection
 
 ```java
-public interface Command {
-    String getName();
-    String execute(Simulation simulation);
-    Class<?> getTargetType();
+/**
+ * Describing all console commands.
+ *
+ * @author Enteee
+ * @author winki
+ */
+public abstract class Command {
+    
+    @Parameter(names = { "-help", "-h" }, description = "Help")
+    public boolean help = false;
+    
+    /**
+     * Gets the name of the command.
+     *
+     * @return name of the command
+     */
+    public abstract String getName();
+    
+    /**
+     * Executes the command.
+     *
+     * @param executor
+     *            the object on which to execute.
+     * @return console output
+     */
+    public abstract String execute(Object executor);
+    
+    /**
+     * The type of classes this command will be sent to.
+     *
+     * @return
+     */
+    public abstract Class<?> getTargetType();
 }
 ```
 
 * Easy interface for smart new agents.
 
 ```java
+/**
+ * Interface implemented by each {@link Element} which can make decisions.
+ *
+ * @author Enteee
+ * @author winki
+ */
 public interface Thinkable {
+    
+    /**
+     * Get the local decision of this thinkable.
+     *
+     * @return the decision
+     */
     public Decision getDecision();
+    
+    /**
+     * Called in parallel for each object before simulation. The objects can
+     * influence the simulation by modifying the returned object of
+     * {@link Thinkable#getDecision()}. Important: This method should not modify
+     * any data but the object returned by {@link Thinkable#getDecision()}.
+     */
     public void think();
 }
 ```
@@ -268,7 +332,7 @@ winki
 - [x] Embedded console, thread-safe 
 - [x] Spawn and time commands for console 
 
-### Calendar week 45
+#### Calendar week 45
 
 Enteee
 - [x] GPS unit tests 
@@ -276,7 +340,7 @@ Enteee
 
 winki
 
-### Calendar week 46
+#### Calendar week 46
 
 Enteee
 - [x] Draw simulation decoupling 
@@ -287,7 +351,7 @@ winki
 - [x] Fix index out of bounds bug in polyshape class 
 - [x] Realistic agent 
 
-### Calendar week 47
+#### Calendar week 47
 
 Enteee
 - [x] Draw fake laneswitch 
@@ -296,7 +360,7 @@ Enteee
 winki
 - [x] Improvement of realistic agent 
 
-### Calendar week 48
+#### Calendar week 48
 
 Enteee
 
@@ -311,7 +375,7 @@ winki
 - [x] Despawning of agents when spawn info of type "Flow" 
 - [x] Added restart command to console 
 
-### Calendar week 49
+#### Calendar week 49
 
 Enteee
 - [x] Bugfix time conversion 10E-9 -> 1E-9 for nano 
@@ -326,7 +390,7 @@ winki
 - [x] Added "ramp" net -> error at junctions 
 - [x] Console can receive parameters from clickable GUI 
 
-### Calendar week 50
+#### Calendar week 50
 
 Enteee
 
@@ -334,7 +398,7 @@ winki
 - [x] Every element has a position and can be located 
 - [x] RealisitcAgent uses GPS 
 
-### Calendar week 51
+#### Calendar week 51
 
 Enteee
 - [x] Simulation lag -> fixed with average velocity 
@@ -343,7 +407,7 @@ winki
 - [x] Spawning and despawning only at junctions. Edges will be mapped to begin junction or end junction at importing time of the routes file 
 - [x] Bugfix in RealisticAgent 
 
-### Calendar week 52
+#### Calendar week 52
 
 Enteee
 
@@ -355,7 +419,7 @@ winki
 - [x] Added remove command 
 - [ ] Agent handling on junctions
 
-### Calendar week 2
+#### Calendar week 2
 
 Enteee
 
