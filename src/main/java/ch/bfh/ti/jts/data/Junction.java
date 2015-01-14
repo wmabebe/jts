@@ -133,7 +133,7 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
         edges.stream().filter(edge -> edge.goesTo(this)).forEach(edge -> {
             edge.getEdgeLeaveCandidates().forEach((agent) -> {
                 try {
-                    // despawn agents
+                    // despawn agents, if destination is this junction
                     final SpawnInfo spawnInfo = agent.getSpawnInfo();
                     if (spawnInfo != null) {
                         final SpawnLocation end = spawnInfo.getEnd();
@@ -144,7 +144,7 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
                         }
                     }
                 } catch (final Exception e) {
-                    log.error(String.format("%s can't despawn on %s", agent, this), e);
+                    log.fatal(String.format("%s can't despawn on %s", agent, this), e);
                 }
                 try {
                     // check switch edge...
@@ -189,10 +189,10 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
                         }
                     }
                     // 3. no decision?
-                    log.warn(String.format("%s despawn, can't cross junction", agent));
+                    log.warn(String.format("%s remove, can't cross junction", agent));
                     agent.remove();
                 } catch (final Exception e) {
-                    log.error(String.format("%s can't switch edge on %s", agent, this), e);
+                    log.fatal(String.format("%s can't switch edge on %s", agent, this), e);
                 }
             });
         });

@@ -327,6 +327,7 @@ Enteee
 - [x] Jcommander bug workaround
 - [x] Info command
 - [x] Agent despawning on no junction cross
+- [x] Refactor element removal -> Advanced removal (elements)
 
 ## Open issues
 

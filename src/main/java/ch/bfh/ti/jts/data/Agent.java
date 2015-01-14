@@ -70,10 +70,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      */
     private SpawnInfo            spawnInfo;
     /**
-     * Remove agent?
-     */
-    private boolean              isRemoveCandidate;
-    /**
      * How many times did the agent collide?
      */
     private int                  collisionCount;
@@ -240,16 +236,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return  !isLaneChangeCandidate()
                 && !isEdgeLeaveCandidate();
         // @formatter:on
-    }
-    
-    public boolean isRemoveCandidate() {
-        return isRemoveCandidate;
-    }
-    
-    public void remove() {
-        isRemoveCandidate = true;
-        getLane().removeEdgeLeaveCandidate(this);
-        lane = null;
     }
     
     @Override

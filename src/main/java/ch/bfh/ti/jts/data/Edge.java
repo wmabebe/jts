@@ -141,11 +141,12 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
                             changeLane.get().addLaneAgent(agent);
                             lane.removeLaneAgent(agent);
                         } else {
+                            lane.removeEdgeLeaveCandidate(agent);
                             agent.remove();
-                            log.warn(String.format("Agent %d was removed due to an invalid lane change information", agent.getId()));
+                            log.warn(String.format("%s was removed due to an invalid lane change information", agent));
                         }
                     } catch (final Exception e) {
-                        log.error(String.format("Agent %d can't switch lane", agent.getId()), e);
+                        log.error(String.format("%s can't change lane", agent), e);
                     }
                 }
             });

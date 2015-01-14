@@ -52,6 +52,7 @@ public abstract class Element implements Serializable, Comparable<Element> {
     private final String               name;
     private final int                  id;
     private Net                        net;
+    private boolean                    isRemoveCandidate;
     
     public Element(final String name) {
         this.name = name;
@@ -140,6 +141,22 @@ public abstract class Element implements Serializable, Comparable<Element> {
     public int compareTo(final Element otherElement) {
         return getId() - otherElement.getId();
         
+    }
+    
+    /**
+     * Flag this element as remove candidate.
+     */
+    public void remove() {
+        isRemoveCandidate = true;
+    }
+    
+    /**
+     * Is this element a remove candidate?
+     * 
+     * @return @{code true} if yes, @{code false} otherwise.
+     */
+    public boolean isRemoveCandidate() {
+        return isRemoveCandidate;
     }
     
     @Override

@@ -79,6 +79,28 @@ public class Net extends Element implements Serializable, Simulatable {
         }
     }
     
+    private void removeElement(final Element element) {
+        
+        elements.remove(element);
+        // set net on element
+        element.setNet(this);
+        // element renderable?
+        if (Renderable.class.isInstance(element)) {
+            final Renderable renderable = (Renderable) element;
+            renderables.removeLayerable(renderable.getRenderLayer(), renderable);
+        }
+        // element thinkable?
+        if (Thinkable.class.isInstance(element)) {
+            final Thinkable thinkable = (Thinkable) element;
+            thinkables.remove(thinkable);
+        }
+        // element simulatable?
+        if (Simulatable.class.isInstance(element)) {
+            final Simulatable simulatable = (Simulatable) element;
+            simulatables.removeLayerable(simulatable.getSimulationLayer(), simulatable);
+        }
+    }
+    
     public void addRoutes(final Collection<SpawnInfo> routes) {
         this.routes.addAll(routes);
     }
@@ -133,38 +155,6 @@ public class Net extends Element implements Serializable, Simulatable {
                 // don't remove flow (infinite spawning)
             }
         }
-    }
-    
-    public boolean removeAgent(int id) {
-        Element element = getElement(id);
-        if (element != null) {
-            if (element instanceof Agent) {
-                final Agent agent = (Agent) element;
-                agent.remove();
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private void doDespawning() {
-        // remove agents...
-        elements.removeIf(x -> {
-            if (x != null && x instanceof Agent) {
-                final Agent a = (Agent) x;
-                return a.isRemoveCandidate();
-            }
-            return false;
-        });
-        thinkables.removeIf(x -> {
-            if (x != null && x instanceof Agent) {
-                final Agent a = (Agent) x;
-                return a.isRemoveCandidate();
-            }
-            return false;
-        });
-        renderables.removeAgents();
-        simulatables.removeAgents();
     }
     
     public GPS<Junction, Edge> getGPS() {
@@ -241,7 +231,10 @@ public class Net extends Element implements Serializable, Simulatable {
     public void simulate(final double duration) {
         simulationTime += duration;
         doSpawning();
-        doDespawning();
+        // remove all elements marked as remove candidate
+        getElementStream().filter(element -> element.isRemoveCandidate()).collect(Collectors.toList()).forEach(element -> {
+            removeElement(element);
+        });
     }
     
     private void spawn(final SpawnInfo spawnInfo, final Agent agent) {

@@ -392,7 +392,7 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
                 // add this agent again
                 if (thisAgent.isEdgeLeaveCandidate()) {
                     addEdgeLeaveCandidate(thisAgent);
-                } else {
+                } else if (!thisAgent.isRemoveCandidate()) {
                     addLaneAgent(thisAgent);
                 }
             }

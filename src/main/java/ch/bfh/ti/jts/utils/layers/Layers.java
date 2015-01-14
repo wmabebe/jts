@@ -9,10 +9,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
-import ch.bfh.ti.jts.data.Agent;
-import ch.bfh.ti.jts.data.Net;
-import ch.bfh.ti.jts.simulation.Simulatable;
-
 /**
  * A data structure which holds its elements in layers.
  *
@@ -53,18 +49,11 @@ public class Layers<T> implements Serializable {
         return layers.get(layer).stream();
     }
     
-    public void removeAgents() {
-        // TODO: why are the agents in the Net layer?
-        final int layer = Simulatable.KNOWN_CLASSES.get(Net.class);
-        Collection<?> col = layers.get(layer);
-        if (col != null) {
-            col.removeIf(x -> {
-                if (x != null && x instanceof Agent) {
-                    final Agent a = (Agent) x;
-                    return a.isRemoveCandidate();
-                }
-                return false;
-            });
+    public void removeLayerable(final int layer, final T layerable) {
+        if (!layers.containsKey(layer)) {
+            throw new IndexOutOfBoundsException("layer");
         }
+        // add layerable to layer
+        layers.get(layer).remove(layerable);
     }
 }

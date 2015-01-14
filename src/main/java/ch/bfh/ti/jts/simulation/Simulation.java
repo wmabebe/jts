@@ -11,7 +11,6 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.gui.Window;
 import ch.bfh.ti.jts.gui.console.Console;
@@ -181,13 +180,6 @@ public class Simulation {
         simulateNet.getThinkableStream().forEach(element -> {
             // think
                 try {
-                    if (element instanceof Agent) {
-                        final Agent agent = (Agent) element;
-                        // don't call think on this removed agent
-                        if (agent.isRemoveCandidate()) {
-                            return;
-                        }
-                    }
                     element.think();
                 } catch (Exception e) {
                     log.error("Think failed for element: " + element, e);
