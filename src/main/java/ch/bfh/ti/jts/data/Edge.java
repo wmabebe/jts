@@ -151,4 +151,9 @@ public class Edge extends Element implements SpawnLocation, DirectedGraphEdge<Ed
             });
         });
     }
+    
+    @Override
+    public String toString() {
+        return String.format("Edge{ id: %d }", getId());
+    }
 }

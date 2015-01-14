@@ -1,20 +1,22 @@
 package ch.bfh.ti.jts.gui.console.commands;
 
-import com.beust.jcommander.Parameters;
+import java.util.Optional;
 
 import ch.bfh.ti.jts.App;
+
+import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "Restart the simulation")
 public class RestartCommand extends Command {
     
     @Override
-    public String execute(final Object executor) {
+    public Optional<String> execute(final Object executor) {
         final App app = (App) executor;
         if (app == null) {
             throw new IllegalArgumentException("app");
         }
         app.restart();
-        return "simulation restarted.";
+        return Optional.of("simulation restarted");
     }
     
     @Override

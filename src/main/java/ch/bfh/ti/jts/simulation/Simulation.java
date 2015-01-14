@@ -190,7 +190,7 @@ public class Simulation {
                     }
                     element.think();
                 } catch (Exception e) {
-                    log.error("Think failed", e);
+                    log.error("Think failed for element: " + element, e);
                 }
             });
     }
@@ -205,10 +205,10 @@ public class Simulation {
         final Console console = Window.getInstance().getConsole();
         if (targetType == Simulation.class) {
             // command on simulation itself
-            console.write(command.execute(this));
+            command.execute(this).ifPresent(message -> console.write(message));
         } else {
             simulateNet.getElementStream(command.getTargetType()).forEach(element -> {
-                console.write(command.execute(element));
+                command.execute(element).ifPresent(message -> console.write(message));
             });
         }
     }

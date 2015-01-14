@@ -3,6 +3,7 @@ package ch.bfh.ti.jts.gui.console.commands;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -20,10 +21,10 @@ import com.beust.jcommander.Parameters;
 public class SpawnCommand extends Command {
     
     @Parameter(names = { "-number", "-n" }, description = "Number of vehicles to spawn")
-    private int number = 1;
+    private final int number = 1;
     
     @Override
-    public String execute(final Object executor) {
+    public Optional<String> execute(final Object executor) {
         final Net net = (Net) executor;
         
         // get net data
@@ -47,7 +48,7 @@ public class SpawnCommand extends Command {
         }
         net.addRoutes(routes);
         
-        return String.format("%d vehicles spawned", number);
+        return Optional.of(String.format("%d vehicles spawned", number));
     }
     
     @Override

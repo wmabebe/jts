@@ -27,15 +27,15 @@ This project is currently under heavy developement.
 
 - [System context](#system-context)
 - [Documentation](#documentation)
-  - [Code logic](#code-logic)
-    - [App](#app)
+  - [Application logic](#application-logic)
+    - [Main & App & Simulation](#main-&-app-&-simulation)
     - [Simulatables](#simulatables)
       - [layer 0](#layer-0)
       - [layer 1](#layer-1)
       - [layer 2](#layer-2)
       - [layer 3](#layer-3)
       - [layer 4](#layer-4)
-- [Code Highlights](#code-highlights)
+- [Code highlights](#code-highlights)
 - [Planning](#planning)
   - [Planned features](#planned-features)
   - [Journal](#journal)
@@ -53,6 +53,7 @@ This project is currently under heavy developement.
     - [Calendar week 50](#calendar-week-50)
     - [Calendar week 51](#calendar-week-51)
     - [Calendar week 52](#calendar-week-52)
+    - [Calendar week 1](#calendar-week-1)
     - [Calendar week 2](#calendar-week-2)
 - [Open issues](#open-issues)
   - [Planned](#planned)
@@ -102,14 +103,14 @@ loop {
         thinkable.think();
     }
     // add simulation state to the list of saved states
-    addSimulationState(deepCopy(this));
+    addSimulationState( deepCopy( this ) );
 }
 end();
 ```
 
 #### Simulatables
 
-* Every simulatabe (s) with layer (l) is only allowed to change element states of simulatables (s2) if s2.l < s.l or s2 == s
+Idea: Every simulatabe (s) with layer (l) is only allowed to change element states of simulatables (s2) if s2.l < s.l or s2 == s. This allows parallel simulation of all the s in one l.
 
 ##### layer 0
 
@@ -142,30 +143,24 @@ end();
 
 ## Code highlights
 
-* [Simulatable.java](src/main/java/ch/bfh/ti/jts/simulation/Simulatable.java): Simulation engine which is easily extensible with new elements
-* [Command.java](src/main/java/ch/bfh/ti/jts/gui/console/commands/Command.java): Integrated console engine with commands that are easy extensible 
+* [Simulatable.java](src/main/java/ch/bfh/ti/jts/simulation/Simulatable.java): Simulation engine which is easily extensible with new elements.
+* [Command.java](src/main/java/ch/bfh/ti/jts/gui/console/commands/Command.java): Integrated console engine with commands that are easy extensible.
   * Command autodiscovery with reflection
-* [Thinkable.java](src/main/java/ch/bfh/ti/jts/ai/Thinkable.java): Easy interface for smart new agents
-* [Importer.java](src/main/java/ch/bfh/ti/jts/importer/Importer.java): Import road map data from [OpenStreetMap][osm]
-* [Window.java](src/main/java/ch/bfh/ti/jts/gui/Window.java): Graphical user interface with 2D output
+* [Thinkable.java](src/main/java/ch/bfh/ti/jts/ai/Thinkable.java): Easy interface for smart new agents.
+* [Importer.java](src/main/java/ch/bfh/ti/jts/importer/Importer.java): Import road map data from [OpenStreetMap][osm].
+* [Window.java](src/main/java/ch/bfh/ti/jts/gui/Window.java): Graphical user interface with 2D output.
   * Allows scrolling and zooming
+  * Allows console input & selection of elements by clicking
 
-## Planning
+## Journal
 
-### Planned features
-
-* Lane changing
-* Parameterizable AI
-
-### Journal
-
-#### Calendar week 39
+### Calendar week 39
 
 Enteee, winki
 
 * Write requirements doc [done]
 
-#### Calendar week 40
+### Calendar week 40
 
 Enteee
 - [x] Basic simulator setup
@@ -175,7 +170,7 @@ winki
 - [x] Basic data structure 
 - [x] Implement xml importer 
 
-#### Calendar week 41
+### Calendar week 41
 
 Enteee
 - [x] Simulation (Decision objects, think, simulate)
@@ -188,7 +183,7 @@ winki
 - [x] Dummy AI 
 - [x] Move agents 
 
-#### Calendar week 42
+### Calendar week 42
 
 Enteee
 - [x] Zooming 
@@ -199,7 +194,7 @@ winki
 - [x] Render agents on polygons 
 - [x] Orientation of agents visible 
 
-#### Calendar week 43
+### Calendar week 43
 
 Enteee
 - [x] GPS-helper 
@@ -208,7 +203,7 @@ winki
 - [x] Import of route-files 
 - [x] Spawning of agents based on activities 
 
-#### Calendar week 44
+### Calendar week 44
 
 Enteee
 - [x] Commands to element redirection 
@@ -217,7 +212,7 @@ winki
 - [x] Embedded console, thread-safe 
 - [x] Spawn and time commands for console 
 
-#### Calendar week 45
+### Calendar week 45
 
 Enteee
 - [x] GPS unit tests 
@@ -225,7 +220,7 @@ Enteee
 
 winki
 
-#### Calendar week 46
+### Calendar week 46
 
 Enteee
 - [x] Draw simulation decoupling 
@@ -236,7 +231,7 @@ winki
 - [x] Fix index out of bounds bug in polyshape class 
 - [x] Realistic agent 
 
-#### Calendar week 47
+### Calendar week 47
 
 Enteee
 - [x] Draw fake laneswitch 
@@ -245,7 +240,7 @@ Enteee
 winki
 - [x] Improvement of realistic agent 
 
-#### Calendar week 48
+### Calendar week 48
 
 Enteee
 
@@ -260,7 +255,7 @@ winki
 - [x] Despawning of agents when spawn info of type "Flow" 
 - [x] Added restart command to console 
 
-#### Calendar week 49
+### Calendar week 49
 
 Enteee
 - [x] Bugfix time conversion 10E-9 -> 1E-9 for nano 
@@ -275,7 +270,7 @@ winki
 - [x] Added "ramp" net -> error at junctions 
 - [x] Console can receive parameters from clickable GUI 
 
-#### Calendar week 50
+### Calendar week 50
 
 Enteee
 
@@ -283,7 +278,7 @@ winki
 - [x] Every element has a position and can be located 
 - [x] RealisitcAgent uses GPS 
 
-#### Calendar week 51
+### Calendar week 51
 
 Enteee
 - [x] Simulation lag -> fixed with average velocity 
@@ -292,7 +287,7 @@ winki
 - [x] Spawning and despawning only at junctions. Edges will be mapped to begin junction or end junction at importing time of the routes file 
 - [x] Bugfix in RealisticAgent 
 
-#### Calendar week 52
+### Calendar week 52
 
 Enteee
 
@@ -304,7 +299,13 @@ winki
 - [x] Added remove command 
 - [ ] Agent handling on junctions
 
-#### Calendar week 2
+### Calendar week 1
+
+Enteee
+
+winki
+
+### Calendar week 2
 
 Enteee
 
@@ -318,9 +319,16 @@ winki
 - [x] Configuration file 
 - [x] Lane statistic values 
 
-## Open issues
+### Calendar week 3
 
-### Planned
+Enteee
+- [x] Readme goes documentation
+- [x] Refactoring clicking
+- [x] Jcommander bug workaround
+- [x] Info command
+- [x] Agent despawning on no junction cross
+
+## Open issues
 
 * Bugfixes
   * Transcendent agents when collision happend
@@ -328,7 +336,7 @@ winki
 
 ### Backlog
 
-* Agents not looking beyond edge boundaries
+* RealsticAgents not looking beyond edge boundaries
 * Area restricted tick method
 * Weather / daylight
 * Console command to import OpenStreetMap data

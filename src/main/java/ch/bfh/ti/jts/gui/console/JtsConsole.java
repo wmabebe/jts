@@ -30,24 +30,26 @@ public class JtsConsole extends BasicConsole {
         private boolean help = false;
     }
     
-    private final MainParams          mainParams = new MainParams();
-    private final JCommander          jc         = new JCommander(mainParams);
-    private final Collection<Command> commands   = new LinkedList<>();
+    private final Reflections   reflections = new Reflections(Command.class.getPackage().getName());
+    private final MainParams    mainParams  = new MainParams();
+    private Collection<Command> commands    = new LinkedList<>();
+    private JCommander          jc          = new JCommander(mainParams);
     
     public JtsConsole() {
-        init();
+        reloadCommands();
     }
     
-    private void init() {
-        Reflections reflections = new Reflections(Command.class.getPackage().getName());
-        reflections.getSubTypesOf(Command.class).forEach((clazz) -> {
+    private void reloadCommands() {
+        jc = new JCommander(mainParams);
+        commands = new LinkedList<>();
+        reflections.getSubTypesOf(Command.class).forEach((commandClass) -> {
             try {
-                Command command = clazz.newInstance();
+                Command command = commandClass.newInstance();
                 commands.add(command);
                 jc.addCommand(command.getName(), command);
                 log.info(String.format("Loaded command %s", command.getName()));
             } catch (Exception e) {
-                log.fatal("Failed instantiating command " + clazz, e);
+                log.fatal("Failed instantiating command " + commandClass, e);
             }
         });
     }
@@ -73,29 +75,28 @@ public class JtsConsole extends BasicConsole {
             try {
                 final String[] args = line.trim().split(" ");
                 jc.parse(args);
-                
                 // display main help?
                 if (mainParams.help) {
                     showHelptext(null);
                     mainParams.help = false; // reset value
-                    return;
-                }
-                final String commandName = jc.getParsedCommand();
-                if (commandName != null) {
-                    final Command command = commands.stream().filter(x -> x.getName().equals(commandName)).findFirst().orElse(null);
-                    if (command != null) {
-                        if (command.help) {
-                            showHelptext(commandName);
-                            command.help = false; // reset value
-                        } else {
-                            execute(command);
-                        }
+                } else {
+                    final String commandName = jc.getParsedCommand();
+                    if (commandName != null) {
+                        commands.stream().filter(x -> x.getName().equals(commandName)).findFirst().ifPresent(command -> {
+                            if (command.help) {
+                                showHelptext(commandName);
+                                command.help = false; // reset value
+                            } else {
+                                execute(command);
+                            }
+                        });
                     }
                 }
             } catch (final ParameterException e) {
                 write("Invalid command");
-                log.warn("Invalid command");
+                log.warn("Invalid command: '" + line + "'", e);
             }
         }
+        reloadCommands();
     }
 }

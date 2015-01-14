@@ -104,7 +104,9 @@ public abstract class BasicConsole implements Console {
     
     @Override
     public void write(final String text) {
-        
+        if (text == null) {
+            throw new IllegalArgumentException("text");
+        }
         if (text.contains("\n")) {
             // multiple lines
             final String[] helpLines = text.split("\n");

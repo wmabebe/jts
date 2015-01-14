@@ -1,5 +1,7 @@
 package ch.bfh.ti.jts.gui.console.commands;
 
+import java.util.Optional;
+
 import com.beust.jcommander.Parameter;
 
 /**
@@ -27,7 +29,7 @@ public abstract class Command {
      *            the object on which to execute.
      * @return console output
      */
-    public abstract String execute(Object executor);
+    public abstract Optional<String> execute(Object executor);
     
     /**
      * The type of classes this command will be sent to.

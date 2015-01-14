@@ -19,6 +19,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.JFrame;
@@ -29,9 +30,13 @@ import org.apache.logging.log4j.Logger;
 
 import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.Main;
+import ch.bfh.ti.jts.data.Agent;
+import ch.bfh.ti.jts.data.Edge;
+import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.gui.console.Console;
 import ch.bfh.ti.jts.gui.console.JtsConsole;
+import ch.bfh.ti.jts.utils.Config;
 import ch.bfh.ti.jts.utils.layers.Layers;
 
 /**
@@ -166,25 +171,23 @@ public class Window {
         public void mousePressed(final MouseEvent e) {
             mousePressedPoint = e.getPoint();
             isDown = true;
-            
+            // get world coordinates of mouse pointer
+            final Point worldCoordinatesPoint = new Point();
+            screenToWorldTransform.transform(mousePressedPoint, worldCoordinatesPoint);
+            Optional<Class<?>> filterClass = Optional.empty();
             if (e.isControlDown()) {
-                Point screenPoint = e.getPoint();
-                
-                // get world coordinates from screen coordinates
-                final Point realPoint = new Point();
-                screenToWorldTransform.transform(screenPoint, realPoint);
-                
-                App.getInstance().addIdToConsole(realPoint);
+                filterClass = Optional.of(Agent.class);
+            } else if (e.isShiftDown()) {
+                filterClass = Optional.of(Junction.class);
+            } else if (e.isAltDown()) {
+                filterClass = Optional.of(Edge.class);
             }
-            if (e.isShiftDown()) {
-                Point screenPoint = e.getPoint();
-                
-                // get world coordinates from screen coordinates
-                final Point realPoint = new Point();
-                screenToWorldTransform.transform(screenPoint, realPoint);
-                
-                App.getInstance().addJunctionNameToConsole(realPoint);
-            }
+            filterClass.ifPresent(filter -> {
+                App.getInstance().getSimulation().getWallCLockSimulationState().getElementByCoordinates(worldCoordinatesPoint, CLICK_RADIUS, filter).ifPresent(element -> {
+                    final Console console = Window.getInstance().getConsole();
+                    console.stringTyped(String.format("%d", element.getId()));
+                });
+            });
         }
         
         @Override
@@ -222,9 +225,14 @@ public class Window {
      * Zoom delta. Determines how much to change the zoom when scrolling. Also
      * sets the minimum zoom
      */
-    private static final double ZOOM_DELTA = 0.05;
+    private static final double ZOOM_DELTA   = 0.05;
     
-    private static final Window INSTANCE   = new Window();
+    /**
+     * The click radius when selectimg elements;
+     */
+    private static final double CLICK_RADIUS = Config.getInstance().getDouble("click.radius", 30.0, 0.0, 1000.0);
+    
+    private static final Window INSTANCE     = new Window();
     
     /**
      * singleton

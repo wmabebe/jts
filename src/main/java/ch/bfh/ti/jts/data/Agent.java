@@ -9,6 +9,7 @@ import java.awt.geom.Point2D;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+
 import ch.bfh.ti.jts.App;
 import ch.bfh.ti.jts.Main;
 import ch.bfh.ti.jts.ai.Decision;
@@ -49,15 +50,15 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      */
     private Lane                 lane;
     /**
-     * The velocity of an agent in m/s
+     * The velocity of an agent in [m/s]
      */
     private double               velocity;
     /**
-     * The acceleration of a agent in m/s^2
+     * The acceleration of a agent in [m/s^2]
      */
     private double               acceleration;
     /**
-     * Distance to drive in m
+     * Distance in [m] from the start of {@link Agent#lane}
      */
     private double               lanePosition;
     /**
@@ -153,7 +154,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     }
     
     public void setLanePosition(final double lanePosition) {
-        this.lanePosition = Math.max(lanePosition, 0);
+        this.lanePosition = lanePosition;
     }
     
     /**
@@ -167,10 +168,12 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      * @return relative position on lane.
      */
     public double getRelativeLanePosition() {
-        if (getLane() == null)
+        if (getLane() == null) {
             throw new ArgumentNullException("lane");
-        if (getLane().getLength() == 0)
+        }
+        if (getLane().getLength() == 0) {
             throw new RuntimeException("lane lnegth is 0");
+        }
         return getLanePosition() / getLane().getLength();
     }
     
@@ -364,8 +367,8 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     }
     
     /**
-     * Sets a new lane of this agent and sets{@link Agent#lanePosition} relative
-     * to new edge lane
+     * Sets a new lane of this agent and sets {@link Agent#lanePosition}
+     * relative to new edge lane.
      *
      * @param nextEdgeLane
      */
@@ -375,9 +378,6 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         }
         setLanePosition(getLanePosition() - lane.getLength());
         lane = nextEdgeLane;
-        if (getLanePosition() > getLane().getLength()) {
-            throw new RuntimeException("position is greater than the length of the lane");
-        }
     }
     
     private void setSpawnInfo(final SpawnInfo spawnInfo) {

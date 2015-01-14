@@ -1,16 +1,18 @@
 package ch.bfh.ti.jts.gui.console.commands;
 
-import com.beust.jcommander.Parameters;
+import java.util.Optional;
 
 import ch.bfh.ti.jts.data.Net;
+
+import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "Show simulation time")
 public class SimulationTimeCommand extends Command {
     
     @Override
-    public String execute(final Object executor) {
+    public Optional<String> execute(final Object executor) {
         final Net net = (Net) executor;
-        return String.format("Simulation time: %.5f seconds", net.getSimulationTime());
+        return Optional.of(String.format("Simulation time: %.5f seconds", net.getSimulationTime()));
     }
     
     @Override
@@ -21,5 +23,5 @@ public class SimulationTimeCommand extends Command {
     @Override
     public Class<?> getTargetType() {
         return Net.class;
-    }    
+    }
 }

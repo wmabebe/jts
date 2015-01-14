@@ -1,9 +1,11 @@
 package ch.bfh.ti.jts.gui.console.commands;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
+import java.util.Optional;
 
 import ch.bfh.ti.jts.simulation.Simulation;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "Set animation interpolation setting")
 public class InterpolationCommand extends Command {
@@ -12,16 +14,18 @@ public class InterpolationCommand extends Command {
     private boolean off = false;
     
     @Override
-    public String execute(Object executor) {
+    public Optional<String> execute(Object executor) {
         final Simulation simulation = (Simulation) executor;
+        Optional<String> message = Optional.empty();
         if (!off) {
             simulation.setInterpolateWallClockSimulationState(true);
-            return "Interpolation on";
+            message = Optional.of("Interpolation on");
         } else {
             simulation.setInterpolateWallClockSimulationState(false);
             off = false; // reset value
-            return "Interpolation off";
-        }        
+            message = Optional.of("Interpolation off");
+        }
+        return message;
     }
     
     @Override

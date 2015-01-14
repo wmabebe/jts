@@ -17,6 +17,7 @@ import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -237,7 +238,14 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
         if (agent.getLane() != this) {
             throw new IllegalArgumentException("agent is not on this lane");
         }
-        return getNextAgentsOnLine(agent.getRelativeLanePosition());
+        Set<Agent> nextAgentsOnLine = new TreeSet<>();
+        try {
+            nextAgentsOnLine = getNextAgentsOnLine(agent.getRelativeLanePosition());
+        } catch (IllegalArgumentException e) {
+            log.info("agent off the line: can't lookup next agents on line");
+        }
+        
+        return nextAgentsOnLine;
     }
     
     /**
@@ -250,7 +258,6 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
     public Set<Agent> getNextAgentsOnLine(final double relativePosition) {
         if (relativePosition < 0 || relativePosition > 1.0) {
             throw new IllegalArgumentException("relative position invalid: " + relativePosition);
-            // LOG.warn("Relative position of agent is invalid");
         }
         final Entry<Double, Set<Agent>> nextAgentsEntry = laneAgents.higherEntry(relativePosition);
         Set<Agent> nextAgents = new HashSet<>();
@@ -399,6 +406,6 @@ public class Lane extends Element implements SpawnLocation, Simulatable, Rendera
     
     @Override
     public String toString() {
-        return String.format("Lane{ name: %s, density: %.2f, v_sms: %.2f, v_tms: %.2f }", getName(), density, spaceMeanSpeed, timeMeanSpeed);
+        return String.format("Lane{ id: %d, name: %s, density: %.2f, v_sms: %.2f, v_tms: %.2f }", getId(), getName(), density, spaceMeanSpeed, timeMeanSpeed);
     }
 }

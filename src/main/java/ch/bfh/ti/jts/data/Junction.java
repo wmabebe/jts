@@ -19,7 +19,6 @@ import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Renderable;
 import ch.bfh.ti.jts.simulation.Simulatable;
 import ch.bfh.ti.jts.utils.graph.DirectedGraphVertex;
-import ch.bfh.ti.jts.utils.graph.GPS;
 
 /**
  * Junctions are the nodes in the street net graph.
@@ -145,7 +144,7 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
                         }
                     }
                 } catch (final Exception e) {
-                    log.error(String.format("Agent %d can't despawn on junction %s", agent.getId(), getName()), e);
+                    log.error(String.format("%s can't despawn on %s", agent, this), e);
                 }
                 try {
                     // check switch edge...
@@ -161,7 +160,7 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
                             return; // break!
                         } else {
                             // not a valid decision
-                            log.warn(String.format("Agent %d made no valid decision for next lane", agent.getId()));
+                            log.warn(String.format("%s made no valid decision for next lane", agent));
                         }
                     }
                     
@@ -172,10 +171,9 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
                         // use gps to get there...
                         Junction lastJunction = agent.getLane().getEdge().getEnd();
                         if (lastJunction == null) {
-                            throw new ArgumentNullException("lastJunction");
+                            throw new NullPointerException("lastJunction");
                         }
-                        GPS<Junction, Edge> gps = getNet().getGPS();
-                        Edge nextEdge = gps.getNextEdge(lastJunction, destination).orElse(null);
+                        Edge nextEdge = getNet().getGPS().getNextEdge(lastJunction, destination).orElse(null);
                         if (nextEdge != null) {
                             // take first lane
                             Lane defaultLane = nextEdge.getDefaultLane(agent.getLane());
@@ -187,18 +185,21 @@ public class Junction extends Element implements SpawnLocation, DirectedGraphVer
                                 log.warn("No default lane for this outgoing lane");
                             }
                         } else {
-                            log.warn("GPS didn't find a path");
+                            log.warn("GPS didn't find a path " + lastJunction + " -> " + destination);
                         }
-                        
                     }
-                    
                     // 3. no decision?
-                    agent.collide();
-                    
+                    log.warn(String.format("%s despawn, can't cross junction", agent));
+                    agent.remove();
                 } catch (final Exception e) {
-                    log.error(String.format("Agent %d can't switch edge on junction %s", agent.getId(), getName()), e);
+                    log.error(String.format("%s can't switch edge on %s", agent, this), e);
                 }
             });
         });
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("Junction{ id: %d }", getId());
     }
 }

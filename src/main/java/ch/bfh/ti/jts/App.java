@@ -1,18 +1,12 @@
 package ch.bfh.ti.jts;
 
 import java.awt.Font;
-import java.awt.Point;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import ch.bfh.ti.jts.data.Agent;
-import ch.bfh.ti.jts.data.Element;
-import ch.bfh.ti.jts.data.Junction;
 import ch.bfh.ti.jts.data.Net;
 import ch.bfh.ti.jts.data.SpawnInfo;
-import ch.bfh.ti.jts.exceptions.ArgumentNullException;
 import ch.bfh.ti.jts.gui.Window;
 import ch.bfh.ti.jts.gui.console.Console;
 import ch.bfh.ti.jts.gui.console.commands.Command;
@@ -115,7 +109,7 @@ public class App implements Runnable {
             final Console console = Window.getInstance().getConsole();
             if (command.getTargetType() == App.class) {
                 // command for app
-                console.write(command.execute(this));
+                command.execute(this).ifPresent(message -> console.write(message));
             } else {
                 // delegate to simulation
                 simulation.executeCommand(command);
@@ -125,35 +119,5 @@ public class App implements Runnable {
     
     public void addCommand(final Command command) {
         commands.add(command);
-    }
-    
-    public void addIdToConsole(final Point worldCoordinates) {
-        if (worldCoordinates == null)
-            throw new ArgumentNullException("worldCoordinates");
-        
-        final Net wallClockSimulationState = App.getInstance().getSimulation().getWallCLockSimulationState();
-        Collection<Class<?>> typeFilter = new LinkedList<Class<?>>();
-        typeFilter.add(Agent.class); // only search agents
-        double clickRadius = Config.getInstance().getDouble("click.radius", 30.0, 0.0, 1000.0);
-        Element element = wallClockSimulationState.getElementByCoordinates(worldCoordinates, clickRadius, typeFilter);
-        if (element != null) {
-            final Console console = Window.getInstance().getConsole();
-            console.stringTyped(String.format("%d", element.getId()));
-        }
-    }
-    
-    public void addJunctionNameToConsole(final Point worldCoordinates) {
-        if (worldCoordinates == null)
-            throw new ArgumentNullException("worldCoordinates");
-        
-        final Net wallClockSimulationState = App.getInstance().getSimulation().getWallCLockSimulationState();
-        Collection<Class<?>> typeFilter = new LinkedList<Class<?>>();
-        typeFilter.add(Junction.class); // only search junctions
-        double clickRadius = Config.getInstance().getDouble("click.radius", 30.0, 0.0, 1000.0);
-        Element element = wallClockSimulationState.getElementByCoordinates(worldCoordinates, clickRadius, typeFilter);
-        if (element != null) {
-            final Console console = Window.getInstance().getConsole();
-            console.stringTyped(element.getName());
-        }
     }
 }

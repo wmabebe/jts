@@ -105,7 +105,7 @@ public abstract class Element implements Serializable, Comparable<Element> {
     /**
      * Absolute position of this element on the world.
      * 
-     * @return position as x and y coordinates
+     * @return position as {@link Point2D}
      */
     public abstract Point2D getPosition();
     

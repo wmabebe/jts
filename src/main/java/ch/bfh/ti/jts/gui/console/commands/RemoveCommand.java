@@ -1,25 +1,29 @@
 package ch.bfh.ti.jts.gui.console.commands;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
+import java.util.Optional;
 
 import ch.bfh.ti.jts.data.Net;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "Remove agents")
 public class RemoveCommand extends Command {
     
     @Parameter(names = { "-id", "id" }, description = "Id of the agent", required = true)
-    private int id = 1;
+    private final int id = 1;
     
     @Override
-    public String execute(final Object executor) {
+    public Optional<String> execute(final Object executor) {
         final Net net = (Net) executor;
         boolean success = net.removeAgent(id);
+        Optional<String> message = Optional.empty();
         if (success) {
-            return "Agent removed";
+            message = Optional.of("Agent removed");
         } else {
-            return String.format("No agent with id %d found", id);
+            message = Optional.of(String.format("No agent with id %d found", id));
         }
+        return message;
     }
     
     @Override

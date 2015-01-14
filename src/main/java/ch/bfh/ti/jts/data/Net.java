@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -174,6 +175,31 @@ public class Net extends Element implements Serializable, Simulatable {
         return elements.stream().filter(x -> x.getId() == elementId).findAny().orElse(null);
     }
     
+    /**
+     * Returns the element that is nearest to a specified coordinate pair. The
+     * elements can be filtered by max distance away from the coordinates and by
+     * its type.
+     * 
+     * @param maxDistance
+     *            max distance that the element can be away from the coordinates
+     *            [m].
+     * @param types
+     *            types of the elements that should be considered
+     * @return nearest element
+     */
+    public Optional<Element> getElementByCoordinates(final Point2D coordinates, double maxDistance, final Class<?> type) {
+        Optional<Element> nearestElement = Optional.empty();
+        double minDistance = Double.MAX_VALUE;
+        List<Element> elements = getElementStream(type).filter(x -> x.getDistance(coordinates) <= maxDistance).collect(Collectors.toList());
+        for (Element element : elements) {
+            if (element.getDistance(coordinates) < minDistance) {
+                nearestElement = Optional.of(element);
+                minDistance = element.getDistance(coordinates);
+            }
+        }
+        return nearestElement;
+    }
+    
     public Stream<Element> getElementStream() {
         return elements.stream().sequential();
     }
@@ -237,31 +263,6 @@ public class Net extends Element implements Serializable, Simulatable {
         agent.setLane(lane);
         lane.addLaneAgent(agent);
         log.debug(agent + " spawned at: " + lane);
-    }
-    
-    /**
-     * Returns the element that is nearest to a specified coordinat pair. The
-     * elements can be filtered by max distance away from the coordinates and by
-     * its type.
-     * 
-     * @param maxDistance
-     *            max distance that the element can be away from the coordinates
-     *            [m].
-     * @param types
-     *            types of the elements that should be considered
-     * @return nearest element
-     */
-    public Element getElementByCoordinates(Point2D coordinates, double maxDistance, final Collection<Class<?>> types) {
-        Element nearestElement = null;
-        double minDistance = Double.MAX_VALUE;
-        List<Element> elements = getElementStream(types).filter(x -> x.getDistance(coordinates) <= maxDistance).collect(Collectors.toList());
-        for (Element element : elements) {
-            if (element.getDistance(coordinates) < minDistance) {
-                nearestElement = element;
-                minDistance = element.getDistance(coordinates);
-            }
-        }
-        return nearestElement;
     }
     
     @Override
