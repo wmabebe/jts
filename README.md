@@ -248,7 +248,7 @@ Enteee
 - [x] Dynamic app sleeping 
 
 winki
-* Bugfix in lane
+- [x] Bugfix in lane
 - [x] Lane switching logic of realisitc agent 
 - [x] Implementation of traffic flows 
 - [x] Agent type can be configured in the routes xml file 
