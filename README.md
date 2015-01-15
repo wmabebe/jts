@@ -36,6 +36,7 @@ This project is currently under heavy developement.
       - [layer 3](#layer-3)
       - [layer 4](#layer-4)
 - [Code highlights](#code-highlights)
+- [Solved Problems](#solved-problems)
 - [Planning](#planning)
   - [Planned features](#planned-features)
   - [Journal](#journal)
@@ -57,7 +58,6 @@ This project is currently under heavy developement.
     - [Calendar week 2](#calendar-week-2)
 - [Open issues](#open-issues)
   - [Planned](#planned)
-  - [Backlog](#backlog)
 - [Resources](#resources)
 - [Licence](#licence)
 
@@ -152,13 +152,45 @@ Idea: Every simulatabe (s) with layer (l) is only allowed to change element stat
   * Allows scrolling and zooming
   * Allows console input & selection of elements by clicking
 
+## Solved Problems
+
+### Data structure
+
+Maybe the biggest decision in the beginning of our project was the question, how to model the road network. The first input cam from our supervisor and was the approach of using a skip list to model a lane. The index should represent the position in meters on the lane.
+
+We decided to model not only straight roads with multiple lanes but also junctions to realize more complex road networks. We oriented us on the [road network data format of the _SUMO_ simulator][sumoroadnetworks]. Therefore our basic domain objects were net, edge, junction, lane and agent.
+
+### Parallelization
+
+...
+
+### Multithreading
+
+...
+
+### Agent intelligence
+
+We tried to implement an artificial intelligence that could master to drive on a arbitrary road network without causing a lot of collisions.
+
+The agent has to make three kinds of decisions:
+
+1. How much to accelerate/deccelerate?
+2. Switch lane? When yes: left or right?
+3. Which turning to take on a junction?
+
+For the acceleration we calculated a security distance, so that no collision would happen, if the agent ahead would fully break. This would work perfectly, if there are no lane changes and no junctions. But this two circumstances made things complicated. We didn't solve this problem through the lack of time.
+
+The idea behind the lane switching decision was the following: An agent tries to drive on the rightest lane of a track whenever this is possible. If he has to slow down, because the agent ahead is too slow, his impatience increases. If the impatience reaches a specified threshold, the agent tries to switch lane to the left to overtake the slow agent ahead. One consequence of this behavior was, that the agents switched to the motorway access road in the ramp scenario. This problem could be solved if we would type the lanes (default, fast lane, motorway access road and so on).
+
+For the turning decision we decided to provide the agent a "GPS" function. The route was then given by the spawning point and the destination. Both informations were given by the routes file. The GPS function was realized with an implementation of the _Dijkstra_ algorithm.
+
 ## Journal
 
 ### Calendar week 39
 
 Enteee, winki
 
-* Write requirements doc [done]
+- [x] Write requirements doc
 
 ### Calendar week 40
 
@@ -296,8 +328,7 @@ winki
 - [x] Agents can set turning (short-term decision) or destination (long-term decision) 
 - [x] Console bugfix (command argument variables must not be final!) 
 - [x] Help text for commands 
-- [x] Added remove command 
-- [ ] Agent handling on junctions
+- [x] Added remove command
 
 ### Calendar week 1
 
@@ -329,35 +360,39 @@ Enteee
 - [x] Agent despawning on no junction cross
 - [x] Refactor element removal -> Advanced removal (elements)
 
+
 ## Open issues
 
-* Bugfixes
-  * Transcendent agents when collision happend
-* Write project documentation
-
-### Backlog
-
-* RealsticAgents not looking beyond edge boundaries
-* Area restricted tick method
-* Weather / daylight
-* Console command to import OpenStreetMap data
-
+- [ ] Bugfixes
+  - [ ] Transcendent agents when collision happend
+- [ ] Agent handling on junctions
+- [ ] RealsticAgents not looking beyond edge boundaries
+- [ ] Area restricted tick method
+- [ ] Weather / daylight
+- [ ] Console command to import OpenStreetMap data
 
 ## Resources
 
 * [Project outline][projoutl]
-* [Simulation of Urban MObility (SUMO), old website][sumoweb]
-* [Simulation of Urban MObility (SUMO), wiki][sumowiki]
+* [_Simulation of Urban MObility_ (_SUMO_), website][sumoweb]
+* [_Simulation of Urban MObility_ (_SUMO_), wiki][sumowiki]
+* [_Simulation of Urban MObility_ (_SUMO_), old website][sumowebold]
+* [Traffic flow (_Wikipedia_)][wikitrafficflow]
 
 ## Licence
 
 This software and the underlying source code is licensed under the [MIT license][license].
 
+
+
 [system_context]: https://raw.githubusercontent.com/winki/jts/master/doc/systemcontext.png "system context"
 
 [osm]:http://www.openstreetmap.ch/
 [projoutl]:https://staff.hti.bfh.ch/swp1/Projekt_1/projects.html
-[sumoweb]:http://web.archive.org/web/20140625054800/http://sumo-sim.org/
+[sumoweb]:http://sumo.dlr.de/
+[sumowebold]:http://web.archive.org/web/20140625054800/http://sumo-sim.org/
 [sumowiki]:http://sumo.dlr.de/wiki/Main_Page
+[sumoroadnetworks]:http://sumo.dlr.de/wiki/Networks/SUMO_Road_Networks
+[wikitrafficflow]:http://en.wikipedia.org/wiki/Traffic_flow
 
 [license]:http://opensource.org/licenses/mit-license.php
