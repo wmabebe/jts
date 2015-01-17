@@ -164,9 +164,28 @@ We decided to model not only straight roads with multiple lanes but also junctio
 
 ### Parallelization
 
-As mentioned in the section [Application logic](#application-logic) jts is structured in layers. The class which keeps track of them is a very simple one as shown below.
+As mentioned in the section [Application logic](#application-logic) jts is structured in layers. The class which keeps track of them is [Layers.java](src/main/java/ch/bfh/ti/jts/utils/layers/Layers.java). Its usage is shown below..
 
 ![layers class](https://raw.githubusercontent.com/winki/jts/master-mischa/doc/layers.png)
+
+* Net stores two different layering objects
+  * renderables : used for rendering
+  * simulatables : used for simulation
+* Net adds elements based on their implementing interfaces (Renderable, Simulatable) to the layers.
+* RenderPanel gets the layering object from Net (instance: wall clock) by calling getRenderables().
+* Simulation gets the layering object from Net (instance: simulation time) by calling getSimulatables().
+* RenderPanel and Simulation delegate execution to all the elements in layering order. See code taken from Simulation.simulate() as example below.
+  * Important: [SortedSet<Integer>](http://docs.oracle.com/javase/7/docs/api/java/util/SortedSet.html) in Layers ensures total order according to natural order (for Integer '<') of layerKeys.
+```java
+    // delegate simulation to @{link Simulatable}s
+    final Layers<Simulatable> simulatables = simulateNet.getSimulatable();
+    for (final int layer : simulatables.getLayersIterator()) {
+        simulatables.getLayerStream(layer).parallel().forEach(e -> {
+            e.simulate(duration);
+        });
+    }
+
+```
 
 The paradigm mentioned in this section allows us for parallel simulation of all the element in one layer. Due to the simple that there is no win java to enforce the paradigm we had to be very careful when writing new code. 
 
