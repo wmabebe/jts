@@ -67,7 +67,7 @@ This project is currently under heavy developement.
 
 ## System context
 
-![system_context]: https://raw.githubusercontent.com/winki/jts/master/doc/systemcontext.png "system context"
+![alt tag]: https://raw.githubusercontent.com/winki/jts/master/doc/systemcontext.png "system context"
 
 ## Documentation
 
@@ -164,7 +164,11 @@ We decided to model not only straight roads with multiple lanes but also junctio
 
 ### Parallelization
 
-As mentioned in the section [Application logic](#application-logic) jts is structured in layers. The class which keeps track of them is a very simple one.  The paradigm mentioned in this section allows us for parallel simulation of all the element in one layer. Due to the simple that there is no win java to enforce the paradigm we had to be very careful when writing new code. 
+As mentioned in the section [Application logic](#application-logic) jts is structured in layers. The class which keeps track of them is a very simple one as shown below.
+
+![alt tag]: https://raw.githubusercontent.com/winki/jts/master-mischa/doc/layers.png "layers class uml"
+
+The paradigm mentioned in this section allows us for parallel simulation of all the element in one layer. Due to the simple that there is no win java to enforce the paradigm we had to be very careful when writing new code. 
 
 ### Multithreading
 
