@@ -37,27 +37,29 @@ This project is currently under heavy developement.
       - [layer 4](#layer-4)
 - [Code highlights](#code-highlights)
 - [Solved Problems](#solved-problems)
-- [Planning](#planning)
-  - [Planned features](#planned-features)
-  - [Journal](#journal)
-    - [Calendar week 39](#calendar-week-39)
-    - [Calendar week 40](#calendar-week-40)
-    - [Calendar week 41](#calendar-week-41)
-    - [Calendar week 42](#calendar-week-42)
-    - [Calendar week 43](#calendar-week-43)
-    - [Calendar week 44](#calendar-week-44)
-    - [Calendar week 45](#calendar-week-45)
-    - [Calendar week 46](#calendar-week-46)
-    - [Calendar week 47](#calendar-week-47)
-    - [Calendar week 48](#calendar-week-48)
-    - [Calendar week 49](#calendar-week-49)
-    - [Calendar week 50](#calendar-week-50)
-    - [Calendar week 51](#calendar-week-51)
-    - [Calendar week 52](#calendar-week-52)
-    - [Calendar week 1](#calendar-week-1)
-    - [Calendar week 2](#calendar-week-2)
+  - [Data structure](#data-structure)
+  - [Parallelization](#parallelization)
+  - [Multithreading](#multithreading)
+  - [Agent intelligence](#agent-intelligence)
+- [Journal](#journal)
+  - [Calendar week 39](#calendar-week-39)
+  - [Calendar week 40](#calendar-week-40)
+  - [Calendar week 41](#calendar-week-41)
+  - [Calendar week 42](#calendar-week-42)
+  - [Calendar week 43](#calendar-week-43)
+  - [Calendar week 44](#calendar-week-44)
+  - [Calendar week 45](#calendar-week-45)
+  - [Calendar week 46](#calendar-week-46)
+  - [Calendar week 47](#calendar-week-47)
+  - [Calendar week 48](#calendar-week-48)
+  - [Calendar week 49](#calendar-week-49)
+  - [Calendar week 50](#calendar-week-50)
+  - [Calendar week 51](#calendar-week-51)
+  - [Calendar week 52](#calendar-week-52)
+  - [Calendar week 1](#calendar-week-1)
+  - [Calendar week 2](#calendar-week-2)
+  - [Calendar week 3](#calendar-week-3)
 - [Open issues](#open-issues)
-  - [Planned](#planned)
 - [Resources](#resources)
 - [Licence](#licence)
 
@@ -65,7 +67,7 @@ This project is currently under heavy developement.
 
 ## System context
 
-![alt text][system_context]
+![system_context]: https://raw.githubusercontent.com/winki/jts/master/doc/systemcontext.png "system context"
 
 ## Documentation
 
@@ -154,19 +156,25 @@ Idea: Every simulatabe (s) with layer (l) is only allowed to change element stat
 
 ## Solved Problems
 
-### Data structure
+### Data model
 
-Maybe the biggest decision in the beginning of our project was the question, how to model the road network. The first input cam from our supervisor and was the approach of using a skip list to model a lane. The index should represent the position in meters on the lane.
+Maybe the biggest decision in the beginning of our project was how to model the road network. The first input cam from our supervisor and was the approach of using a skip list to model a lane. The index should represent the position in meters on the lane.
 
 We decided to model not only straight roads with multiple lanes but also junctions to realize more complex road networks. We oriented us on the [road network data format of the _SUMO_ simulator][sumoroadnetworks]. Therefore our basic domain objects were net, edge, junction, lane and agent.
 
 ### Parallelization
 
-...
+As mentioned in the section [Application logic](#application-logic) jts is structured in layers. The class which keeps track of them is a very simple one.  The paradigm mentioned in this section allows us for parallel simulation of all the element in one layer. Due to the simple that there is no win java to enforce the paradigm we had to be very careful when writing new code. 
 
 ### Multithreading
 
 ...
+
+### Dijekstra for path finding
+
+### Wall clock & simulation time
+
+### 
 
 ### Agent intelligence
 
@@ -385,7 +393,6 @@ This software and the underlying source code is licensed under the [MIT license]
 
 
 
-[system_context]: https://raw.githubusercontent.com/winki/jts/master/doc/systemcontext.png "system context"
 
 [osm]:http://www.openstreetmap.ch/
 [projoutl]:https://staff.hti.bfh.ch/swp1/Projekt_1/projects.html
