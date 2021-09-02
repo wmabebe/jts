@@ -122,7 +122,6 @@ public class App implements Runnable {
             executeCommands();
             simulation.tick();
             simulation.getSimNet().addToAgentQueues();
-            //simulation.getSimNet().printAgentQueues();
         }
         System.out.println("Logging...");
         Handshake.logHandshakes(this.simulation,startTime,TIME_LIMIT);
