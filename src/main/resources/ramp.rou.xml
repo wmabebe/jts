@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 10/25/14 20:05:54 by SUMO activitygen Version 0.21.0
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo-sim.org/xsd/activitygenConfiguration.xsd">
+
+    <input>
+        <net-file value="..\map1.net.xml"/>
+        <stat-file value="..\map1.stat.xml"/>
+    </input>
+
+    <output>
+        <output-file value="..\map1.rou.xml"/>
+    </output>
+
+    <time>
+        <duration-d value="1"/>
+    </time>
+
+    <random_number>
+        <random value="true"/>
+    </random_number>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo-sim.org/xsd/routes_file.xsd">
+	
+	<vType id="car" accel="4.0" decel="20.0" sigma="0.0" length="5" minGap="2.5" maxSpeed="90" agent="Realistic"/>
+
+	<flow type="car" frequency="0.5" departSpeed="50.0" arrivalSpeed="0">
+		<route junctions="j0 j3"/>
+	</flow>
+	<flow type="car" frequency="0.2" departSpeed="20.0" arrivalSpeed="0">
+		<route junctions="jx j3"/>
+	</flow>
+	
+</routes>

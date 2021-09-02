@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 10/25/14 20:19:04 by SUMO netgenerate Version 0.21.0
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo-sim.org/xsd/netgenerateConfiguration.xsd">
+
+    <random_network>
+        <rand value="true"/>
+        <rand.iterations value="4"/>
+        <rand.bidi-probability value="1"/>
+    </random_network>
+
+    <output>
+        <output-file value="..\multilane.net.xml"/>
+    </output>
+
+    <processing>
+        <no-internal-links value="true"/>
+    </processing>
+
+    <building_defaults>
+        <default.lanenumber value="2"/>
+    </building_defaults>
+
+    <random_number>
+        <seed value="88"/>
+    </random_number>
+
+</configuration>
+-->
+
+<net version="0.13" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo-sim.org/xsd/net_file.xsd">
+
+    <location netOffset="153.32,166.79" convBoundary="0.00,0.00,276.93,385.42" origBoundary="-153.32,-166.79,123.61,218.63" projParameter="!"/>
+
+    <edge id="-11" from="10" to="1" priority="-1">
+        <lane id="-11_0" index="0" speed="13.90" length="207.60" shape="280.90,2.95 162.26,163.05"/>
+        <lane id="-11_1" index="1" speed="13.90" length="207.60" shape="278.25,0.98 159.61,161.08"/>
+    </edge>
+    <edge id="-13" from="12" to="1" priority="-1">
+        <lane id="-13_0" index="0" speed="13.90" length="245.25" shape="260.04,387.67 151.42,173.98"/>
+        <lane id="-13_1" index="1" speed="13.90" length="245.25" shape="262.98,386.17 154.37,172.49"/>
+    </edge>
+    <edge id="-3" from="2" to="1" priority="-1">
+        <lane id="-3_0" index="0" speed="13.90" length="197.13" shape="3.11,39.03 149.95,157.71"/>
+        <lane id="-3_1" index="1" speed="13.90" length="197.13" shape="1.04,41.60 147.88,160.27"/>
+    </edge>
+    <edge id="11" from="1" to="10" priority="-1">
+        <lane id="11_0" index="0" speed="13.90" length="207.60" shape="154.30,157.15 272.95,-2.95"/>
+        <lane id="11_1" index="1" speed="13.90" length="207.60" shape="156.96,159.12 275.60,-0.98"/>
+    </edge>
+    <edge id="13" from="1" to="12" priority="-1">
+        <lane id="13_0" index="0" speed="13.90" length="245.25" shape="160.25,169.50 268.87,383.18"/>
+        <lane id="13_1" index="1" speed="13.90" length="245.25" shape="157.31,170.99 265.92,384.68"/>
+    </edge>
+    <edge id="3" from="1" to="2" priority="-1">
+        <lane id="3_0" index="0" speed="13.90" length="197.13" shape="143.73,165.41 -3.11,46.73"/>
+        <lane id="3_1" index="1" speed="13.90" length="197.13" shape="145.80,162.84 -1.04,44.16"/>
+    </edge>
+
+    <junction id="1" type="priority" x="153.32" y="166.79" incLanes="-13_0 -13_1 -11_0 -11_1 -3_0 -3_1" intLanes="" shape="150.00,174.71 161.68,168.77 163.54,164.00 153.02,156.20 150.96,156.46 142.73,166.65">
+        <request index="0" response="00000000000" foes="10000100000"/>
+        <request index="1" response="00000000000" foes="10000100000"/>
+        <request index="2" response="01110000000" foes="01111100000"/>
+        <request index="3" response="01100010000" foes="01100010000"/>
+        <request index="4" response="01100000000" foes="01100001000"/>
+        <request index="5" response="01100000111" foes="11100000111"/>
+        <request index="6" response="00010000100" foes="00010000100"/>
+        <request index="7" response="00000000000" foes="00001000100"/>
+        <request index="8" response="00000000000" foes="00000111100"/>
+        <request index="9" response="00000000000" foes="00000111100"/>
+        <request index="10" response="00000100011" foes="00000100011"/>
+    </junction>
+    <junction id="10" type="priority" x="276.93" y="0.00" incLanes="11_0 11_1" intLanes="" shape="276.97,0.03 282.19,3.90 271.66,-3.90 276.89,-0.03">
+        <request index="0" response="0" foes="0"/>
+    </junction>
+    <junction id="12" type="priority" x="264.45" y="385.42" incLanes="13_0 13_1" intLanes="" shape="264.41,385.45 258.61,388.39 270.29,382.46 264.50,385.40">
+        <request index="0" response="0" foes="0"/>
+    </junction>
+    <junction id="2" type="priority" x="0.00" y="42.88" incLanes="3_0 3_1" intLanes="" shape="0.03,42.84 4.12,37.79 -4.12,47.98 -0.03,42.92">
+        <request index="0" response="0" foes="0"/>
+    </junction>
+
+    <connection from="-11" to="13" fromLane="0" toLane="0" dir="r" state="m"/>
+    <connection from="-11" to="3" fromLane="1" toLane="1" dir="l" state="m"/>
+    <connection from="-11" to="11" fromLane="1" toLane="1" dir="t" state="m"/>
+    <connection from="-13" to="3" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from="-13" to="3" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from="-13" to="11" fromLane="1" toLane="1" dir="l" state="m"/>
+    <connection from="-13" to="13" fromLane="1" toLane="1" dir="t" state="m"/>
+    <connection from="-3" to="11" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from="-3" to="13" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from="-3" to="13" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from="-3" to="3" fromLane="1" toLane="1" dir="t" state="m"/>
+    <connection from="11" to="-11" fromLane="1" toLane="1" dir="t" state="M"/>
+    <connection from="13" to="-13" fromLane="1" toLane="1" dir="t" state="M"/>
+    <connection from="3" to="-3" fromLane="1" toLane="1" dir="t" state="M"/>
+
+</net>

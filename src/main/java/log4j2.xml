@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="1">
+   <ThreadContextMapFilter onMatch="ACCEPT" onMismatch="NEUTRAL" operator="or">
+     <KeyValuePair key="User1" value="DEBUG"/>
+     <KeyValuePair key="User2" value="WARN"/>
+   </ThreadContextMapFilter>
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L) - %m%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="org.apache.log4j.xml" level="warn"/>
+        <Logger name="ch.bfh.ti.jts.App" level="warn"/>
+        <Logger name="ch.bfh.ti.jts.simulation.Simulation" level="warn"/>
+        <Logger name="ch.bfh.ti.jts.gui.Window" level="warn"/>
+        <Logger name="ch.bfh.ti.jts.gui.console.BasicConsole" level="warn"/>
+        <Logger name="ch.bfh.ti.jts.gui.console.JtsConsole" level="warn"/>
+        <Logger name="ch.bfh.ti.jts.data.Net" level="warn"/>
+        <Logger name="ch.bfh.ti.jts.data.Edge" level="warn"/>
+        <Logger name="ch.bfh.ti.jts.data.Junction" level="error"/>
+        <Logger name="ch.bfh.ti.jts.data.Lane" level="warn"/>
+        <Logger name="ch.bfh.ti.jts.data.Agent" level="warn"/>
+        <Logger name="ch.bfh.ti.jts.utils.Config" level="warn"/>
+        <Logger name="ch.bfh.ti.jts.ai.agents.RealisticAgent" level="warn"/>
+        <Root level="debug">
+            <AppenderRef ref="STDOUT"/>
+        </Root>
+    </Loggers>
+</Configuration>
