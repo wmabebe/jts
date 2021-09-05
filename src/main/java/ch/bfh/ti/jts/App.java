@@ -53,7 +53,7 @@ public class App implements Runnable {
     private String               netName;
     private Simulation           simulation;
     
-    private int TIME_LIMIT = 200;
+    private int TIME_LIMIT = 100;
 
     public void addCommand(final Command command) {
         commands.add(command);
@@ -128,7 +128,6 @@ public class App implements Runnable {
         while (isRunning() && !Thread.interrupted() && i++ <= TIME_LIMIT) {
             executeCommands();
             simulation.tick();
-            simulation.getSimNet().addToAgentQueues();
             if (i % deltaTick == 0) {
                 handshakeRateOverTime.add(simulation.getSimNet().calculateAverageHandshakeRate(deltaTick));
             }

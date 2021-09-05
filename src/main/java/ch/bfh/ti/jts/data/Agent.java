@@ -433,6 +433,7 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         setVelocity(oldVelocity + getAcceleration() * duration);
         // update position
         setLanePosition(getLanePosition() + (oldVelocity + getVelocity()) / 2 * duration);
+        makeHandshakeByEnqueuingNeighbors();
     }
     
     @Override
