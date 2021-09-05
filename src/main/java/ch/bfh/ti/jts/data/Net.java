@@ -68,6 +68,11 @@ public class Net extends Element implements Serializable, Simulatable {
         return agents;
     }
     
+    /**
+     * This method iterates through all the vehicles in the simulation
+     * and updates their handshake queues. 
+     * @param sampleHandshakeRate
+     */
     public void addToAgentQueues() {
         for (Element e: elements) {
             if (e instanceof Agent) {
@@ -84,6 +89,26 @@ public class Net extends Element implements Serializable, Simulatable {
                 System.out.println(a.getId() + "\t" + a.getNeighborsQueue().toString());
             }
         }
+    }
+    
+    /**
+     * Iterate over all vehicles in the simulation and
+     * return the average handshake rate.
+     * @param timeSpan
+     * @return Average handshake rate of all agents
+     * over given timespan.
+     */
+    public double calculateAverageHandshakeRate(int timeSpan) {
+        double rate = 0.0;
+        int total = 0;
+        for (Element e: elements) {
+            if (e instanceof Agent) {
+                Agent a = (Agent) e;
+                rate += a.getLatestHandshakeRate(timeSpan);
+                total++;
+            }
+        }
+        return rate/total;
     }
 
     public void addElement(final Element element) {

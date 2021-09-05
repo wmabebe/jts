@@ -1,7 +1,10 @@
 package ch.bfh.ti.jts;
 
 import java.awt.Font;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -50,7 +53,7 @@ public class App implements Runnable {
     private String               netName;
     private Simulation           simulation;
     
-    private int TIME_LIMIT = 1000;
+    private int TIME_LIMIT = 200;
 
     public void addCommand(final Command command) {
         commands.add(command);
@@ -117,14 +120,25 @@ public class App implements Runnable {
         isRunning = true;
         init();
         int i = 0;
+        int deltaTick = (int) (TIME_LIMIT * 0.02);
+        List<Double> handshakeRateOverTime = new ArrayList<Double>();
         final long startTime = System.currentTimeMillis();
+        System.out.println("Simulation started...");
+        char[] animationChars = new char[]{'|', '/', '-', '\\'};
         while (isRunning() && !Thread.interrupted() && i++ <= TIME_LIMIT) {
             executeCommands();
             simulation.tick();
             simulation.getSimNet().addToAgentQueues();
+            if (i % deltaTick == 0) {
+                handshakeRateOverTime.add(simulation.getSimNet().calculateAverageHandshakeRate(deltaTick));
+            }
+            if (i % (int)(TIME_LIMIT * 0.1) == 0) {
+                System.out.print("Progress: " + (100 * i/TIME_LIMIT) + "% \r");
+            }
+
         }
         System.out.println("Logging...");
-        Handshake.logHandshakes(this.simulation,startTime,TIME_LIMIT);
+        Handshake.logHandshakes(this.simulation,startTime,TIME_LIMIT,handshakeRateOverTime);
         System.out.println("Logging complete.");
         end();
     }

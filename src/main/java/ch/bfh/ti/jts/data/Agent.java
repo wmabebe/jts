@@ -88,6 +88,12 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
     private final double DIST = 250.0;
     
     /**
+     * Count the number of neighbors since last rate sampling.
+     * Increase for each neighbor added and always reset to 0 after sampling.
+     */
+    private int neighborCountSinceLastSampling;
+    
+    /**
      * Keep track of neighbors on same lane that are in proximity
      */
     private HashMap<Agent,Double> neighborsQueue = new HashMap<Agent,Double>();
@@ -148,13 +154,31 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return Helpers.clamp(delta, 0.0, Double.MAX_VALUE);
     }
     
+    /**
+     * Add new neighbors to the queue if they fall within
+     * specified range of this vehicle. Increment neighborsCount
+     * value;
+     */
     public void makeHandshakeByEnqueuingNeighbors() {
         for (Agent agent: lane.getAgentsInOrder()) {
             double delta = Math.abs(this.getLanePosition() - agent.getLanePosition());
             if(!neighborsQueue.containsKey(agent) && !this.equals(agent) && delta <= DIST) {
                 neighborsQueue.put(agent,delta);
+                neighborCountSinceLastSampling++;
             }
         }
+    }
+    
+    /**
+     * Return the rate of handshakes since the last rate sampling.
+     * Reset the neighborsCount to 0.
+     * @param timeSpan
+     * @return rate of handshakes
+     */
+    public double getLatestHandshakeRate(int timeSpan) {
+        double rate = neighborCountSinceLastSampling / timeSpan;
+        neighborCountSinceLastSampling = 0;
+        return rate;
     }
     
     public Lane getLane() {

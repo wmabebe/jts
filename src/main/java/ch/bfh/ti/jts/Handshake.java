@@ -1,12 +1,13 @@
 package ch.bfh.ti.jts;
 import java.io.*;
+import java.util.List;
 
 import ch.bfh.ti.jts.data.Agent;
 import ch.bfh.ti.jts.simulation.Simulation;
 
 public class Handshake {
     
-    public static void logHandshakes(Simulation simulation, long startTime, int simIterations) {
+    public static void logHandshakes(Simulation simulation, long startTime, int simIterations,List<Double> rates) {
         try {
             FileWriter myWriter = new FileWriter("handshake_"+simIterations+"_log.txt");
             
@@ -19,9 +20,11 @@ public class Handshake {
                 totalNeighbors += a.getNeighborsQueue().size();
                 myWriter.write(a.getId() + "\t" + a.getNeighborsQueue().size() + "\t" + a.getNeighborsQueue().toString() + "\n");
             }
+            myWriter.write("#Handshake Rate: " + rates.toString() + "\n");
             myWriter.write("#Total agents : " + totalAgents + "\n");
             myWriter.write("#Avg neighbors: " + totalNeighbors/totalAgents + "\n");
             myWriter.write("#Total execution time: " + (endTime - startTime) + "\n");
+            
             /* end */
            
             myWriter.close();
@@ -30,6 +33,5 @@ public class Handshake {
             System.out.println("An error occurred while logging.");
             e.printStackTrace();
           }
-        
     }
 }
