@@ -132,10 +132,12 @@ public class App implements Runnable {
             }
             if (i % (int)(TIME_LIMIT * 0.1) == 0) {
                 System.out.print("Progress: " + (100 * i/TIME_LIMIT) + "%" + '\r');
+                Handshake.logLightweightHandshakes(this.simulation,startTime,TIME_LIMIT,handshakeRateOverTime);
+                System.out.println("Logged @ " +(int) 100 * i / TIME_LIMIT + "%" + '\r');
             }
 
         }
-        System.out.println("Logging...");
+        System.out.println("Final Logging...");
         //Swap next two lines for verbose log
         //Handshake.logHandshakes(this.simulation,startTime,TIME_LIMIT,handshakeRateOverTime);
         Handshake.logLightweightHandshakes(this.simulation,startTime,TIME_LIMIT,handshakeRateOverTime);
