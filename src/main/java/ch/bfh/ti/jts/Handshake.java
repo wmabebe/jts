@@ -34,4 +34,32 @@ public class Handshake {
             e.printStackTrace();
           }
     }
+    
+    public static void logLightweightHandshakes(Simulation simulation, long startTime, int simIterations,List<Double> rates) {
+        try {
+            FileWriter myWriter = new FileWriter("handshake_"+simIterations+"_log.txt");
+            
+            
+            /* Start */
+            final long endTime = System.currentTimeMillis();
+            int totalAgents = simulation.getSimNet().getAgents().size();
+            int totalNeighbors = 0;
+            for (Agent a: simulation.getSimNet().getAgents()) {
+                totalNeighbors += a.getNeighborsSet().size();
+                myWriter.write(a.getId() + "\t size= " + a.getNeighborsSet().size() + "\t neighbors=" + a.getNeighborsSet().toString() + "\n");
+            }
+            myWriter.write("#Handshake Rate: " + rates.toString() + "\n");
+            myWriter.write("#Total agents : " + totalAgents + "\n");
+            myWriter.write("#Avg neighbors: " + totalNeighbors/totalAgents + "\n");
+            myWriter.write("#Total execution time: " + (endTime - startTime) + "\n");
+            
+            /* end */
+           
+            myWriter.close();
+            
+          } catch (IOException e) {
+            System.out.println("An error occurred while logging.");
+            e.printStackTrace();
+          }
+    }
 }

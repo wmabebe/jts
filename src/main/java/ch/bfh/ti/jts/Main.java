@@ -1,5 +1,7 @@
 package ch.bfh.ti.jts;
 
+import java.util.Arrays;
+
 import javax.swing.UIManager;
 
 import org.apache.logging.log4j.LogManager;
@@ -16,7 +18,7 @@ import ch.bfh.ti.jts.utils.Config;
 public class Main {
 
     public static void main(final String[] args) {
-
+        
         try {
             // set look and feel to native
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

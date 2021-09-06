@@ -20,5 +20,7 @@ hs_err_pid*
 *.dll
 /bin/
 /nbproject/private/
-/handshake_100_log.txt
+/handshake_*_log.txt
 /handshake_200_log.txt
+/handshake_1000_log.txt
+/handshake_500_log.txt

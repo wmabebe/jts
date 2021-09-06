@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableMap;
@@ -98,9 +99,19 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
      */
     private HashMap<Agent,Double> neighborsQueue = new HashMap<Agent,Double>();
     
+    /**
+     * Lightweight queue using just a set of neighboring agent ids
+     */
+    
+    private HashSet<Integer> neighborsSet = new HashSet<Integer>();
+    
     public Agent() {
         super("Agent");
         color = getRandomColor();
+    }
+    
+    public HashSet<Integer> getNeighborsSet(){
+        return this.neighborsSet;
     }
     
     /**
@@ -164,6 +175,21 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
             double delta = Math.abs(this.getLanePosition() - agent.getLanePosition());
             if(!neighborsQueue.containsKey(agent) && !this.equals(agent) && delta <= DIST) {
                 neighborsQueue.put(agent,delta);
+                neighborCountSinceLastSampling++;
+            }
+        }
+    }
+    
+    /**
+     * Adds neighbors that are in proximity to the neighbors set.
+     * A lightweight alternative for makeHandshakeByEnqueuingNeighbors
+     * used to avoid stackoverflowing during logging.
+     */
+    public void makeLightweightHandshake() {
+        for (Agent agent: lane.getAgentsInOrder()) {
+            double delta = Math.abs(this.getLanePosition() - agent.getLanePosition());
+            if(!neighborsSet.contains(agent.getId()) && !this.equals(agent) && delta <= DIST) {
+                neighborsSet.add(agent.getId());
                 neighborCountSinceLastSampling++;
             }
         }
@@ -433,7 +459,9 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         setVelocity(oldVelocity + getAcceleration() * duration);
         // update position
         setLanePosition(getLanePosition() + (oldVelocity + getVelocity()) / 2 * duration);
-        makeHandshakeByEnqueuingNeighbors();
+        //Swap next two lines to capture more Queue information
+        //makeHandshakeByEnqueuingNeighbors();
+        makeLightweightHandshake();
     }
     
     @Override

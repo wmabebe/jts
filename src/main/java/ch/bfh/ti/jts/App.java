@@ -124,7 +124,6 @@ public class App implements Runnable {
         List<Double> handshakeRateOverTime = new ArrayList<Double>();
         final long startTime = System.currentTimeMillis();
         System.out.println("Simulation started...");
-        char[] animationChars = new char[]{'|', '/', '-', '\\'};
         while (isRunning() && !Thread.interrupted() && i++ <= TIME_LIMIT) {
             executeCommands();
             simulation.tick();
@@ -132,12 +131,14 @@ public class App implements Runnable {
                 handshakeRateOverTime.add(simulation.getSimNet().calculateAverageHandshakeRate(deltaTick));
             }
             if (i % (int)(TIME_LIMIT * 0.1) == 0) {
-                System.out.print("Progress: " + (100 * i/TIME_LIMIT) + "% \r");
+                System.out.print("Progress: " + (100 * i/TIME_LIMIT) + "%" + '\r');
             }
 
         }
         System.out.println("Logging...");
-        Handshake.logHandshakes(this.simulation,startTime,TIME_LIMIT,handshakeRateOverTime);
+        //Swap next two lines for verbose log
+        //Handshake.logHandshakes(this.simulation,startTime,TIME_LIMIT,handshakeRateOverTime);
+        Handshake.logLightweightHandshakes(this.simulation,startTime,TIME_LIMIT,handshakeRateOverTime);
         System.out.println("Logging complete.");
         end();
     }
