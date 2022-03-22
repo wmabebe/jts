@@ -53,7 +53,10 @@ public class App implements Runnable {
     private String               netName;
     private Simulation           simulation;
     
-    private int TIME_LIMIT = 100;
+    private int TIME_LIMIT = 2000;
+    private float SAMPLE_RATIO = (float) 0.02;
+    private int THRESHOLD = 10;
+    private float Z = (float) 1.5;
 
     public void addCommand(final Command command) {
         commands.add(command);
@@ -124,15 +127,20 @@ public class App implements Runnable {
         List<Double> handshakeRateOverTime = new ArrayList<Double>();
         final long startTime = System.currentTimeMillis();
         System.out.println("Simulation started...");
+        System.out.println("TIME_LIMIT: " + TIME_LIMIT);
+        System.out.println("SAMPLE_RATIO: " + SAMPLE_RATIO);
         while (isRunning() && !Thread.interrupted() && i++ <= TIME_LIMIT) {
             executeCommands();
             simulation.tick();
             if (i % deltaTick == 0) {
                 handshakeRateOverTime.add(simulation.getSimNet().calculateAverageHandshakeRate(deltaTick));
             }
-            if (i % (int)(TIME_LIMIT * 0.1) == 0) {
+            //Simulate time epochs
+            if (i % (int)(TIME_LIMIT * SAMPLE_RATIO) == 0) {
                 System.out.print("Progress: " + (100 * i/TIME_LIMIT) + "%" + '\r');
-                Handshake.logLightweightHandshakes(this.simulation,startTime,TIME_LIMIT,handshakeRateOverTime);
+                //Handshake.logLightweightHandshakes(this.simulation,startTime,TIME_LIMIT,handshakeRateOverTime);
+                Handshake.fixedThresholding(this.simulation, (int)(i / (TIME_LIMIT * SAMPLE_RATIO)), THRESHOLD, startTime, TIME_LIMIT, handshakeRateOverTime);
+                //Handshake.adaptiveThresholding(this.simulation, (int)(i / (TIME_LIMIT * SAMPLE_RATIO)), Z, startTime, TIME_LIMIT, handshakeRateOverTime);
                 System.out.println("Logged @ " +(int) 100 * i / TIME_LIMIT + "%" + '\r');
             }
 

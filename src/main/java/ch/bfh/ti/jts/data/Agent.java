@@ -114,6 +114,10 @@ public abstract class Agent extends Element implements Thinkable, Simulatable, R
         return this.neighborsSet;
     }
     
+    public void emptyNeighborsSet() {
+        this.neighborsSet = new HashSet<Integer>();
+    }
+    
     /**
      * This agent collided for some reason with something
      */

@@ -62,4 +62,71 @@ public class Handshake {
             e.printStackTrace();
           }
     }
+    
+    public static void fixedThresholding(Simulation simulation, int timestep, int threshold, long startTime, int simIterations,List<Double> rates) {
+        try {
+            FileWriter myWriter = new FileWriter("fixed_thresholding_epochs"+simIterations+"_threshold"+threshold+"_log.txt",true);
+            /* Start */
+            final long endTime = System.currentTimeMillis();
+            int totalAgents = simulation.getSimNet().getAgents().size();
+            int maxedQueue = 0;
+            int totalQueueSize = 0;
+            int uploadSize = 0;
+            for (Agent a: simulation.getSimNet().getAgents()) {
+                totalQueueSize += a.getNeighborsSet().size();
+                if (a.getNeighborsSet().size() >= threshold) {
+                    maxedQueue ++;
+                    uploadSize += a.getNeighborsSet().size();
+                    a.emptyNeighborsSet();
+                }
+            }
+            //myWriter.write("Epoch \t Uploader \t Total_agents \t compute_time\n");
+            String line = String.format("%d\t %d\t %d\t %d\t %d\t %d\n", timestep,maxedQueue,uploadSize,totalQueueSize,totalAgents,(endTime - startTime));
+            myWriter.write(line);
+            
+            /* end */
+           
+            myWriter.close();
+        }catch(IOException ex) {
+            System.out.println("Unable to open file " + "fixed_thresholding_"+simIterations+"_log.txt");
+        }
+    }
+    
+    public static void adaptiveThresholding(Simulation simulation, int timestep, float z, long startTime, int simIterations,List<Double> rates) {
+        try {
+            FileWriter myWriter = new FileWriter("adaptive_thresholding_epochs"+simIterations+"_z"+z+"_log.txt",true);
+            final long endTime = System.currentTimeMillis();
+            int totalAgents = simulation.getSimNet().getAgents().size();
+            int maxedQueue = 0;
+            int uploadSize = 0;
+            int totalQueueSize = 0;
+            int mean = 0;
+            float std = 0;
+            for (Agent a: simulation.getSimNet().getAgents()) {
+                mean += a.getNeighborsSet().size();
+            }
+            mean /=  simulation.getSimNet().getAgents().size();
+            for (Agent a: simulation.getSimNet().getAgents()) {
+                std += Math.pow(a.getNeighborsSet().size() - mean,2);
+            }
+            std /= (simulation.getSimNet().getAgents().size() - 1);
+            std = (float) Math.sqrt(std);
+            int threshold = mean + (int)(z * std);
+            for (Agent a: simulation.getSimNet().getAgents()) {
+                totalQueueSize += a.getNeighborsSet().size();
+                if (a.getNeighborsSet().size() >= threshold && a.getNeighborsSet().size() > 10) {
+                    maxedQueue ++;
+                    uploadSize += a.getNeighborsSet().size();
+                    a.emptyNeighborsSet();
+                }
+            }
+            //myWriter.write("Epoch \t Uploader \t Total_agents \t compute_time\n");
+            String line = String.format("%d\t %d\t %d\t %d\t %.2f\t %d\t %d\t %d\n", timestep,maxedQueue,uploadSize,mean,std,totalQueueSize,totalAgents,(endTime - startTime));
+            myWriter.write(line);
+            
+            myWriter.close();
+        }catch(IOException ex) {
+                System.out.println("Unable to open file " + "adaptive_thresholding_"+simIterations+"_log.txt");
+        }
+    }
 }
