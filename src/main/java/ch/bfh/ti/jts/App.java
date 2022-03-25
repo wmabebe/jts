@@ -55,7 +55,7 @@ public class App implements Runnable {
     
     private int TIME_LIMIT = 2000;
     private float SAMPLE_RATIO = (float) 0.02;
-    private int THRESHOLD = 10;
+    private int THRESHOLD = 100;
     private float Z = (float) 1.5;
 
     public void addCommand(final Command command) {
